@@ -137,72 +137,163 @@ html.light ::-webkit-scrollbar-thumb:hover {
 }
 
 /* Container & Surface Overrides in Light Mode */
-html.light .bg-\[\#051424\] {
-  background-color: #f4f6fa !important;
+html.light .bg-\[\#051424\],
+html.light .bg-\[\#060e1a\] {
+  background-color: #f1f5f9 !important;
 }
 html.light .bg-\[\#051424\]\/85,
 html.light .bg-\[\#051424\]\/90 {
-  background-color: rgba(255, 255, 255, 0.88) !important;
+  background-color: rgba(255, 255, 255, 0.92) !important;
 }
-html.light .bg-\[\#081728\]\/95 {
+html.light .bg-\[\#081728\]\/95,
+html.light .bg-\[\#08101e\]\/95,
+html.light header {
   background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
+}
+html.light aside,
+html.light aside > div,
+html.light .bg-\[\#08101e\] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+html.light .bg-\[\#060c17\]\/60 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
 }
 html.light .bg-\[\#091827\] {
   background-color: #f1f5f9 !important;
 }
 html.light .bg-\[\#0d1c2d\] {
-  background-color: #f8fafc !important;
-}
-html.light .bg-\[\#122131\] {
   background-color: #ffffff !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04) !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
+}
+html.light .bg-\[\#0e1a2d\] {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+html.light .bg-\[\#111e33\] {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+html.light .bg-\[\#122131\],
+html.light .bg-\[\#0a1424\],
+html.light .bg-\[\#0b1522\],
+html.light .bg-\[\#16273b\] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.03) !important;
 }
 html.light .bg-\[\#010f1f\],
 html.light .bg-\[\#010f1f\]\/80 {
   background-color: #f1f5f9 !important;
 }
 html.light .bg-\[\#1c2b3c\] {
-  background-color: #e2e8f0 !important;
+  background-color: #f1f5f9 !important;
 }
 html.light .bg-\[\#1c2b3c\]\/60,
 html.light .bg-\[\#1c2b3c\]\/40 {
-  background-color: rgba(226, 232, 240, 0.7) !important;
+  background-color: rgba(241, 245, 249, 0.8) !important;
 }
 html.light .bg-\[\#273647\] {
-  background-color: #cbd5e1 !important;
+  background-color: #e2e8f0 !important;
 }
-html.light .hover\:bg-\[\#1c2b3c\]:hover {
+html.light .bg-\[\#0f1d33\] {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+html.light .bg-\[\#1c2e4a\] {
+  background-color: #e0f2fe !important;
+  border-color: #bae6fd !important;
+  color: #0369a1 !important;
+}
+html.light .bg-\[\#1a2a42\] {
+  background-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+}
+html.light .bg-cyan-500\/10 {
+  background-color: #e0f2fe !important;
+}
+
+/* Hover States in Light Mode */
+html.light .hover\:bg-\[\#1c2b3c\]:hover,
+html.light .hover\:bg-\[\#14233c\]:hover {
   background-color: #e2e8f0 !important;
 }
 html.light .hover\:bg-\[\#273647\]:hover {
   background-color: #cbd5e1 !important;
 }
-html.light .hover\:bg-\[\#152335\]:hover {
+html.light .hover\:bg-\[\#152335\]:hover,
+html.light .hover\:bg-\[\#111e33\]:hover,
+html.light .hover\:bg-\[\#132238\]:hover {
   background-color: #f1f5f9 !important;
+}
+html.light .hover\:text-white:hover,
+html.light .hover\:text-\[\#f8fafc\]:hover,
+html.light .hover\:text-\[\#f1f5f9\]:hover {
+  color: #0f172a !important;
 }
 
 /* Borders in Light Mode */
 html.light .border-\[\#1c2b3c\],
 html.light .border-\[\#1c2b3c\]\/60,
-html.light .border-\[\#1c2b3c\]\/80 {
+html.light .border-\[\#1c2b3c\]\/80,
+html.light .border-\[\#14233c\],
+html.light .border-\[\#1b2f4f\],
+html.light .border-\[\#182637\],
+html.light .border-\[\#192b45\],
+html.light .border-\[\#1a293b\],
+html.light .border-\[\#233b5c\] {
   border-color: #e2e8f0 !important;
 }
-html.light .border-\[\#273647\] {
+html.light .border-\[\#1a2e4c\],
+html.light .border-\[\#1c304d\],
+html.light .border-\[\#1e3453\],
+html.light .border-\[\#233857\],
+html.light .border-\[\#273647\],
+html.light .border-\[\#273d61\] {
   border-color: #cbd5e1 !important;
 }
 
 /* Typography in Light Mode */
-html.light .text-\[\#d4e4fa\] {
+html.light .text-\[\#d4e4fa\],
+html.light .text-\[\#e2e8f0\],
+html.light .text-\[\#f8fafc\],
+html.light .text-\[\#f1f5f9\] {
   color: #0f172a !important;
 }
 html.light .text-\[\#c2c6d6\] {
   color: #334155 !important;
+}
+html.light .text-\[\#94a3b8\] {
+  color: #475569 !important;
 }
 html.light .text-\[\#8c909f\] {
   color: #64748b !important;
 }
 html.light .text-\[\#adc6ff\] {
   color: #1d4ed8 !important;
+}
+html.light .text-\[\#7dd3fc\] {
+  color: #0284c7 !important;
+}
+html.light .text-cyan-400 {
+  color: #0284c7 !important;
+}
+html.light .text-cyan-300 {
+  color: #0369a1 !important;
+}
+html.light .text-emerald-400 {
+  color: #15803d !important;
+}
+html.light .text-rose-400 {
+  color: #b91c1c !important;
+}
+html.light .text-amber-400 {
+  color: #b45309 !important;
 }
 
 /* Accent Badges in Light Mode */
@@ -237,18 +328,18 @@ html.light input::placeholder {
 }
 
 /* Modals & Dialogs in Light Mode */
-html.light .bg-\[\#0a1826\] {
-  background-color: #ffffff !important;
-}
+html.light .bg-\[\#0a1826\],
 html.light .bg-\[\#081728\] {
-  background-color: #f8fafc !important;
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
 }
 
 /* Table rows & alternating strips in Light Mode */
 html.light tr:hover {
   background-color: #f1f5f9 !important;
 }
-html.light .divide-\[\#1c2b3c\] > :not([hidden]) ~ :not([hidden]) {
+html.light .divide-\[\#1c2b3c\] > :not([hidden]) ~ :not([hidden]),
+html.light .divide-\[\#14233c\] > :not([hidden]) ~ :not([hidden]) {
   border-color: #e2e8f0 !important;
 }
 
@@ -270,3 +361,180 @@ html.light .recharts-cartesian-grid line {
 html.light svg text {
   fill: #475569 !important;
 }
+
+/* =========================================================
+   ALPHA INTELLIGENCE CARD (DARK & LIGHT THEME)
+   ========================================================= */
+.alpha-intelligence-card {
+  background: linear-gradient(to bottom, #0f1d33, #0a1424);
+  border-color: #1b2f4f;
+}
+
+html.light .alpha-intelligence-card {
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%) !important;
+  border-color: #bae6fd !important;
+  box-shadow: 0 4px 14px -2px rgba(2, 132, 199, 0.1) !important;
+}
+
+html.light .alpha-intelligence-card p {
+  color: #0f172a !important;
+}
+
+html.light .alpha-intelligence-card .text-cyan-300 {
+  color: #0284c7 !important;
+}
+
+html.light .alpha-intelligence-card .text-cyan-400 {
+  color: #0369a1 !important;
+}
+
+html.light .alpha-intelligence-card .text-\[\#64748b\] {
+  color: #64748b !important;
+}
+
+html.light .alpha-intelligence-card .border-t {
+  border-color: #e2e8f0 !important;
+}
+
+html.light .alpha-intelligence-card svg path {
+  stroke: #0284c7 !important;
+}
+
+html.light .alpha-intelligence-card svg circle {
+  fill: #0284c7 !important;
+}
+
+/* =========================================================
+   SECTOR PERFORMANCE TILES (DARK & LIGHT THEME)
+   ========================================================= */
+/* Light Mode Sector Performance Overrides */
+html.light .sector-tile {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light .sector-tile-strong-bull {
+  background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%) !important;
+  border-color: #86efac !important;
+  color: #15803d !important;
+}
+html.light .sector-tile-strong-bull .text-\[\#4edea3\] {
+  color: #15803d !important;
+}
+html.light .sector-tile-strong-bull .sector-badge {
+  background-color: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #86efac !important;
+}
+
+html.light .sector-tile-bull {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+  color: #16a34a !important;
+}
+html.light .sector-tile-bull .text-\[\#4edea3\] {
+  color: #16a34a !important;
+}
+html.light .sector-tile-bull .sector-badge {
+  background-color: #dcfce7 !important;
+  color: #16a34a !important;
+  border-color: #bbf7d0 !important;
+}
+
+html.light .sector-tile-neutral {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+html.light .sector-tile-neutral .text-\[\#c2c6d6\] {
+  color: #475569 !important;
+}
+html.light .sector-tile-neutral .sector-badge {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light .sector-tile-bear {
+  background: #fef2f2 !important;
+  border-color: #fecaca !important;
+  color: #dc2626 !important;
+}
+html.light .sector-tile-bear .text-\[\#ffb4ab\] {
+  color: #dc2626 !important;
+}
+html.light .sector-tile-bear .sector-badge {
+  background-color: #fee2e2 !important;
+  color: #dc2626 !important;
+  border-color: #fca5a5 !important;
+}
+
+html.light .sector-tile-strong-bear {
+  background: linear-gradient(135deg, #fff1f2 0%, #fef2f2 100%) !important;
+  border-color: #fca5a5 !important;
+  color: #b91c1c !important;
+}
+html.light .sector-tile-strong-bear .text-\[\#ff897d\] {
+  color: #b91c1c !important;
+}
+html.light .sector-tile-strong-bear .sector-badge {
+  background-color: #fee2e2 !important;
+  color: #b91c1c !important;
+  border-color: #f87171 !important;
+}
+
+html.light .sector-tile .text-\[\#d4e4fa\] {
+  color: #0f172a !important;
+}
+
+html.light .sector-tile .text-\[\#8c909f\] {
+  color: #64748b !important;
+}
+
+html.light .sector-tile .border-t {
+  border-color: #e2e8f0 !important;
+}
+
+html.light .sector-tile .bg-\[\#1c2b3c\] {
+  background-color: #e2e8f0 !important;
+}
+
+/* =========================================================
+   REMAINING COMPONENTS LIGHT & DARK MODE POLISH
+   ========================================================= */
+/* Market Sentiment Gauge Needle & Center Pin */
+html.light .gauge-center-pin {
+  fill: #0f172a !important;
+}
+html.light .gauge-needle {
+  stroke: #0f172a !important;
+}
+
+/* Heatmap & Matrix Cells */
+html.light .heatmap-cell,
+html.light .correlation-cell {
+  border-color: #ffffff !important;
+}
+
+/* WhatIf Scenario Sliders */
+html.light input[type="range"] {
+  background-color: #cbd5e1 !important;
+}
+html.light input[type="range"]::-webkit-slider-thumb {
+  background-color: #0284c7 !important;
+}
+
+/* Badges & Pills in Light Mode */
+html.light .badge-subtle {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Notification Popovers & Dropdowns */
+html.light .popover-content,
+html.light .dropdown-content {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+}
+

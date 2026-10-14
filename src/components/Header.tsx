@@ -11,7 +11,8 @@ import {
   TrendingUp,
   Sparkles,
   LogOut,
-  ExternalLink
+  ExternalLink,
+  Download
 } from 'lucide-react';
 import { ScreenTab } from '../types';
 
@@ -19,6 +20,7 @@ interface HeaderProps {
   onOpenSearch: () => void;
   onOpenAuth: () => void;
   onNotificationClick: () => void;
+  onExportCSV?: () => void;
   theme: 'dark' | 'light';
   toggleTheme: () => void;
   onToggleMobileMenu?: () => void;
@@ -30,6 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSearch,
   onOpenAuth,
   onNotificationClick,
+  onExportCSV,
   theme,
   toggleTheme,
   onToggleMobileMenu,
@@ -96,21 +99,35 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Center / Right: Global Search, Notifications, Theme Toggle, User Profile */}
-      <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+      {/* Center / Right: Global Search, Export CSV, Notifications, Theme Toggle, User Profile */}
+      <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
         {/* Global Stock / Company Search Button */}
         <button
           type="button"
           onClick={onOpenSearch}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] hover:border-cyan-500/40 text-[#94a3b8] hover:text-[#f8fafc] text-[13px] transition-all shadow-sm group"
+          className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] hover:border-cyan-500/40 text-[#94a3b8] hover:text-[#f8fafc] text-[13px] transition-all shadow-sm group"
         >
           <Search className="w-4 h-4 text-[#64748b] group-hover:text-cyan-400 transition-colors" />
-          <span className="hidden md:inline font-normal">Search symbols or companies...</span>
+          <span className="hidden md:inline font-normal">Search symbols...</span>
           <span className="md:hidden">Search</span>
           <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-[#1a2a42] text-[#7dd3fc] rounded border border-[#233857]">
             ⌘K
           </kbd>
         </button>
+
+        {/* Export Current View Financial Data to CSV */}
+        {onExportCSV && (
+          <button
+            type="button"
+            onClick={onExportCSV}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] hover:border-cyan-500/50 text-[#94a3b8] hover:text-white text-[13px] font-medium transition-all shadow-sm group"
+            title={`Export current view (${tabTitles[currentTab] || 'financial dataset'}) to CSV for offline quantitative analysis`}
+            aria-label="Export financial data to CSV"
+          >
+            <Download className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
+            <span className="hidden sm:inline">Export CSV</span>
+          </button>
+        )}
 
         {/* Notifications Button */}
         <button
@@ -128,12 +145,13 @@ export const Header: React.FC<HeaderProps> = ({
           type="button"
           onClick={toggleTheme}
           className="w-9 h-9 rounded-lg bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] text-[#94a3b8] hover:text-amber-400 flex items-center justify-center transition-colors shadow-sm"
-          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
           {theme === 'dark' ? (
-            <Sun className="w-4 h-4 text-amber-400" />
+            <Sun className="w-4 h-4 text-amber-400 transition-transform hover:rotate-45" />
           ) : (
-            <Moon className="w-4 h-4 text-cyan-400" />
+            <Moon className="w-4 h-4 text-cyan-400 transition-transform hover:-rotate-12" />
           )}
         </button>
 

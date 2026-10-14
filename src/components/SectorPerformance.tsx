@@ -34,46 +34,51 @@ export const SectorPerformance: React.FC<SectorPerformanceProps> = ({
   const getTileStyles = (val: number) => {
     if (val >= 2.0) {
       return {
+        tileClass: 'sector-tile sector-tile-strong-bull',
         bg: 'bg-gradient-to-br from-[#003823]/80 via-[#0d1c2d] to-[#010f1f]',
         border: 'border-[#00a572]/60 hover:border-[#4edea3]',
         text: 'text-[#4edea3]',
-        badgeBg: 'bg-[#00a572]/20 text-[#4edea3] border-[#00a572]/30',
+        badgeBg: 'sector-badge bg-[#00a572]/20 text-[#4edea3] border-[#00a572]/30',
         glow: 'shadow-[0_0_12px_rgba(78,222,163,0.12)]'
       };
     }
     if (val > 0) {
       return {
+        tileClass: 'sector-tile sector-tile-bull',
         bg: 'bg-gradient-to-br from-[#0c2e22]/60 via-[#0d1c2d] to-[#010f1f]',
         border: 'border-[#00a572]/35 hover:border-[#00a572]',
         text: 'text-[#4edea3]',
-        badgeBg: 'bg-[#00a572]/15 text-[#4edea3] border-[#00a572]/25',
+        badgeBg: 'sector-badge bg-[#00a572]/15 text-[#4edea3] border-[#00a572]/25',
         glow: ''
       };
     }
     if (val === 0) {
       return {
+        tileClass: 'sector-tile sector-tile-neutral',
         bg: 'bg-[#0d1c2d]',
         border: 'border-[#1c2b3c] hover:border-[#273647]',
         text: 'text-[#c2c6d6]',
-        badgeBg: 'bg-[#1c2b3c] text-[#c2c6d6] border-[#273647]',
+        badgeBg: 'sector-badge bg-[#1c2b3c] text-[#c2c6d6] border-[#273647]',
         glow: ''
       };
     }
     if (val > -1.0) {
       return {
+        tileClass: 'sector-tile sector-tile-bear',
         bg: 'bg-gradient-to-br from-[#2e1418]/60 via-[#0d1c2d] to-[#010f1f]',
         border: 'border-[#93000a]/40 hover:border-[#ffb4ab]/60',
         text: 'text-[#ffb4ab]',
-        badgeBg: 'bg-[#93000a]/20 text-[#ffb4ab] border-[#93000a]/30',
+        badgeBg: 'sector-badge bg-[#93000a]/20 text-[#ffb4ab] border-[#93000a]/30',
         glow: ''
       };
     }
     // Strongly negative
     return {
+      tileClass: 'sector-tile sector-tile-strong-bear',
       bg: 'bg-gradient-to-br from-[#440d12]/80 via-[#0d1c2d] to-[#010f1f]',
       border: 'border-[#ff5449]/50 hover:border-[#ff897d]',
       text: 'text-[#ff897d]',
-      badgeBg: 'bg-[#93000a]/35 text-[#ff897d] border-[#ff5449]/40',
+      badgeBg: 'sector-badge bg-[#93000a]/35 text-[#ff897d] border-[#ff5449]/40',
       glow: 'shadow-[0_0_12px_rgba(255,84,73,0.12)]'
     };
   };
@@ -237,7 +242,7 @@ export const SectorPerformance: React.FC<SectorPerformanceProps> = ({
               <div
                 key={sector.id}
                 onClick={() => setSelectedSector(sector)}
-                className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2 select-none group active:scale-[0.98] ${styles.bg} ${styles.border} ${styles.glow}`}
+                className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2 select-none group active:scale-[0.98] ${styles.tileClass} ${styles.bg} ${styles.border} ${styles.glow}`}
               >
                 {/* Sector Name & Return */}
                 <div className="flex items-start justify-between gap-1">
@@ -314,7 +319,7 @@ export const SectorPerformance: React.FC<SectorPerformanceProps> = ({
               <div
                 key={sector.id}
                 onClick={() => setSelectedSector(sector)}
-                className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all hover:border-[#273647] ${styles.bg} ${styles.border}`}
+                className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all hover:border-[#273647] ${styles.tileClass} ${styles.bg} ${styles.border}`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className="w-5 font-mono text-[11px] font-bold text-[#8c909f] text-center">

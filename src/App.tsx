@@ -25,6 +25,7 @@ import { ScreenerScreen } from './screens/ScreenerScreen';
 import { NewsSentimentScreen } from './screens/NewsSentimentScreen';
 import { TechnicalAnalysisScreen } from './screens/TechnicalAnalysisScreen';
 import { BacktestScreen } from './screens/BacktestScreen';
+import { exportCurrentViewFinancialData } from './utils/csvExport';
 
 export default function App() {
   // Make AI Insights ('ai-predict') the primary default page
@@ -255,6 +256,17 @@ export default function App() {
     showToast(`Switched active context to ${stock.ticker}`);
   };
 
+  // Export current view's financial data to CSV
+  const handleExportCSV = () => {
+    try {
+      const result = exportCurrentViewFinancialData(currentTab, currentStock, watchlist);
+      showToast(`📥 Exported ${result.viewTitle} (${result.rowCount} rows) to ${result.filename}`);
+    } catch (err) {
+      console.error('CSV export failed:', err);
+      showToast('❌ Failed to export financial data to CSV.');
+    }
+  };
+
   // Screen Router
   const renderActiveScreen = () => {
     switch (currentTab) {
@@ -385,6 +397,9 @@ export default function App() {
         setIsCollapsed={setIsSidebarCollapsed}
         isMobileOpen={isMobileNavOpen}
         setIsMobileOpen={setIsMobileNavOpen}
+        theme={theme}
+        toggleTheme={toggleTheme}
+        onExportCSV={handleExportCSV}
       />
 
       {/* 2. Main Scrollable Content Container (Offset by sidebar width on desktop) */}
@@ -398,6 +413,7 @@ export default function App() {
           onOpenSearch={() => setIsSearchOpen(true)}
           onOpenAuth={() => setAuthScreen('login')}
           onNotificationClick={() => setIsPriceAlertOpen(true)}
+          onExportCSV={handleExportCSV}
           theme={theme}
           toggleTheme={toggleTheme}
           onToggleMobileMenu={() => setIsMobileNavOpen(true)}
