@@ -19,7 +19,8 @@ import {
   Zap,
   Sun,
   Moon,
-  Download
+  Download,
+  Keyboard
 } from 'lucide-react';
 import { ScreenTab } from '../types';
 
@@ -33,6 +34,7 @@ interface SidebarProps {
   theme?: 'dark' | 'light';
   toggleTheme?: () => void;
   onExportCSV?: () => void;
+  onOpenShortcuts?: () => void;
 }
 
 interface NavItem {
@@ -53,7 +55,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setIsMobileOpen,
   theme = 'dark',
   toggleTheme,
-  onExportCSV
+  onExportCSV,
+  onOpenShortcuts
 }) => {
   const navItems: NavItem[] = [
     // Core Navigation
@@ -262,6 +265,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <span className="truncate">Export View (CSV)</span>
               </button>
             )}
+
+            {/* Keyboard Shortcuts Helper Button */}
+            {onOpenShortcuts && (
+              <button
+                type="button"
+                onClick={onOpenShortcuts}
+                className="w-full flex items-center justify-between py-1.5 px-2.5 rounded-xl bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] hover:border-cyan-500/40 text-[12px] font-medium text-[#94a3b8] hover:text-white transition-all shadow-sm group cursor-pointer"
+                title="Open Keyboard Shortcuts (Press ?)"
+                aria-label="Open keyboard shortcuts helper"
+              >
+                <div className="flex items-center gap-2">
+                  <Keyboard className="w-3.5 h-3.5 text-cyan-400 group-hover:scale-110 transition-transform" />
+                  <span className="truncate">Shortcuts</span>
+                </div>
+                <kbd className="px-1.5 py-0.5 rounded bg-[#132238] border border-[#233857] text-[#7dd3fc] font-mono text-[10px] font-bold">
+                  ?
+                </kbd>
+              </button>
+            )}
           </div>
 
           <div className="alpha-intelligence-card rounded-xl p-3 bg-gradient-to-b from-[#0f1d33] to-[#0a1424] border border-[#1b2f4f] shadow-lg relative overflow-hidden group">
@@ -359,6 +381,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
               <div className="hidden md:group-hover/exptip:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 items-center px-2.5 py-1.5 rounded-md bg-[#0a1424] text-white text-[11px] font-medium shadow-xl border border-[#1e3453] pointer-events-none whitespace-nowrap">
                 <span>Export View to CSV</span>
+                <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0a1424] border-l border-b border-[#1e3453] rotate-45" />
+              </div>
+            </div>
+          )}
+
+          {/* Collapsed Shortcuts Button */}
+          {onOpenShortcuts && (
+            <div className="relative group/shortcuttip">
+              <button
+                type="button"
+                onClick={onOpenShortcuts}
+                className="w-10 h-10 rounded-xl bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] flex items-center justify-center text-[#94a3b8] hover:text-cyan-400 transition-colors cursor-pointer"
+                title="Keyboard Shortcuts (Press ?)"
+                aria-label="Open keyboard shortcuts helper"
+              >
+                <Keyboard className="w-4 h-4" />
+              </button>
+              <div className="hidden md:group-hover/shortcuttip:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 items-center px-2.5 py-1.5 rounded-md bg-[#0a1424] text-white text-[11px] font-medium shadow-xl border border-[#1e3453] pointer-events-none whitespace-nowrap">
+                <span>Keyboard Shortcuts (?)</span>
                 <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0a1424] border-l border-b border-[#1e3453] rotate-45" />
               </div>
             </div>

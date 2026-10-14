@@ -7,6 +7,7 @@ import { MarketSentimentGauge } from '../components/MarketSentimentGauge';
 import { MarketHeatmap } from '../components/MarketHeatmap';
 import { EarningsCalendar } from '../components/EarningsCalendar';
 import { VolatilityMonitor } from '../components/VolatilityMonitor';
+import { MarketHighlights } from '../components/MarketHighlights';
 
 interface DashboardScreenProps {
   currentStock: StockData;
@@ -562,6 +563,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
               </div>
             </section>
           </div>
+
+          {/* Real-time Market Highlights & Live Simulated News Wire */}
+          <MarketHighlights onSelectStock={onSelectStock} onNavigate={onNavigate} />
 
           {/* Live Model Watchlist Preview */}
           <section className="bg-[#122131] rounded-2xl p-4 border border-[#1c2b3c] flex flex-col gap-3 shadow-sm">

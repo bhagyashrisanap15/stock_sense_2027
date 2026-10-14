@@ -26,6 +26,7 @@ import { NewsSentimentScreen } from './screens/NewsSentimentScreen';
 import { TechnicalAnalysisScreen } from './screens/TechnicalAnalysisScreen';
 import { BacktestScreen } from './screens/BacktestScreen';
 import { exportCurrentViewFinancialData } from './utils/csvExport';
+import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 
 export default function App() {
   // Make AI Insights ('ai-predict') the primary default page
@@ -60,6 +61,7 @@ export default function App() {
 
   // Modals
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [authScreen, setAuthScreen] = useState<AuthScreen>('none');
   const [isBacktestOpen, setIsBacktestOpen] = useState(false);
   const [isJsonDossierOpen, setIsJsonDossierOpen] = useState(false);
@@ -96,17 +98,154 @@ export default function App() {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  // Keyboard shortcut Ctrl+K / Cmd+K for search
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3600);
+  };
+
+  // Export current view's financial data to CSV
+  const handleExportCSV = () => {
+    try {
+      const result = exportCurrentViewFinancialData(currentTab, currentStock, watchlist);
+      showToast(`📥 Exported ${result.viewTitle} (${result.rowCount} rows) to ${result.filename}`);
+    } catch (err) {
+      console.error('CSV export failed:', err);
+      showToast('❌ Failed to export financial data to CSV.');
+    }
+  };
+
+  // Global Keyboard Shortcuts Listener: '?' helper, Cmd+K, Cmd+E, Cmd+D, Cmd+B, Cmd+P, Cmd+J, Esc, and quick 1-9 navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      const target = e.target as HTMLElement | null;
+      const isInput =
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          (target as any).isContentEditable);
+
+      // 1. Mod-key shortcuts (Cmd on Mac, Ctrl on Windows/Linux)
+      if (e.metaKey || e.ctrlKey) {
+        if (e.key === 'k' || e.key === 'K') {
+          e.preventDefault();
+          setIsSearchOpen((prev) => !prev);
+          return;
+        }
+        if (e.key === 'e' || e.key === 'E') {
+          e.preventDefault();
+          handleExportCSV();
+          return;
+        }
+        if (e.key === 'd' || e.key === 'D') {
+          e.preventDefault();
+          toggleTheme();
+          return;
+        }
+        if (e.key === 'b' || e.key === 'B') {
+          e.preventDefault();
+          setIsSidebarCollapsed((prev) => !prev);
+          return;
+        }
+        if (e.key === 'p' || e.key === 'P') {
+          e.preventDefault();
+          setIsPriceAlertOpen((prev) => !prev);
+          return;
+        }
+        if (e.key === 'j' || e.key === 'J') {
+          e.preventDefault();
+          setIsJsonDossierOpen((prev) => !prev);
+          return;
+        }
+      }
+
+      // If user is currently typing in an input / textarea / select, skip single-key triggers
+      if (isInput) return;
+
+      // 2. Global Help Modal Trigger: '?' or 'Shift + /'
+      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
         e.preventDefault();
-        setIsSearchOpen((prev) => !prev);
+        setIsShortcutsOpen((prev) => !prev);
+        return;
+      }
+
+      // 3. Escape key closes any active modal or drawer
+      if (e.key === 'Escape') {
+        setIsShortcutsOpen(false);
+        setIsSearchOpen(false);
+        setIsPriceAlertOpen(false);
+        setIsJsonDossierOpen(false);
+        setIsBacktestOpen(false);
+        setAuthScreen('none');
+        return;
+      }
+
+      // 4. Quick Navigation & Action commands
+      switch (e.key) {
+        case '1':
+          setCurrentTab('ai-predict');
+          showToast('Navigated to AI Insights (1)');
+          break;
+        case '2':
+          setCurrentTab('dashboard');
+          showToast('Navigated to Dashboard (2)');
+          break;
+        case '3':
+          setCurrentTab('markets');
+          showToast('Navigated to Markets (3)');
+          break;
+        case '4':
+          setCurrentTab('watchlist');
+          showToast('Navigated to Watchlist (4)');
+          break;
+        case '5':
+          setCurrentTab('portfolio');
+          showToast('Navigated to Portfolio (5)');
+          break;
+        case '6':
+          setCurrentTab('risk-radar');
+          showToast('Navigated to Risk Radar (6)');
+          break;
+        case '7':
+          setCurrentTab('screener');
+          showToast('Navigated to Stock Screener (7)');
+          break;
+        case '8':
+          setCurrentTab('technical-analysis');
+          showToast('Navigated to Technical Analysis (8)');
+          break;
+        case '9':
+          setCurrentTab('backtesting');
+          showToast('Navigated to Backtesting (9)');
+          break;
+        case '0':
+          setCurrentTab('heatmap');
+          showToast('Navigated to Sector Heatmap (0)');
+          break;
+        case 'n':
+        case 'N':
+          setCurrentTab('news-sentiment');
+          showToast('Navigated to News & Sentiment (N)');
+          break;
+        case 'o':
+        case 'O':
+          setCurrentTab('overview');
+          showToast('Navigated to Overview (O)');
+          break;
+        case 't':
+        case 'T':
+          toggleTheme();
+          break;
+        default:
+          break;
       }
     };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [theme, currentTab, currentStock, watchlist]);
 
   // Price Alerts with LocalStorage persistence
   const [priceAlerts, setPriceAlerts] = useState<any[]>(() => {
@@ -149,13 +288,6 @@ export default function App() {
       }
     ];
   });
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3600);
-  };
 
   const handleAddPriceAlert = (newAlert: any) => {
     const alertItem = {
@@ -254,17 +386,6 @@ export default function App() {
   const handleSelectStock = (stock: StockData) => {
     setCurrentStock(stock);
     showToast(`Switched active context to ${stock.ticker}`);
-  };
-
-  // Export current view's financial data to CSV
-  const handleExportCSV = () => {
-    try {
-      const result = exportCurrentViewFinancialData(currentTab, currentStock, watchlist);
-      showToast(`📥 Exported ${result.viewTitle} (${result.rowCount} rows) to ${result.filename}`);
-    } catch (err) {
-      console.error('CSV export failed:', err);
-      showToast('❌ Failed to export financial data to CSV.');
-    }
   };
 
   // Screen Router
@@ -400,6 +521,7 @@ export default function App() {
         theme={theme}
         toggleTheme={toggleTheme}
         onExportCSV={handleExportCSV}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
       />
 
       {/* 2. Main Scrollable Content Container (Offset by sidebar width on desktop) */}
@@ -414,6 +536,7 @@ export default function App() {
           onOpenAuth={() => setAuthScreen('login')}
           onNotificationClick={() => setIsPriceAlertOpen(true)}
           onExportCSV={handleExportCSV}
+          onOpenShortcuts={() => setIsShortcutsOpen(true)}
           theme={theme}
           toggleTheme={toggleTheme}
           onToggleMobileMenu={() => setIsMobileNavOpen(true)}
@@ -490,6 +613,19 @@ export default function App() {
         onDeleteAlert={handleDeletePriceAlert}
         onToggleAlert={handleTogglePriceAlert}
         onSimulateTick={handleSimulatePriceTick}
+      />
+
+      <KeyboardShortcutsModal
+        isOpen={isShortcutsOpen}
+        onClose={() => setIsShortcutsOpen(false)}
+        onNavigate={setCurrentTab}
+        onOpenSearch={() => setIsSearchOpen(true)}
+        onExportCSV={handleExportCSV}
+        toggleTheme={toggleTheme}
+        theme={theme}
+        toggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
+        onOpenPriceAlert={() => setIsPriceAlertOpen(true)}
+        onOpenJsonDossier={() => setIsJsonDossierOpen(true)}
       />
 
       {/* Global Toast Notification */}

@@ -188,6 +188,265 @@ class StockSenseApiService {
       })
     };
   }
+
+  /**
+   * Simulated Real-time Financial News & Highlights API
+   * Simulates network latency and returns curated, institutional market headlines
+   * across NSE/BSE securities, macro policy, corporate earnings, and AI developments.
+   */
+  public async getMarketHighlights(options?: {
+    category?: string;
+    sentiment?: string;
+    query?: string;
+    limit?: number;
+  }): Promise<MarketHighlightItem[]> {
+    // Simulate real-world async network latency
+    await new Promise((resolve) => setTimeout(resolve, 280));
+
+    const headlines: MarketHighlightItem[] = [
+      {
+        id: 'hl-1',
+        ticker: 'NIFTY 50',
+        companyOrTopic: 'NSE Benchmark Index',
+        title: 'NIFTY 50 Breaches 25,400 as Institutional Inflows Cross ₹4,250 Cr Across Large-Cap IT & Banks',
+        source: 'CNBC-TV18 Live',
+        publishedAt: '4m ago',
+        timestamp: new Date(Date.now() - 4 * 60 * 1000).toISOString(),
+        summary: 'Broad-based accumulation spearheaded by Tier-1 IT exporters and bellwether private sector lenders lifted benchmark indices to record intra-day territory.',
+        sentiment: 'BULLISH',
+        sentimentScore: 0.88,
+        category: 'Breaking',
+        aiImpactRating: 'HIGH',
+        impactRationale: 'Strong cash equity delivery volume with positive FII derivative rollover confirms institutional trend continuation.',
+        readTime: '2 min read'
+      },
+      {
+        id: 'hl-2',
+        ticker: 'RELIANCE',
+        companyOrTopic: 'Reliance Industries Ltd.',
+        title: 'Jamnagar Green Hydrogen & Solar Gigafactory Phase-1 Operational Timeline Advanced to Q3',
+        source: 'Bloomberg Markets',
+        publishedAt: '16m ago',
+        timestamp: new Date(Date.now() - 16 * 60 * 1000).toISOString(),
+        summary: 'New Energy division captive electrolyzer deployment reaches key milestones, establishing sustainable margin upside against cyclical petrochem crack spreads.',
+        sentiment: 'BULLISH',
+        sentimentScore: 0.82,
+        category: 'Energy',
+        aiImpactRating: 'HIGH',
+        impactRationale: 'Accelerated commercial commissioning hedges feedstock volatility and improves consolidated ESG valuation multiples.',
+        readTime: '3 min read'
+      },
+      {
+        id: 'hl-3',
+        ticker: 'TCS',
+        companyOrTopic: 'Tata Consultancy Services',
+        title: 'TCS Seals $1.2B Enterprise Generative AI & Hybrid Cloud Modernization Deal with European Banking Group',
+        source: 'Mint Tech',
+        publishedAt: '28m ago',
+        timestamp: new Date(Date.now() - 28 * 60 * 1000).toISOString(),
+        summary: 'Multi-year engagement spans legacy core banking transformation with proprietary LLM agent frameworks and automated fraud monitoring architectures.',
+        sentiment: 'BULLISH',
+        sentimentScore: 0.85,
+        category: 'Tech & AI',
+        aiImpactRating: 'HIGH',
+        impactRationale: 'Bolsters total contract value (TCV) in the BFSI vertical, easing discretionary software spending concerns.',
+        readTime: '3 min read'
+      },
+      {
+        id: 'hl-4',
+        ticker: 'RBI / MONETARY',
+        companyOrTopic: 'Reserve Bank of India',
+        title: 'RBI MPC Holds Policy Repo Rate at 6.50%; Projects FY27 Real GDP Growth at 7.2% with Benign Inflation',
+        source: 'The Economic Times',
+        publishedAt: '45m ago',
+        timestamp: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+        summary: 'Governor Das emphasizes sustained domestic capex momentum and stable food price trajectories while maintaining an accommodative stance withdrawal.',
+        sentiment: 'BULLISH',
+        sentimentScore: 0.74,
+        category: 'Macro',
+        aiImpactRating: 'HIGH',
+        impactRationale: 'Stable monetary policy anchors sovereign bond yields and ensures liquidity for commercial bank credit expansion.',
+        readTime: '4 min read'
+      },
+      {
+        id: 'hl-5',
+        ticker: 'HDFCBANK',
+        companyOrTopic: 'HDFC Bank Ltd.',
+        title: 'HDFC Bank Net Interest Margin Expands 14 bps Post-Merger; Retail Branch Deposit Growth Accelerates 16.8% YoY',
+        source: 'Reuters Banking',
+        publishedAt: '1h ago',
+        timestamp: new Date(Date.now() - 65 * 60 * 1000).toISOString(),
+        summary: 'Successful suburban branch mobilization campaigns successfully lowered wholesale funding dependence, with gross NPA ratio steady at 1.24%.',
+        sentiment: 'BULLISH',
+        sentimentScore: 0.79,
+        category: 'Banking',
+        aiImpactRating: 'HIGH',
+        impactRationale: 'Faster deposit accretion removes the key lingering overhang from the mortgage entity amalgamation.',
+        readTime: '3 min read'
+      },
+      {
+        id: 'hl-6',
+        ticker: 'INFY',
+        companyOrTopic: 'Infosys Limited',
+        title: 'Infosys Topaz Enterprise AI Suite Deployed Across 30+ Global Fortune 500 Clients as Attrition Drops to 12.9%',
+        source: 'Financial Express',
+        publishedAt: '1h 30m ago',
+        timestamp: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
+        summary: 'Cognitive agent deployment accelerates software delivery cycles while offshore bench utilization climbed to a multi-quarter high of 82.4%.',
+        sentiment: 'BULLISH',
+        sentimentScore: 0.76,
+        category: 'Tech & AI',
+        aiImpactRating: 'MEDIUM',
+        impactRationale: 'Utilization gains and reduced attrition directly protect operating margins despite moderate constant-currency revenue growth.',
+        readTime: '3 min read'
+      },
+      {
+        id: 'hl-7',
+        ticker: 'TATASTEEL',
+        companyOrTopic: 'Tata Steel Ltd.',
+        title: 'Tata Steel Commences Low-Carbon Hydrogen Blast Furnace Pilot Trial at Jamshedpur Facility',
+        source: 'Business Standard',
+        publishedAt: '2h ago',
+        timestamp: new Date(Date.now() - 120 * 60 * 1000).toISOString(),
+        summary: 'The green metallurgy initiative targets a 15% reduction in coking coal consumption, aligning with zero-carbon European supply obligations.',
+        sentiment: 'BULLISH',
+        sentimentScore: 0.71,
+        category: 'Earnings',
+        aiImpactRating: 'MEDIUM',
+        impactRationale: 'Reduces long-term carbon tax exposure under the EU Carbon Border Adjustment Mechanism (CBAM).',
+        readTime: '2 min read'
+      },
+      {
+        id: 'hl-8',
+        ticker: 'INDIA VIX',
+        companyOrTopic: 'National Stock Exchange',
+        title: 'India VIX Drops 4.2% to 12.84 Signaling Placid Volatility Ahead of Monthly Derivative Settlement',
+        source: 'Bloomberg Markets',
+        publishedAt: '2h 45m ago',
+        timestamp: new Date(Date.now() - 165 * 60 * 1000).toISOString(),
+        summary: 'Implied volatility across index option skew compressed toward annual lows, encouraging algorithmic volatility sellers and momentum strategies.',
+        sentiment: 'BULLISH',
+        sentimentScore: 0.68,
+        category: 'Macro',
+        aiImpactRating: 'MEDIUM',
+        impactRationale: 'Low volatility environment promotes equity multiple expansion and reduces hedging risk premiums.',
+        readTime: '2 min read'
+      },
+      {
+        id: 'hl-9',
+        ticker: 'SEBI / REGULATORY',
+        companyOrTopic: 'Securities and Exchange Board of India',
+        title: 'SEBI Streamlines Algorithmic Trading Safeguards & Expands Direct Market Access for Institutional Quants',
+        source: 'Moneycontrol Pro',
+        publishedAt: '3h ago',
+        timestamp: new Date(Date.now() - 180 * 60 * 1000).toISOString(),
+        summary: 'New unified API sandbox protocols and standardized co-location audit rules will cut compliance overhead for domestic quantitative hedge funds.',
+        sentiment: 'NEUTRAL',
+        sentimentScore: 0.15,
+        category: 'Regulatory',
+        aiImpactRating: 'MEDIUM',
+        impactRationale: 'Enhanced market structure liquidity with tighter latency controls benefits high-turnover algorithmic desks.',
+        readTime: '3 min read'
+      },
+      {
+        id: 'hl-10',
+        ticker: 'CRUDE / COMMODITIES',
+        companyOrTopic: 'Global Energy Markets',
+        title: 'Brent Crude Stabilizes at $74/bbl as OPEC+ Maintains Gradual Supply Normalization Trajectory',
+        source: 'Reuters Commodities',
+        publishedAt: '4h ago',
+        timestamp: new Date(Date.now() - 240 * 60 * 1000).toISOString(),
+        summary: 'Subdued global manufacturing indicators capped upside, providing a comfortable macro cushion for India’s current account deficit and OMC retail margins.',
+        sentiment: 'BULLISH',
+        sentimentScore: 0.62,
+        category: 'Energy',
+        aiImpactRating: 'MEDIUM',
+        impactRationale: 'Favorable imported inflation outlook for Indian refiners, paint manufacturers, and airline carriers.',
+        readTime: '3 min read'
+      },
+      {
+        id: 'hl-11',
+        ticker: 'FPI / FLOWS',
+        companyOrTopic: 'Institutional Capital Tracker',
+        title: 'Foreign Portfolio Investors (FPI) Record ₹8,900 Cr Net Equity Inflows in 5 Straight Sessions',
+        source: 'Livemint',
+        publishedAt: '5h ago',
+        timestamp: new Date(Date.now() - 300 * 60 * 1000).toISOString(),
+        summary: 'Global asset allocators expanded emerging market weightings following sovereign rating upgrades and resilient domestic consumption trends.',
+        sentiment: 'BULLISH',
+        sentimentScore: 0.86,
+        category: 'Macro',
+        aiImpactRating: 'HIGH',
+        impactRationale: 'Strong foreign institutional liquidity absorbs primary market paper supply and stabilizes rupee exchange rate.',
+        readTime: '2 min read'
+      },
+      {
+        id: 'hl-12',
+        ticker: 'SEMICONDUCTOR',
+        companyOrTopic: 'India Semiconductor Mission',
+        title: 'Commercial Fab Construction in Gujarat Reaches Superstructure Phase with Equipment Delivery Scheduled',
+        source: 'The Hindu BusinessLine',
+        publishedAt: '6h ago',
+        timestamp: new Date(Date.now() - 360 * 60 * 1000).toISOString(),
+        summary: 'First cleanroom installations planned for Q4, strengthening domestic electronics manufacturing ecosystem and auto-grade chip localization.',
+        sentiment: 'BULLISH',
+        sentimentScore: 0.73,
+        category: 'Industry',
+        aiImpactRating: 'MEDIUM',
+        impactRationale: 'Long-term structural tailwind for domestic industrial automation, electronics, and semiconductor supply chains.',
+        readTime: '3 min read'
+      }
+    ];
+
+    let filtered = [...headlines];
+
+    // Filter by Category
+    if (options?.category && options.category !== 'all') {
+      const cat = options.category.toLowerCase();
+      filtered = filtered.filter((h) => h.category.toLowerCase().includes(cat) || (cat === 'breaking' && h.category === 'Breaking'));
+    }
+
+    // Filter by Sentiment
+    if (options?.sentiment && options.sentiment !== 'all') {
+      filtered = filtered.filter((h) => h.sentiment.toLowerCase() === options.sentiment?.toLowerCase());
+    }
+
+    // Filter by Query (symbol, title, or summary search)
+    if (options?.query && options.query.trim() !== '') {
+      const q = options.query.toLowerCase().trim();
+      filtered = filtered.filter(
+        (h) =>
+          h.title.toLowerCase().includes(q) ||
+          h.summary.toLowerCase().includes(q) ||
+          h.ticker.toLowerCase().includes(q) ||
+          h.companyOrTopic.toLowerCase().includes(q)
+      );
+    }
+
+    if (options?.limit && options.limit > 0) {
+      filtered = filtered.slice(0, options.limit);
+    }
+
+    return filtered;
+  }
+}
+
+export interface MarketHighlightItem {
+  id: string;
+  ticker: string;
+  companyOrTopic: string;
+  title: string;
+  source: string;
+  publishedAt: string;
+  timestamp: string;
+  summary: string;
+  sentiment: 'BULLISH' | 'NEUTRAL' | 'BEARISH';
+  sentimentScore: number;
+  category: 'Breaking' | 'Macro' | 'Earnings' | 'Regulatory' | 'Tech & AI' | 'Banking' | 'Energy' | 'Industry';
+  aiImpactRating: 'HIGH' | 'MEDIUM' | 'LOW';
+  impactRationale: string;
+  readTime: string;
+  url?: string;
 }
 
 export const apiService = new StockSenseApiService();

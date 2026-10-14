@@ -12,7 +12,8 @@ import {
   Sparkles,
   LogOut,
   ExternalLink,
-  Download
+  Download,
+  Keyboard
 } from 'lucide-react';
 import { ScreenTab } from '../types';
 
@@ -21,6 +22,7 @@ interface HeaderProps {
   onOpenAuth: () => void;
   onNotificationClick: () => void;
   onExportCSV?: () => void;
+  onOpenShortcuts?: () => void;
   theme: 'dark' | 'light';
   toggleTheme: () => void;
   onToggleMobileMenu?: () => void;
@@ -33,6 +35,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAuth,
   onNotificationClick,
   onExportCSV,
+  onOpenShortcuts,
   theme,
   toggleTheme,
   onToggleMobileMenu,
@@ -154,6 +157,19 @@ export const Header: React.FC<HeaderProps> = ({
             <Moon className="w-4 h-4 text-cyan-400 transition-transform hover:-rotate-12" />
           )}
         </button>
+
+        {/* Keyboard Shortcuts Trigger Button */}
+        {onOpenShortcuts && (
+          <button
+            type="button"
+            onClick={onOpenShortcuts}
+            className="w-9 h-9 rounded-lg bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] hover:border-cyan-500/40 text-[#94a3b8] hover:text-cyan-400 flex items-center justify-center transition-colors shadow-sm"
+            title="Keyboard shortcuts & command palette (Press ?)"
+            aria-label="Open keyboard shortcuts helper"
+          >
+            <Keyboard className="w-4 h-4" />
+          </button>
+        )}
 
         {/* Separator */}
         <div className="h-6 w-[1px] bg-[#14233c] mx-0.5" />
