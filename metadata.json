@@ -1,8 +1,6 @@
 {
-  "name": "StockSense 2027",
-  "description": "Next-generation market intelligence, stock sentiment analytics, technical charts, and predictive 2027 portfolio forecasting platform.",
-  "prompt": "StockSense 2027 market intelligence, stock sentiment analytics, portfolio tracking and predictive forecasting",
-  "capabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "name": "StockSense - AI Predict & Explain",
+  "description": "Institutional-grade explainable AI stock analytics and quantitative market intelligence platform with real-time SHAP feature attribution, technical indicators, and risk simulation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
