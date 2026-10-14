@@ -518,10 +518,6 @@ export default function App() {
         setIsCollapsed={setIsSidebarCollapsed}
         isMobileOpen={isMobileNavOpen}
         setIsMobileOpen={setIsMobileNavOpen}
-        theme={theme}
-        toggleTheme={toggleTheme}
-        onExportCSV={handleExportCSV}
-        onOpenShortcuts={() => setIsShortcutsOpen(true)}
       />
 
       {/* 2. Main Scrollable Content Container (Offset by sidebar width on desktop) */}

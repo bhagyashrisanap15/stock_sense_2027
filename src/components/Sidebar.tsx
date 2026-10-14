@@ -16,11 +16,7 @@ import {
   ChevronRight,
   X,
   Sparkles,
-  Zap,
-  Sun,
-  Moon,
-  Download,
-  Keyboard
+  Zap
 } from 'lucide-react';
 import { ScreenTab } from '../types';
 
@@ -31,10 +27,6 @@ interface SidebarProps {
   setIsCollapsed: (value: boolean | ((prev: boolean) => boolean)) => void;
   isMobileOpen: boolean;
   setIsMobileOpen: (open: boolean) => void;
-  theme?: 'dark' | 'light';
-  toggleTheme?: () => void;
-  onExportCSV?: () => void;
-  onOpenShortcuts?: () => void;
 }
 
 interface NavItem {
@@ -52,11 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed,
   setIsCollapsed,
   isMobileOpen,
-  setIsMobileOpen,
-  theme = 'dark',
-  toggleTheme,
-  onExportCSV,
-  onOpenShortcuts
+  setIsMobileOpen
 }) => {
   const navItems: NavItem[] = [
     // Core Navigation
@@ -222,70 +210,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {renderNavList()}
       </div>
 
-      {/* Bottom Sidebar Controls & Alpha Card */}
+      {/* Bottom Sidebar Alpha Card & Kernel Status */}
       {!isCollapsed ? (
-        <div className="p-3 border-t border-[#14233c] shrink-0 bg-[#060c17]/60 space-y-2.5">
-          {/* Quick Actions: Dark Mode Toggle & CSV Export */}
-          <div className="space-y-1.5">
-            {/* Dark / Light Mode Switch */}
-            {toggleTheme && (
-              <div className="flex items-center justify-between p-2 rounded-xl bg-[#0e1a2d] border border-[#1a2e4c]">
-                <div className="flex items-center gap-2 min-w-0">
-                  {theme === 'dark' ? (
-                    <Moon className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                  ) : (
-                    <Sun className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  )}
-                  <span className="text-[11.5px] font-medium text-[#c2c6d6] truncate">
-                    {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={toggleTheme}
-                  className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#14233c] hover:bg-cyan-500/20 text-cyan-300 border border-[#233857] hover:border-cyan-500/40 transition-all shrink-0 cursor-pointer"
-                  title={theme === 'dark' ? 'Switch whole app to Light Mode' : 'Switch whole app to Dark Mode'}
-                  aria-label="Toggle theme appearance"
-                >
-                  <span>Toggle</span>
-                </button>
-              </div>
-            )}
-
-            {/* Export Current View CSV Button */}
-            {onExportCSV && (
-              <button
-                type="button"
-                onClick={onExportCSV}
-                className="w-full flex items-center justify-center gap-2 py-1.5 px-2.5 rounded-xl bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] hover:border-cyan-500/40 text-[12px] font-medium text-[#94a3b8] hover:text-white transition-all shadow-sm group cursor-pointer"
-                title="Export current screen financial dataset to CSV"
-                aria-label="Export view data to CSV"
-              >
-                <Download className="w-3.5 h-3.5 text-cyan-400 group-hover:scale-110 transition-transform" />
-                <span className="truncate">Export View (CSV)</span>
-              </button>
-            )}
-
-            {/* Keyboard Shortcuts Helper Button */}
-            {onOpenShortcuts && (
-              <button
-                type="button"
-                onClick={onOpenShortcuts}
-                className="w-full flex items-center justify-between py-1.5 px-2.5 rounded-xl bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] hover:border-cyan-500/40 text-[12px] font-medium text-[#94a3b8] hover:text-white transition-all shadow-sm group cursor-pointer"
-                title="Open Keyboard Shortcuts (Press ?)"
-                aria-label="Open keyboard shortcuts helper"
-              >
-                <div className="flex items-center gap-2">
-                  <Keyboard className="w-3.5 h-3.5 text-cyan-400 group-hover:scale-110 transition-transform" />
-                  <span className="truncate">Shortcuts</span>
-                </div>
-                <kbd className="px-1.5 py-0.5 rounded bg-[#132238] border border-[#233857] text-[#7dd3fc] font-mono text-[10px] font-bold">
-                  ?
-                </kbd>
-              </button>
-            )}
-          </div>
-
+        <div className="p-3 border-t border-[#14233c] shrink-0 bg-[#060c17]/60">
           <div className="alpha-intelligence-card rounded-xl p-3 bg-gradient-to-b from-[#0f1d33] to-[#0a1424] border border-[#1b2f4f] shadow-lg relative overflow-hidden group">
             {/* Ambient background glow */}
             <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-cyan-500/10 blur-xl pointer-events-none" />
@@ -344,67 +271,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       ) : (
         /* Collapsed mode bottom controls */
         <div className="p-2 border-t border-[#14233c] flex flex-col items-center gap-1.5 shrink-0 bg-[#060c17]/60">
-          {/* Collapsed Theme Toggle */}
-          {toggleTheme && (
-            <div className="relative group/themetip">
-              <button
-                type="button"
-                onClick={toggleTheme}
-                className="w-10 h-10 rounded-xl bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] flex items-center justify-center text-[#94a3b8] hover:text-amber-400 transition-colors cursor-pointer"
-                title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                aria-label="Toggle theme appearance"
-              >
-                {theme === 'dark' ? (
-                  <Moon className="w-4 h-4 text-cyan-400" />
-                ) : (
-                  <Sun className="w-4 h-4 text-amber-400" />
-                )}
-              </button>
-              <div className="hidden md:group-hover/themetip:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 items-center px-2.5 py-1.5 rounded-md bg-[#0a1424] text-white text-[11px] font-medium shadow-xl border border-[#1e3453] pointer-events-none whitespace-nowrap">
-                <span>{theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</span>
-                <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0a1424] border-l border-b border-[#1e3453] rotate-45" />
-              </div>
-            </div>
-          )}
-
-          {/* Collapsed CSV Export */}
-          {onExportCSV && (
-            <div className="relative group/exptip">
-              <button
-                type="button"
-                onClick={onExportCSV}
-                className="w-10 h-10 rounded-xl bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] flex items-center justify-center text-cyan-400 hover:text-white transition-colors cursor-pointer"
-                title="Export current view to CSV"
-                aria-label="Export view to CSV"
-              >
-                <Download className="w-4 h-4" />
-              </button>
-              <div className="hidden md:group-hover/exptip:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 items-center px-2.5 py-1.5 rounded-md bg-[#0a1424] text-white text-[11px] font-medium shadow-xl border border-[#1e3453] pointer-events-none whitespace-nowrap">
-                <span>Export View to CSV</span>
-                <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0a1424] border-l border-b border-[#1e3453] rotate-45" />
-              </div>
-            </div>
-          )}
-
-          {/* Collapsed Shortcuts Button */}
-          {onOpenShortcuts && (
-            <div className="relative group/shortcuttip">
-              <button
-                type="button"
-                onClick={onOpenShortcuts}
-                className="w-10 h-10 rounded-xl bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] flex items-center justify-center text-[#94a3b8] hover:text-cyan-400 transition-colors cursor-pointer"
-                title="Keyboard Shortcuts (Press ?)"
-                aria-label="Open keyboard shortcuts helper"
-              >
-                <Keyboard className="w-4 h-4" />
-              </button>
-              <div className="hidden md:group-hover/shortcuttip:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 items-center px-2.5 py-1.5 rounded-md bg-[#0a1424] text-white text-[11px] font-medium shadow-xl border border-[#1e3453] pointer-events-none whitespace-nowrap">
-                <span>Keyboard Shortcuts (?)</span>
-                <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0a1424] border-l border-b border-[#1e3453] rotate-45" />
-              </div>
-            </div>
-          )}
-
           {/* Collapsed Live Kernel Status */}
           <div
             className="w-10 h-10 rounded-xl bg-[#0f1d33] border border-[#1e3453] flex items-center justify-center text-cyan-400 group/pulse relative cursor-pointer"
