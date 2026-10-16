@@ -105,7 +105,7 @@ export const MarketSentiment: React.FC<MarketSentimentProps> = ({ onNavigate }) 
       value: '1.22 (Bullish bias)',
       score: 68,
       label: 'Greed',
-      detail: 'Put selling outpaces call purchases, confirming bullish support at 24,600.'
+      detail: 'Put volume outpaces call open interest, confirming bullish support at 24,600.'
     },
     {
       id: 'safe-haven',

@@ -471,7 +471,7 @@ export const STOCKS_DATA: Record<string, StockData> = {
       pb: 0.17
     },
     volume24h: '38.2M shares',
-    volumeSurge: '+28.0% Heavy Sell',
+    volumeSurge: '+28.0% Heavy Outflow',
     vol20dAvg: '29.8M',
     
     shapFactors: [

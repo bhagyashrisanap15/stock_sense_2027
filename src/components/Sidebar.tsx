@@ -52,10 +52,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, group: 'core' },
     { id: 'markets', label: 'Markets', icon: TrendingUp, group: 'core' },
 
-    // Portfolio & Trading
+    // Portfolio & Analytics
     { id: 'watchlist', label: 'Watchlist', icon: Bookmark, group: 'portfolio' },
     { id: 'portfolio', label: 'Portfolio', icon: Wallet, group: 'portfolio' },
-    { id: 'paper-trading', label: 'Paper Trading', icon: CandlestickChart, group: 'portfolio' },
+    { id: 'paper-trading', label: 'Portfolio Simulator', icon: CandlestickChart, group: 'portfolio' },
 
     // Analytics & Research
     { id: 'risk-radar', label: 'Risk Radar', icon: ShieldAlert, group: 'analytics' },

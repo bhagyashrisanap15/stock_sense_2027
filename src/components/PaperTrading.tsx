@@ -126,33 +126,11 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
   }, [paperState]);
 
   // UI Navigation & Filters
-  const [activeTab, setActiveTab] = useState<'positions' | 'terminal' | 'history' | 'analytics'>('positions');
-  const [orderSide, setOrderSide] = useState<'BUY' | 'SELL'>('BUY');
-  const [selectedTicker, setSelectedTicker] = useState<string>(currentStock?.ticker || 'RELIANCE');
-  const [quantityInput, setQuantityInput] = useState<string>('10');
-  const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
-  const [limitPriceInput, setLimitPriceInput] = useState<string>('');
-  const [historyFilter, setHistoryFilter] = useState<'ALL' | 'BUY' | 'SELL'>('ALL');
+  const [activeTab, setActiveTab] = useState<'positions' | 'analytics' | 'history'>('positions');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  // Sync selected ticker if prop changes
-  useEffect(() => {
-    if (currentStock?.ticker) {
-      setSelectedTicker(currentStock.ticker);
-    }
-  }, [currentStock?.ticker]);
 
-  // Selected stock object
-  const activeStock = STOCKS_DATA[selectedTicker] || STOCKS_DATA.RELIANCE;
-  const executionPrice = orderType === 'LIMIT' && Number(limitPriceInput) > 0 ? Number(limitPriceInput) : activeStock.price;
-
-  // Set default limit price when switching ticker
-  useEffect(() => {
-    if (activeStock) {
-      setLimitPriceInput(activeStock.price.toFixed(2));
-    }
-  }, [selectedTicker]);
 
   // Toast helper
   const showToast = (msg: string) => {
@@ -214,162 +192,6 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
   const winningSales = closedSales.filter((o) => (o.realizedPnL || 0) > 0);
   const winRate = closedSales.length > 0 ? Math.round((winningSales.length / closedSales.length) * 100) : 0;
 
-  // Position for currently selected trade ticker
-  const existingPosition = paperState.positions[selectedTicker];
-  const sharesOwned = existingPosition ? existingPosition.shares : 0;
-
-  // Quantity and Cost calculations
-  const parsedQuantity = Math.max(0, parseInt(quantityInput, 10) || 0);
-  const estimatedOrderCost = parsedQuantity * executionPrice;
-  const remainingCashAfterBuy = paperState.cash - estimatedOrderCost;
-
-  // Quick Quantity Presets
-  const handleSetMaxQuantity = () => {
-    if (orderSide === 'BUY') {
-      const maxShares = Math.floor(paperState.cash / executionPrice);
-      setQuantityInput(String(Math.max(1, maxShares)));
-    } else {
-      setQuantityInput(String(sharesOwned));
-    }
-  };
-
-  const handlePercentageQuantity = (pct: number) => {
-    if (orderSide === 'BUY') {
-      const allocatedFunds = paperState.cash * pct;
-      const shares = Math.floor(allocatedFunds / executionPrice);
-      setQuantityInput(String(Math.max(1, shares)));
-    } else {
-      const shares = Math.floor(sharesOwned * pct);
-      setQuantityInput(String(Math.max(1, shares)));
-    }
-  };
-
-  // Order Submission Handler
-  const handleExecuteOrder = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (parsedQuantity <= 0) {
-      showToast('Please enter a valid share quantity greater than 0.');
-      return;
-    }
-
-    const nowStr = new Date().toLocaleString('en-IN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }) + ' IST';
-
-    if (orderSide === 'BUY') {
-      if (estimatedOrderCost > paperState.cash) {
-        showToast(`Insufficient buying power. Required: ₹${estimatedOrderCost.toLocaleString('en-IN')} | Available: ₹${paperState.cash.toLocaleString('en-IN')}`);
-        return;
-      }
-
-      // Update positions with weighted average price
-      const currentPos = paperState.positions[selectedTicker];
-      let updatedPos: PaperTradePosition;
-
-      if (currentPos) {
-        const totalShares = currentPos.shares + parsedQuantity;
-        const totalInvested = (currentPos.shares * currentPos.avgBuyPrice) + estimatedOrderCost;
-        const newAvg = totalInvested / totalShares;
-
-        updatedPos = {
-          ...currentPos,
-          shares: totalShares,
-          avgBuyPrice: Number(newAvg.toFixed(2))
-        };
-      } else {
-        updatedPos = {
-          ticker: selectedTicker,
-          companyName: activeStock.name,
-          shares: parsedQuantity,
-          avgBuyPrice: executionPrice,
-          firstPurchased: nowStr
-        };
-      }
-
-      const newOrder: PaperTradeOrder = {
-        id: `ord-${Date.now()}`,
-        ticker: selectedTicker,
-        companyName: activeStock.name,
-        side: 'BUY',
-        shares: parsedQuantity,
-        price: executionPrice,
-        totalValue: estimatedOrderCost,
-        timestamp: nowStr
-      };
-
-      setPaperState((prev) => ({
-        cash: Number((prev.cash - estimatedOrderCost).toFixed(2)),
-        positions: {
-          ...prev.positions,
-          [selectedTicker]: updatedPos
-        },
-        orders: [newOrder, ...prev.orders]
-      }));
-
-      showToast(`Bought ${parsedQuantity} shares of ${selectedTicker} at ₹${executionPrice.toFixed(2)}!`);
-      setActiveTab('positions');
-    } else {
-      // SELL ORDER
-      if (sharesOwned < parsedQuantity) {
-        showToast(`Cannot sell ${parsedQuantity} shares. You only own ${sharesOwned} shares of ${selectedTicker}.`);
-        return;
-      }
-
-      const avgBuy = existingPosition ? existingPosition.avgBuyPrice : executionPrice;
-      const realizedPnL = Number(((executionPrice - avgBuy) * parsedQuantity).toFixed(2));
-      const realizedPnLPct = Number((((executionPrice - avgBuy) / avgBuy) * 100).toFixed(2));
-      const proceeds = Number((parsedQuantity * executionPrice).toFixed(2));
-
-      const newOrder: PaperTradeOrder = {
-        id: `ord-${Date.now()}`,
-        ticker: selectedTicker,
-        companyName: activeStock.name,
-        side: 'SELL',
-        shares: parsedQuantity,
-        price: executionPrice,
-        totalValue: proceeds,
-        timestamp: nowStr,
-        realizedPnL,
-        realizedPnLPct
-      };
-
-      const updatedPositions = { ...paperState.positions };
-      if (sharesOwned === parsedQuantity) {
-        delete updatedPositions[selectedTicker];
-      } else {
-        updatedPositions[selectedTicker] = {
-          ...existingPosition,
-          shares: existingPosition.shares - parsedQuantity
-        };
-      }
-
-      setPaperState((prev) => ({
-        cash: Number((prev.cash + proceeds).toFixed(2)),
-        positions: updatedPositions,
-        orders: [newOrder, ...prev.orders]
-      }));
-
-      showToast(`Sold ${parsedQuantity} shares of ${selectedTicker} for ₹${proceeds.toLocaleString('en-IN')} (P&L: ${realizedPnL >= 0 ? '+' : ''}₹${realizedPnL.toFixed(2)})!`);
-      setActiveTab('positions');
-    }
-  };
-
-  // Quick action from position row to pre-fill terminal
-  const handleQuickTrade = (ticker: string, side: 'BUY' | 'SELL') => {
-    setSelectedTicker(ticker);
-    setOrderSide(side);
-    if (side === 'SELL') {
-      const pos = paperState.positions[ticker];
-      if (pos) setQuantityInput(String(pos.shares));
-    }
-    setActiveTab('terminal');
-  };
-
   // Reset virtual account
   const handleResetPortfolio = () => {
     const freshState: StoredPaperState = {
@@ -390,7 +212,7 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
     };
     setPaperState(freshState);
     setShowResetConfirm(false);
-    showToast('Virtual Paper Trading portfolio reset to ₹10,00,000 cash.');
+    showToast('Virtual portfolio reset to ₹10,00,000 cash.');
   };
 
   // Add 1 Lakh Funds
@@ -399,7 +221,7 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
       ...prev,
       cash: prev.cash + 100000
     }));
-    showToast('Added ₹1,00,000 virtual cash to buying power!');
+    showToast('Added ₹1,00,000 virtual cash to liquid capital!');
   };
 
   // CSV Export for trade history
@@ -499,9 +321,9 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
           </span>
         </div>
 
-        {/* Available Cash Buying Power */}
+        {/* Available Cash Capital */}
         <div className="flex flex-col border-l border-[#1c2b3c] pl-2 sm:pl-3">
-          <span className="text-[10px] text-[#8c909f] uppercase font-semibold">Available Buying Power</span>
+          <span className="text-[10px] text-[#8c909f] uppercase font-semibold">Available Liquid Capital</span>
           <span className="font-mono text-[17px] font-bold text-[#adc6ff] mt-0.5">
             ₹{paperState.cash.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
           </span>
@@ -560,28 +382,6 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
             <span>Active Holdings ({positionRows.length})</span>
           </button>
           <button
-            onClick={() => setActiveTab('terminal')}
-            className={`px-3 py-1 rounded-lg text-[12px] font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'terminal'
-                ? 'bg-[#1c2b3c] text-[#4edea3] shadow-sm border border-[#00a572]/40'
-                : 'text-[#8c909f] hover:text-[#d4e4fa]'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[15px]">shopping_cart</span>
-            <span>Trade Terminal</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('history')}
-            className={`px-3 py-1 rounded-lg text-[12px] font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'history'
-                ? 'bg-[#1c2b3c] text-[#adc6ff] shadow-sm border border-[#273647]'
-                : 'text-[#8c909f] hover:text-[#d4e4fa]'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[15px]">history</span>
-            <span>Trade Log ({paperState.orders.length})</span>
-          </button>
-          <button
             onClick={() => setActiveTab('analytics')}
             className={`px-3 py-1 rounded-lg text-[12px] font-semibold transition-all flex items-center gap-1.5 ${
               activeTab === 'analytics'
@@ -592,17 +392,18 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
             <span className="material-symbols-outlined text-[15px]">analytics</span>
             <span>Analytics</span>
           </button>
-        </div>
-
-        {activeTab === 'positions' && (
           <button
-            onClick={() => setActiveTab('terminal')}
-            className="px-3 py-1 rounded-lg bg-[#00a572] hover:bg-[#4edea3] text-[#00281b] text-[12px] font-bold flex items-center gap-1 transition-all shadow-sm active:scale-95"
+            onClick={() => setActiveTab('history')}
+            className={`px-3 py-1 rounded-lg text-[12px] font-semibold transition-all flex items-center gap-1.5 ${
+              activeTab === 'history'
+                ? 'bg-[#1c2b3c] text-[#adc6ff] shadow-sm border border-[#273647]'
+                : 'text-[#8c909f] hover:text-[#d4e4fa]'
+            }`}
           >
-            <span className="material-symbols-outlined text-[16px]">add</span>
-            <span>New Order</span>
+            <span className="material-symbols-outlined text-[15px]">history</span>
+            <span>Allocation Log ({paperState.orders.length})</span>
           </button>
-        )}
+        </div>
       </div>
 
       {/* ================= VIEW 1: ACTIVE HOLDINGS ================= */}
@@ -614,16 +415,9 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
               <div className="flex flex-col">
                 <span className="text-[14px] font-semibold text-[#d4e4fa]">No Open Paper Positions</span>
                 <span className="text-[11px] text-[#8c909f] mt-0.5">
-                  Your simulated portfolio is 100% in cash. Use the Trade Terminal to purchase equities.
+                  Your simulated portfolio is currently in cash allocation mode.
                 </span>
               </div>
-              <button
-                onClick={() => setActiveTab('terminal')}
-                className="mt-1 px-4 py-2 rounded-xl bg-[#4d8eff] hover:bg-[#adc6ff] text-[#00285d] text-[12px] font-bold flex items-center gap-1.5 transition-all shadow-sm"
-              >
-                <span className="material-symbols-outlined text-[16px]">shopping_cart</span>
-                <span>Open Trade Terminal</span>
-              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -688,19 +482,17 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
                       </span>
                     </div>
 
-                    {/* Action buttons */}
+                    {/* Holding Navigation Action */}
                     <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
                       <button
-                        onClick={() => handleQuickTrade(pos.ticker, 'BUY')}
-                        className="px-2.5 py-1 rounded-lg bg-[#00a572]/20 hover:bg-[#00a572]/35 text-[#4edea3] text-[11px] font-bold font-mono transition-colors"
+                        onClick={() => {
+                          if (onSelectStock) onSelectStock(pos.stock);
+                          if (onNavigate) onNavigate('technical-analysis');
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-[#1c2b3c] hover:bg-[#273647] text-[#adc6ff] text-[11px] font-medium font-mono transition-colors flex items-center gap-1"
                       >
-                        Buy More
-                      </button>
-                      <button
-                        onClick={() => handleQuickTrade(pos.ticker, 'SELL')}
-                        className="px-2.5 py-1 rounded-lg bg-[#93000a]/25 hover:bg-[#93000a]/40 text-[#ffb4ab] text-[11px] font-bold font-mono transition-colors"
-                      >
-                        Sell
+                        <span>Technical View</span>
+                        <span className="material-symbols-outlined text-[13px]">arrow_forward</span>
                       </button>
                     </div>
                   </div>
@@ -711,229 +503,15 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
         </div>
       )}
 
-      {/* ================= VIEW 2: TRADE TERMINAL ================= */}
-      {activeTab === 'terminal' && (
-        <form onSubmit={handleExecuteOrder} className="space-y-3.5 relative z-10">
-          {/* Ticker Selector & Quote Header */}
-          <div className="bg-[#0d1c2d] p-3 rounded-xl border border-[#1c2b3c] flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-[#8c909f] uppercase font-semibold">Select Symbol:</span>
-              <select
-                value={selectedTicker}
-                onChange={(e) => {
-                  setSelectedTicker(e.target.value);
-                  const st = STOCKS_DATA[e.target.value];
-                  if (st && onSelectStock) onSelectStock(st);
-                }}
-                className="bg-[#1c2b3c] text-[#d4e4fa] font-mono font-bold text-[13px] px-2.5 py-1 rounded-lg border border-[#273647] focus:outline-none focus:border-[#4d8eff]"
-              >
-                {Object.keys(STOCKS_DATA).map((t) => (
-                  <option key={t} value={t}>
-                    {t} - {STOCKS_DATA[t].name}
-                  </option>
-                ))}
-              </select>
-            </div>
 
-            {/* Live Price Tag */}
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-[16px] font-bold text-[#d4e4fa]">
-                ₹{activeStock.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-              </span>
-              <span
-                className={`font-mono text-[11px] font-bold px-1.5 py-0.5 rounded ${
-                  activeStock.changePercent >= 0 ? 'bg-[#00a572]/20 text-[#4edea3]' : 'bg-[#93000a]/30 text-[#ffb4ab]'
-                }`}
-              >
-                {activeStock.changePercent >= 0 ? '+' : ''}{activeStock.changePercent}%
-              </span>
-            </div>
-          </div>
-
-          {/* Side Selector: Buy vs Sell */}
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setOrderSide('BUY')}
-              className={`py-2.5 rounded-xl font-bold text-[13px] font-mono flex items-center justify-center gap-1.5 transition-all ${
-                orderSide === 'BUY'
-                  ? 'bg-[#00a572] text-[#00281b] shadow-lg shadow-[#00a572]/20 ring-2 ring-[#4edea3]'
-                  : 'bg-[#0d1c2d] text-[#8c909f] hover:text-[#d4e4fa] border border-[#1c2b3c]'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">add_circle</span>
-              <span>BUY / LONG</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setOrderSide('SELL')}
-              className={`py-2.5 rounded-xl font-bold text-[13px] font-mono flex items-center justify-center gap-1.5 transition-all ${
-                orderSide === 'SELL'
-                  ? 'bg-[#ff5449] text-[#2c0001] shadow-lg shadow-[#ff5449]/20 ring-2 ring-[#ff897d]'
-                  : 'bg-[#0d1c2d] text-[#8c909f] hover:text-[#d4e4fa] border border-[#1c2b3c]'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">remove_circle</span>
-              <span>SELL / CLOSE ({sharesOwned} owned)</span>
-            </button>
-          </div>
-
-          {/* Order Configuration Box */}
-          <div className="bg-[#0d1c2d] p-3.5 rounded-xl border border-[#1c2b3c] space-y-3">
-            {/* Order Type Toggle */}
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] text-[#8c909f] font-semibold uppercase">Execution Type:</span>
-              <div className="flex bg-[#1c2b3c] p-0.5 rounded-lg border border-[#273647]">
-                <button
-                  type="button"
-                  onClick={() => setOrderType('MARKET')}
-                  className={`px-2.5 py-0.5 rounded text-[11px] font-semibold transition-all ${
-                    orderType === 'MARKET' ? 'bg-[#4d8eff] text-[#00285d]' : 'text-[#8c909f] hover:text-[#d4e4fa]'
-                  }`}
-                >
-                  Market (Live)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOrderType('LIMIT')}
-                  className={`px-2.5 py-0.5 rounded text-[11px] font-semibold transition-all ${
-                    orderType === 'LIMIT' ? 'bg-[#4d8eff] text-[#00285d]' : 'text-[#8c909f] hover:text-[#d4e4fa]'
-                  }`}
-                >
-                  Limit
-                </button>
-              </div>
-            </div>
-
-            {/* Limit Price Input if limit order */}
-            {orderType === 'LIMIT' && (
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] text-[#8c909f] font-semibold">Limit Price (₹):</span>
-                <input
-                  type="number"
-                  step="0.05"
-                  value={limitPriceInput}
-                  onChange={(e) => setLimitPriceInput(e.target.value)}
-                  className="w-32 bg-[#1c2b3c] text-[#d4e4fa] font-mono font-bold text-[13px] px-3 py-1.5 rounded-lg border border-[#273647] text-right focus:outline-none focus:border-[#4d8eff]"
-                />
-              </div>
-            )}
-
-            {/* Share Quantity Input */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] text-[#8c909f] font-semibold uppercase">Quantity (Shares):</span>
-                <input
-                  type="number"
-                  min="1"
-                  max={orderSide === 'SELL' ? sharesOwned : undefined}
-                  value={quantityInput}
-                  onChange={(e) => setQuantityInput(e.target.value)}
-                  className="w-32 bg-[#1c2b3c] text-[#d4e4fa] font-mono font-bold text-[14px] px-3 py-1.5 rounded-lg border border-[#273647] text-right focus:outline-none focus:border-[#4d8eff]"
-                />
-              </div>
-
-              {/* Quick Allocation Chips */}
-              <div className="flex items-center justify-end gap-1.5 text-[10px] font-mono">
-                <button
-                  type="button"
-                  onClick={() => handlePercentageQuantity(0.25)}
-                  className="px-2 py-0.5 rounded bg-[#1c2b3c] hover:bg-[#273647] text-[#adc6ff] transition-colors"
-                >
-                  25%
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handlePercentageQuantity(0.5)}
-                  className="px-2 py-0.5 rounded bg-[#1c2b3c] hover:bg-[#273647] text-[#adc6ff] transition-colors"
-                >
-                  50%
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handlePercentageQuantity(0.75)}
-                  className="px-2 py-0.5 rounded bg-[#1c2b3c] hover:bg-[#273647] text-[#adc6ff] transition-colors"
-                >
-                  75%
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSetMaxQuantity}
-                  className="px-2 py-0.5 rounded bg-[#4d8eff]/20 hover:bg-[#4d8eff]/35 text-[#adc6ff] font-bold border border-[#4d8eff]/30 transition-colors"
-                >
-                  MAX
-                </button>
-              </div>
-            </div>
-
-            {/* Order Cost Breakdown Box */}
-            <div className="bg-[#010f1f] p-2.5 rounded-lg border border-[#1c2b3c] space-y-1 text-[11px] font-mono">
-              <div className="flex justify-between items-center text-[#8c909f]">
-                <span>Order Execution Price</span>
-                <span className="text-[#d4e4fa]">₹{executionPrice.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between items-center text-[#8c909f]">
-                <span>Estimated Total Value</span>
-                <span className="text-[#d4e4fa] font-bold text-[13px]">
-                  ₹{estimatedOrderCost.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                </span>
-              </div>
-              <div className="flex justify-between items-center text-[#8c909f]">
-                <span>Brokerage & Regulatory Taxes</span>
-                <span className="text-[#4edea3]">₹0.00 (Simulated Paper)</span>
-              </div>
-              <div className="flex justify-between items-center pt-1 border-t border-[#1c2b3c] text-[#8c909f]">
-                <span>{orderSide === 'BUY' ? 'Remaining Buying Power' : 'Available Shares After'}</span>
-                <span className={orderSide === 'BUY' && remainingCashAfterBuy < 0 ? 'text-[#ff5449] font-bold' : 'text-[#adc6ff]'}>
-                  {orderSide === 'BUY'
-                    ? `₹${Math.max(0, remainingCashAfterBuy).toLocaleString('en-IN')}`
-                    : `${Math.max(0, sharesOwned - parsedQuantity)} shares`}
-                </span>
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={orderSide === 'BUY' ? remainingCashAfterBuy < 0 : sharesOwned < parsedQuantity || sharesOwned === 0}
-              className={`w-full py-3 rounded-xl font-bold font-mono text-[14px] flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 ${
-                orderSide === 'BUY'
-                  ? 'bg-[#00a572] hover:bg-[#4edea3] text-[#00281b] disabled:bg-[#1c2b3c] disabled:text-[#8c909f]'
-                  : 'bg-[#ff5449] hover:bg-[#ff897d] text-[#2c0001] disabled:bg-[#1c2b3c] disabled:text-[#8c909f]'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">
-                {orderSide === 'BUY' ? 'bolt' : 'receipt_long'}
-              </span>
-              <span>
-                {orderSide === 'BUY'
-                  ? `Execute Virtual BUY (${parsedQuantity} ${selectedTicker})`
-                  : `Execute Virtual SELL (${parsedQuantity} ${selectedTicker})`}
-              </span>
-            </button>
-          </div>
-        </form>
-      )}
 
       {/* ================= VIEW 3: TRANSACTION HISTORY ================= */}
       {activeTab === 'history' && (
         <div className="space-y-2.5 relative z-10">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex bg-[#0d1c2d] p-0.5 rounded-lg border border-[#1c2b3c]">
-              {(['ALL', 'BUY', 'SELL'] as const).map((filter) => (
-                <button
-                  key={filter}
-                  onClick={() => setHistoryFilter(filter)}
-                  className={`px-2.5 py-0.5 rounded text-[10px] font-semibold transition-all ${
-                    historyFilter === filter
-                      ? 'bg-[#1c2b3c] text-[#adc6ff] shadow-sm'
-                      : 'text-[#8c909f] hover:text-[#d4e4fa]'
-                  }`}
-                >
-                  {filter}
-                </button>
-              ))}
-            </div>
+            <span className="text-[12px] font-semibold text-[#8c909f] font-mono">
+              Simulated Audit Ledger ({paperState.orders.length} entries)
+            </span>
 
             <button
               onClick={handleExportCSV}
@@ -946,7 +524,6 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
 
           <div className="space-y-1.5 max-h-96 overflow-y-auto pr-1">
             {paperState.orders
-              .filter((o) => historyFilter === 'ALL' || o.side === historyFilter)
               .map((ord) => {
                 const isBuy = ord.side === 'BUY';
 
@@ -958,10 +535,10 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
                     <div className="flex items-center gap-2">
                       <span
                         className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                          isBuy ? 'bg-[#00a572]/20 text-[#4edea3]' : 'bg-[#93000a]/30 text-[#ffb4ab]'
+                          isBuy ? 'bg-[#00a572]/20 text-[#4edea3]' : 'bg-[#3131c0]/20 text-[#adc6ff]'
                         }`}
                       >
-                        {ord.side}
+                        {isBuy ? 'LONG ALLOCATION' : 'PORTFOLIO REBALANCE'}
                       </span>
                       <div className="flex flex-col">
                         <span className="font-bold text-[#d4e4fa] text-[12px]">{ord.ticker}</span>

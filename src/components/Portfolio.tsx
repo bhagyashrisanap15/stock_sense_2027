@@ -321,7 +321,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[16px] text-[#00ff9d]">candlestick_chart</span>
-          <span>Paper Trading</span>
+          <span>Simulator</span>
         </button>
         <button
           onClick={() => setViewMode('dividends')}
@@ -658,7 +658,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
                         />
                       </div>
                       <div className="flex flex-col gap-1">
-                        <label className="text-[10px] text-[#c2c6d6]">Avg Buy Price (₹)</label>
+                        <label className="text-[10px] text-[#c2c6d6]">Cost Basis Price (₹)</label>
                         <input
                           type="number"
                           value={editPrice}
@@ -726,11 +726,11 @@ export const Portfolio: React.FC<PortfolioProps> = ({
                     <button
                       onClick={() => {
                         onSelectStock(h.stock);
-                        onNavigate('markets');
+                        onNavigate('technical-analysis');
                       }}
                       className="px-2 py-0.5 rounded bg-[#4d8eff]/20 text-[#adc6ff] hover:bg-[#4d8eff]/30 font-semibold text-[10px] transition-colors"
                     >
-                      Trade
+                      Technical
                     </button>
                   </div>
                 </div>

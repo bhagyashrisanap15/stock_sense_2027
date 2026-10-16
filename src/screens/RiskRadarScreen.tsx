@@ -327,7 +327,7 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
                   <span className="text-[13px] text-[#d4e4fa] font-medium">
                     Market Shock ({shockValue.toFixed(1)}%)
                   </span>
-                  <span className="text-[11px] text-[#c2c6d6]">Systemic Nifty sell-off</span>
+                  <span className="text-[11px] text-[#c2c6d6]">Systemic Nifty market drop</span>
                 </div>
               </div>
               <span className="font-mono text-[13px] text-[#ffb4ab] font-bold">

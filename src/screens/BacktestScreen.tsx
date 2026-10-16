@@ -82,11 +82,11 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
 
   // Trade Execution Log
   const tradeLogs = [
-    { id: 'TR-904', date: '14 Oct 2024', side: 'BUY', price: '₹2,780.00', returnPct: '+5.4%', pnl: '+₹54,200', exitReason: 'Take Profit Hit', status: 'WIN' },
-    { id: 'TR-892', date: '28 Sep 2024', side: 'SELL', price: '₹2,840.00', returnPct: '+3.8%', pnl: '+₹38,000', exitReason: 'SHAP Reversal Signal', status: 'WIN' },
-    { id: 'TR-881', date: '11 Sep 2024', side: 'BUY', price: '₹2,810.00', returnPct: '-2.1%', pnl: '-₹21,000', exitReason: 'Stop Loss Hit', status: 'LOSS' },
-    { id: 'TR-870', date: '24 Aug 2024', side: 'BUY', price: '₹2,695.00', returnPct: '+7.1%', pnl: '+₹71,400', exitReason: 'Take Profit Hit', status: 'WIN' },
-    { id: 'TR-863', date: '05 Aug 2024', side: 'BUY', price: '₹2,620.00', returnPct: '+6.2%', pnl: '+₹62,000', exitReason: 'Momentum Climax', status: 'WIN' }
+    { id: 'TR-904', date: '14 Oct 2024', side: 'LONG', price: '₹2,780.00', returnPct: '+5.4%', pnl: '+₹54,200', exitReason: 'Take Profit Hit', status: 'WIN' },
+    { id: 'TR-892', date: '28 Sep 2024', side: 'SHORT', price: '₹2,840.00', returnPct: '+3.8%', pnl: '+₹38,000', exitReason: 'SHAP Reversal Signal', status: 'WIN' },
+    { id: 'TR-881', date: '11 Sep 2024', side: 'LONG', price: '₹2,810.00', returnPct: '-2.1%', pnl: '-₹21,000', exitReason: 'Stop Loss Hit', status: 'LOSS' },
+    { id: 'TR-870', date: '24 Aug 2024', side: 'LONG', price: '₹2,695.00', returnPct: '+7.1%', pnl: '+₹71,400', exitReason: 'Take Profit Hit', status: 'WIN' },
+    { id: 'TR-863', date: '05 Aug 2024', side: 'LONG', price: '₹2,620.00', returnPct: '+6.2%', pnl: '+₹62,000', exitReason: 'Momentum Climax', status: 'WIN' }
   ];
 
   return (
@@ -358,7 +358,7 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
               <tr>
                 <th className="py-2.5 px-4">Trade ID</th>
                 <th className="py-2.5 px-4">Date</th>
-                <th className="py-2.5 px-4">Side</th>
+                <th className="py-2.5 px-4">Position Vector</th>
                 <th className="py-2.5 px-4">Execution Price</th>
                 <th className="py-2.5 px-4">Exit Signal / Rationale</th>
                 <th className="py-2.5 px-4 text-right">Return %</th>
@@ -372,7 +372,7 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
                   <td className="py-3 px-4 text-[#94a3b8] text-[12px]">{trade.date}</td>
                   <td className="py-3 px-4">
                     <span className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold ${
-                      trade.side === 'BUY' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
+                      trade.side === 'LONG' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
                     }`}>
                       {trade.side}
                     </span>

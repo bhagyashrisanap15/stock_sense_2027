@@ -597,7 +597,7 @@ export const MarketsScreen: React.FC<MarketsScreenProps> = ({
           <div className="flex items-center justify-between">
             <span className="font-semibold text-[15px] text-[#d4e4fa]">Moving Averages Alignment</span>
             <span className="px-2 py-0.5 bg-[#00a572]/15 text-[#4edea3] rounded-full text-[11px] font-semibold border border-[#00a572]/30">
-              Strong Buy (3/3)
+              Strong Bullish (3/3)
             </span>
           </div>
 

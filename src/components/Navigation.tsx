@@ -23,7 +23,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onTabChange 
     { id: 'risk-radar' as ScreenTab, label: 'Risk Radar', icon: ShieldAlert },
     { id: 'watchlist' as ScreenTab, label: 'Watchlist', icon: Bookmark },
     { id: 'portfolio' as ScreenTab, label: 'Portfolio', icon: Wallet },
-    { id: 'paper-trading' as ScreenTab, label: 'Trading', icon: CandlestickChart }
+    { id: 'paper-trading' as ScreenTab, label: 'Simulator', icon: CandlestickChart }
   ];
 
   return (

@@ -367,7 +367,7 @@ export function exportCurrentViewFinancialData(
         'Ticker',
         'Company Name',
         'Quantity (Shares)',
-        'Avg Buy Price (INR)',
+        'Cost Basis Price (INR)',
         'Current Price (INR)',
         'Invested Capital (INR)',
         'Current Market Value (INR)',
@@ -454,7 +454,7 @@ export function exportCurrentViewFinancialData(
         'Order ID',
         'Ticker',
         'Company Name',
-        'Side (BUY/SELL)',
+        'Allocation Vector (LONG/REBALANCE)',
         'Shares',
         'Execution Price (INR)',
         'Total Order Value (INR)',
@@ -672,7 +672,7 @@ export function exportCurrentViewFinancialData(
 
       const summaryHeaders = ['Strategy Metric', 'Value', 'Benchmark (NIFTY 50)', 'Outperformance Alpha'];
       const summaryRows = [
-        ['Strategy Name', 'Multi-Factor TreeSHAP Momentum + Mean Reversion', 'NIFTY 50 Buy & Hold', '+14.2% Net Alpha'],
+        ['Strategy Name', 'Multi-Factor TreeSHAP Momentum + Mean Reversion', 'NIFTY 50 Benchmark', '+14.2% Net Alpha'],
         ['Backtest Duration', '5 Years (Jan 2021 - Present)', '5 Years', '-'],
         ['Initial Capital', '₹10,00,000', '₹10,00,000', '-'],
         ['Final Portfolio Equity', '₹28,45,200', '₹18,12,400', '+₹10,32,800'],

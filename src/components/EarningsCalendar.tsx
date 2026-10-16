@@ -219,7 +219,7 @@ export const EarningsCalendar: React.FC<EarningsCalendarProps> = ({
                 <div className="flex items-center gap-1.5 text-[#8c909f]">
                   <span className="material-symbols-outlined text-[14px] text-[#4edea3]">recommend</span>
                   <span>
-                    <strong className="text-[#4edea3] font-mono">{buyPct}%</strong> Buy ({item.analystRatings.total} analysts)
+                    <strong className="text-[#4edea3] font-mono">{buyPct}%</strong> Bullish ({item.analystRatings.total} analysts)
                   </span>
                 </div>
 
@@ -351,28 +351,28 @@ export const EarningsCalendar: React.FC<EarningsCalendarProps> = ({
                       width: `${(selectedEarnings.analystRatings.buy / selectedEarnings.analystRatings.total) * 100}%`
                     }}
                     className="bg-[#4edea3] h-full"
-                    title="Buy"
+                    title="Bullish"
                   />
                   <div
                     style={{
                       width: `${(selectedEarnings.analystRatings.hold / selectedEarnings.analystRatings.total) * 100}%`
                     }}
                     className="bg-[#c0c1ff] h-full"
-                    title="Hold"
+                    title="Neutral"
                   />
                   <div
                     style={{
                       width: `${(selectedEarnings.analystRatings.sell / selectedEarnings.analystRatings.total) * 100}%`
                     }}
                     className="bg-[#ff5449] h-full"
-                    title="Sell"
+                    title="Bearish"
                   />
                 </div>
 
                 <div className="flex justify-between items-center text-[10px] font-mono text-[#8c909f]">
-                  <span className="text-[#4edea3]">{selectedEarnings.analystRatings.buy} Buy</span>
-                  <span className="text-[#c0c1ff]">{selectedEarnings.analystRatings.hold} Hold</span>
-                  <span className="text-[#ffb4ab]">{selectedEarnings.analystRatings.sell} Sell</span>
+                  <span className="text-[#4edea3]">{selectedEarnings.analystRatings.buy} Bullish</span>
+                  <span className="text-[#c0c1ff]">{selectedEarnings.analystRatings.hold} Neutral</span>
+                  <span className="text-[#ffb4ab]">{selectedEarnings.analystRatings.sell} Bearish</span>
                 </div>
               </div>
 

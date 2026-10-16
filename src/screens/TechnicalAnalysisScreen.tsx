@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { StockData, ScreenTab } from '../types';
 import { STOCKS_DATA } from '../data/stocks';
+import { RsiStrategyCalculator, RsiMomentumLineChart, get14PeriodRsiData } from '../components/RsiStrategyCalculator';
 
 interface TechnicalAnalysisScreenProps {
   currentStock: StockData;
@@ -55,6 +56,8 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
   const bullishIndicators = [isRsiBullish, isMacdBullish, isSma20Bullish, isSma50Bullish, isSma200Bullish, isBollingerBullish].filter(Boolean).length;
   const totalIndicators = 6;
   const confluencePct = Math.round((bullishIndicators / totalIndicators) * 100);
+
+  const rsi14Data = get14PeriodRsiData(stock.ticker, stock.rsi);
 
   return (
     <div className="flex flex-col w-full gap-5 max-w-[1600px] xl:max-w-[1720px] mx-auto pb-12">
@@ -141,9 +144,12 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
         </div>
       </div>
 
+      {/* Featured: RSI Strategy Calculator & Overbought/Oversold Signal Identification */}
+      <RsiStrategyCalculator stock={stock} />
+
       {/* Grid: Indicators */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {/* RSI 14 Card */}
+        {/* RSI 14 Card with 14-period momentum visualization below current RSI value */}
         <div className="bg-[#122131] rounded-2xl p-5 border border-[#1c2b3c] flex flex-col justify-between shadow-sm">
           <div>
             <div className="flex items-center justify-between mb-3">
@@ -171,10 +177,25 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
               <div className="absolute top-0 bottom-0 left-[70%] w-[1px] bg-white/30" />
             </div>
 
-            <p className="text-[12px] text-[#94a3b8] leading-relaxed">
+            {/* 14-Period RSI Momentum Line Chart Visualization */}
+            <div className="my-3">
+              <div className="flex items-center justify-between mb-1 text-[11px] font-mono">
+                <span className="text-[#94a3b8]">14-Period RSI Momentum Trend:</span>
+                <span className="text-cyan-300 font-semibold">T-13 → Now</span>
+              </div>
+              <RsiMomentumLineChart
+                data={rsi14Data}
+                currentRsi={stock.rsi}
+                overboughtThreshold={70}
+                oversoldThreshold={30}
+                height={80}
+              />
+            </div>
+
+            <p className="text-[12px] text-[#94a3b8] leading-relaxed mt-2">
               {stock.rsi >= 50
-                ? 'Oscillator demonstrates structural buying momentum above the 50 median without overbought fatigue.'
-                : 'Oscillator reads in defensive lower quartile, reflecting seller dominance and mean-reverting pressure.'}
+                ? 'Oscillator demonstrates structural bullish momentum above the 50 median without overbought fatigue.'
+                : 'Oscillator reads in defensive lower quartile, reflecting downward pressure and mean-reverting potential.'}
             </p>
           </div>
 

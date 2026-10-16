@@ -324,7 +324,7 @@ class StockSenseApiService {
         source: 'Bloomberg Markets',
         publishedAt: '2h 45m ago',
         timestamp: new Date(Date.now() - 165 * 60 * 1000).toISOString(),
-        summary: 'Implied volatility across index option skew compressed toward annual lows, encouraging algorithmic volatility sellers and momentum strategies.',
+        summary: 'Implied volatility across index option skew compressed toward annual lows, encouraging algorithmic volatility traders and momentum strategies.',
         sentiment: 'BULLISH',
         sentimentScore: 0.68,
         category: 'Macro',

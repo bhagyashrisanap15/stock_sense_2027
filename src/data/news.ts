@@ -292,7 +292,7 @@ export async function fetchAllMarketHeadlines(): Promise<NewsArticle[]> {
       title: 'NIFTY 50 Consolidates Near Record Highs as FII Inflows Top ₹4,200 Cr in Cash Equities',
       source: 'CNBC-TV18',
       publishedAt: '12m ago',
-      summary: 'Broad-based buying across large-cap IT and private banking indices pushed benchmark indices toward fresh milestones.',
+      summary: 'Broad-based gains across large-cap IT and private banking indices pushed benchmark indices toward fresh milestones.',
       sentiment: 'BULLISH',
       sentimentScore: 0.84,
       category: 'Macro',
