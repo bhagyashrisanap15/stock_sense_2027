@@ -14,7 +14,7 @@ import {
   Info
 } from 'lucide-react';
 import { StockData, ScreenTab } from '../types';
-import { STOCKS_DATA } from '../data/stocks';
+import { STOCKS_DATA, getStockData } from '../data/stocks';
 import { RsiStrategyCalculator, RsiMomentumLineChart, get14PeriodRsiData } from '../components/RsiStrategyCalculator';
 
 interface TechnicalAnalysisScreenProps {
@@ -29,16 +29,21 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
   onNavigate
 }) => {
   const [selectedTicker, setSelectedTicker] = useState<string>(currentStock.ticker);
-  const tickers = ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'TATASTEEL'];
+
+  // Sync state if currentStock changes externally (e.g. from global search or watchlist)
+  React.useEffect(() => {
+    setSelectedTicker(currentStock.ticker);
+  }, [currentStock.ticker]);
+
+  const baseTickers = ['RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'SBIN', 'ITC', 'TATAMOTORS', 'BHARTIARTL', 'LT'];
+  const tickers = baseTickers.includes(currentStock.ticker) ? baseTickers : [currentStock.ticker, ...baseTickers];
 
   const handleTickerChange = (ticker: string) => {
     setSelectedTicker(ticker);
-    if (STOCKS_DATA[ticker]) {
-      onSelectStock(STOCKS_DATA[ticker]);
-    }
+    onSelectStock(getStockData(ticker));
   };
 
-  const stock = STOCKS_DATA[selectedTicker] || currentStock;
+  const stock = getStockData(selectedTicker);
 
   // Technical calculations
   const priceVsSma20 = (((stock.price - stock.sma20) / stock.sma20) * 100).toFixed(2);

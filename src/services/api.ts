@@ -1,5 +1,5 @@
 import { StockData, ShapFactor, DirectionSignal } from '../types';
-import { STOCKS_DATA } from '../data/stocks';
+import { STOCKS_DATA, getStockData as resolveStock } from '../data/stocks';
 
 export interface ApiHealthStatus {
   status: 'healthy' | 'degraded' | 'offline';
@@ -66,12 +66,12 @@ class StockSenseApiService {
   }
 
   public async getStockData(ticker: string): Promise<StockData> {
-    const stock = STOCKS_DATA[ticker] || STOCKS_DATA['RELIANCE'];
+    const stock = resolveStock(ticker);
     return { ...stock };
   }
 
   public async getModelMetadata(ticker: string): Promise<ModelMetadata> {
-    const stock = STOCKS_DATA[ticker] || STOCKS_DATA['RELIANCE'];
+    const stock = resolveStock(ticker);
     return {
       modelName: `${stock.activeModel} & Quantile Regressor`,
       modelVersion: 'v2.4.2 (Production)',

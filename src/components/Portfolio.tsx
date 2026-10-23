@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StockData, ScreenTab } from '../types';
-import { STOCKS_DATA, DEFAULT_MOCK_PORTFOLIO } from '../data/stocks';
+import { STOCKS_DATA, DEFAULT_MOCK_PORTFOLIO, getStockData } from '../data/stocks';
 import { MarketCorrelation } from './MarketCorrelation';
 import { DividendsSection } from './DividendsSection';
 import { getDividendInfo } from '../data/dividends';
@@ -22,20 +22,31 @@ interface PositionData {
   purchaseDate: string;
 }
 
+const STORAGE_KEY = 'stocksense_portfolio_positions_v2';
+
 export const Portfolio: React.FC<PortfolioProps> = ({
   watchlist,
   onSelectStock,
   onNavigate,
   onOpenSearch
 }) => {
-  // Mock positions state, initializing with default mock data for watched stocks
+  // Positions state, initializing with persistent localStorage or default data
   const [positions, setPositions] = useState<Record<string, PositionData>>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.warn('Could not read portfolio positions from storage:', e);
+    }
+
     const initial: Record<string, PositionData> = {};
     watchlist.forEach((ticker) => {
       if (DEFAULT_MOCK_PORTFOLIO[ticker]) {
         initial[ticker] = { ...DEFAULT_MOCK_PORTFOLIO[ticker], ticker };
       } else {
-        const stock = STOCKS_DATA[ticker];
+        const stock = getStockData(ticker);
         const basePrice = stock ? stock.price * 0.95 : 1000;
         initial[ticker] = {
           ticker,
@@ -48,6 +59,14 @@ export const Portfolio: React.FC<PortfolioProps> = ({
     return initial;
   });
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(positions));
+    } catch (e) {
+      // ignore
+    }
+  }, [positions]);
+
   const [filterMode, setFilterMode] = useState<'all' | 'gainers' | 'losers' | 'bullish'>('all');
   const [viewMode, setViewMode] = useState<'performance' | 'paper' | 'dividends' | 'correlation'>('performance');
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
@@ -58,7 +77,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
   // Compute calculated values for all items in watchlist that have positions
   const holdingRows = watchlist
     .map((ticker) => {
-      const stock = STOCKS_DATA[ticker];
+      const stock = getStockData(ticker);
       if (!stock) return null;
       const pos = positions[ticker] || {
         ticker,

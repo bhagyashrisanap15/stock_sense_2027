@@ -20,7 +20,7 @@ import {
   Activity
 } from 'lucide-react';
 import { StockData, ScreenTab } from '../types';
-import { STOCKS_DATA } from '../data/stocks';
+import { STOCKS_DATA, getStockData } from '../data/stocks';
 import { AiForecastChart } from '../components/AiForecastChart';
 import { WhatIfScenarioPanel } from '../components/WhatIfScenarioPanel';
 import { ModelTransparencyPanel } from '../components/ModelTransparencyPanel';
@@ -43,7 +43,8 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
   const [isShapAvailable, setIsShapAvailable] = useState<boolean>(true);
   const [exportToast, setExportToast] = useState<string | null>(null);
 
-  const sampleTickers = ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'TATASTEEL'];
+  const baseTickers = ['RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'SBIN', 'ITC', 'TATAMOTORS', 'BHARTIARTL', 'LT'];
+  const sampleTickers = baseTickers.includes(currentStock.ticker) ? baseTickers : [currentStock.ticker, ...baseTickers];
 
   const handleExportPDF = () => {
     const filename = `${currentStock.ticker}_XAI_Audit_${Date.now().toString().slice(-4)}.pdf`;
@@ -134,9 +135,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
                   <button
                     key={tick}
                     onClick={() => {
-                      if (STOCKS_DATA[tick]) {
-                        onSelectStock(STOCKS_DATA[tick]);
-                      }
+                      onSelectStock(getStockData(tick));
                     }}
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all shrink-0 ${
                       isSelected

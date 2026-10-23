@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StockData, ScreenTab } from '../types';
-import { STOCKS_DATA } from '../data/stocks';
+import { STOCKS_DATA, getStockData } from '../data/stocks';
 import { MarketCorrelation } from '../components/MarketCorrelation';
 
 interface WatchlistScreenProps {
@@ -22,12 +22,11 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({
   const [selectedSector, setSelectedSector] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const sectors = ['All', 'IT & Telecom', 'Banking & Finance', 'Energy', 'Metals'];
+  const sectors = ['All', 'Banking & Finance', 'IT & Telecom', 'Automobile & EV', 'Energy', 'FMCG & Consumer', 'Metals'];
 
-  const allStocks = Object.values(STOCKS_DATA);
+  const watchedStocks = watchlist.map((t) => getStockData(t));
 
-  const displayedStocks = allStocks.filter((s) => {
-    const isWatched = watchlist.includes(s.ticker);
+  const displayedStocks = watchedStocks.filter((s) => {
     const matchesQuery =
       searchQuery === '' ||
       s.ticker.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -36,11 +35,13 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({
     const matchesSector =
       selectedSector === 'All' ||
       (selectedSector === 'IT & Telecom' && (s.sector.includes('IT') || s.sector.includes('Telecom'))) ||
-      (selectedSector === 'Banking & Finance' && s.sector.includes('Bank')) ||
+      (selectedSector === 'Banking & Finance' && (s.sector.includes('Bank') || s.sector.includes('Finance'))) ||
+      (selectedSector === 'Automobile & EV' && s.sector.includes('Auto')) ||
+      (selectedSector === 'FMCG & Consumer' && s.sector.includes('FMCG')) ||
       (selectedSector === 'Energy' && s.sector.includes('Energy')) ||
-      (selectedSector === 'Metals' && s.sector.includes('Metal'));
+      (selectedSector === 'Metals' && (s.sector.includes('Metal') || s.sector.includes('Steel')));
 
-    return isWatched && matchesQuery && matchesSector;
+    return matchesQuery && matchesSector;
   });
 
   return (

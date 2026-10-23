@@ -90,14 +90,49 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
           <div className="hidden sm:flex items-center gap-2 mt-0.5">
-            <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              NIFTY 50 22,485.40 (+0.42%)
-            </span>
-            <span className="text-[#334155] text-[10px]">·</span>
-            <span className="text-[10px] font-mono text-[#94a3b8]">
-              India VIX 12.80 (-1.8%)
-            </span>
+            {/* IST Market Session Status */}
+            {(() => {
+              // Indian Standard Time (UTC + 5.5 hours)
+              const now = new Date();
+              const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+              const istDate = new Date(utc + 3600000 * 5.5);
+              const day = istDate.getDay(); // 0 is Sun, 6 is Sat
+              const hour = istDate.getHours();
+              const minute = istDate.getMinutes();
+              const timeInMinutes = hour * 60 + minute;
+              const isWeekday = day >= 1 && day <= 5;
+              const isOpen = isWeekday && timeInMinutes >= 555 && timeInMinutes <= 930; // 09:15 to 15:30
+              const isPreOpen = isWeekday && timeInMinutes >= 540 && timeInMinutes < 555; // 09:00 to 09:15
+
+              return (
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded flex items-center gap-1 font-semibold border ${
+                      isOpen
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                        : isPreOpen
+                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        : 'bg-slate-800/80 text-slate-400 border-slate-700/50'
+                    }`}
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        isOpen ? 'bg-emerald-400 animate-pulse' : isPreOpen ? 'bg-amber-400' : 'bg-slate-500'
+                      }`}
+                    />
+                    NSE/BSE: {isOpen ? 'LIVE' : isPreOpen ? 'PRE-OPEN' : 'CLOSED'}
+                  </span>
+                  <span className="text-[#334155] text-[10px]">·</span>
+                  <span className="text-[10px] font-mono text-emerald-400">
+                    NIFTY 50 24,835.10 (+0.64%)
+                  </span>
+                  <span className="text-[#334155] text-[10px] hidden md:inline">·</span>
+                  <span className="text-[10px] font-mono text-[#94a3b8] hidden md:inline">
+                    India VIX 12.84 (-3.4%)
+                  </span>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>

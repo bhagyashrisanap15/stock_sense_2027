@@ -32,13 +32,26 @@ export default function App() {
   // Make AI Insights ('ai-predict') the primary default page
   const [currentTab, setCurrentTab] = useState<ScreenTab>('ai-predict');
   const [currentStock, setCurrentStock] = useState<StockData>(STOCKS_DATA.RELIANCE);
-  const [watchlist, setWatchlist] = useState<string[]>([
-    'RELIANCE',
-    'TCS',
-    'INFY',
-    'HDFCBANK',
-    'TATASTEEL'
-  ]);
+  const [watchlist, setWatchlist] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('stocksense_watchlist_v2');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      // ignore
+    }
+    return ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK', 'SBIN', 'ITC', 'TATAMOTORS'];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stocksense_watchlist_v2', JSON.stringify(watchlist));
+    } catch (e) {
+      // ignore
+    }
+  }, [watchlist]);
 
   // Sidebar Layout States
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {

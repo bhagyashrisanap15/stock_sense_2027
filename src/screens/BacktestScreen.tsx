@@ -25,7 +25,7 @@ import {
   Legend
 } from 'recharts';
 import { StockData, ScreenTab } from '../types';
-import { STOCKS_DATA } from '../data/stocks';
+import { STOCKS_DATA, getStockData } from '../data/stocks';
 
 interface BacktestScreenProps {
   currentStock: StockData;
@@ -47,13 +47,17 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [hasRun, setHasRun] = useState<boolean>(true);
 
-  const tickers = ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'TATASTEEL'];
+  // Sync state if currentStock changes externally
+  React.useEffect(() => {
+    setSelectedTicker(currentStock.ticker);
+  }, [currentStock.ticker]);
+
+  const baseTickers = ['RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'SBIN', 'ITC', 'TATAMOTORS', 'BHARTIARTL', 'LT'];
+  const tickers = baseTickers.includes(currentStock.ticker) ? baseTickers : [currentStock.ticker, ...baseTickers];
 
   const handleTickerChange = (ticker: string) => {
     setSelectedTicker(ticker);
-    if (STOCKS_DATA[ticker]) {
-      onSelectStock(STOCKS_DATA[ticker]);
-    }
+    onSelectStock(getStockData(ticker));
   };
 
   const handleRunSimulation = () => {
@@ -61,33 +65,119 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
     setTimeout(() => {
       setIsRunning(false);
       setHasRun(true);
-    }, 900);
+    }, 600);
   };
 
-  // Simulated Equity Curve Data based on Horizon & Stock
-  const curveData = [
-    { period: 'Q1 Y1', strategy: 1000000, benchmark: 1000000 },
-    { period: 'Q2 Y1', strategy: 1064000, benchmark: 1021000 },
-    { period: 'Q3 Y1', strategy: 1142000, benchmark: 1045000 },
-    { period: 'Q4 Y1', strategy: 1210000, benchmark: 1082000 },
-    { period: 'Q1 Y2', strategy: 1285000, benchmark: 1094000 },
-    { period: 'Q2 Y2', strategy: 1390000, benchmark: 1140000 },
-    { period: 'Q3 Y2', strategy: 1475000, benchmark: 1162000 },
-    { period: 'Q4 Y2', strategy: 1560000, benchmark: 1210000 },
-    { period: 'Q1 Y3', strategy: 1680000, benchmark: 1245000 },
-    { period: 'Q2 Y3', strategy: 1820000, benchmark: 1290000 },
-    { period: 'Q3 Y3', strategy: 1940000, benchmark: 1335000 },
-    { period: 'Q4 Y3', strategy: 2085400, benchmark: 1380000 }
-  ];
+  const stock = getStockData(selectedTicker);
 
-  // Trade Execution Log
-  const tradeLogs = [
-    { id: 'TR-904', date: '14 Oct 2024', side: 'LONG', price: '₹2,780.00', returnPct: '+5.4%', pnl: '+₹54,200', exitReason: 'Take Profit Hit', status: 'WIN' },
-    { id: 'TR-892', date: '28 Sep 2024', side: 'SHORT', price: '₹2,840.00', returnPct: '+3.8%', pnl: '+₹38,000', exitReason: 'SHAP Reversal Signal', status: 'WIN' },
-    { id: 'TR-881', date: '11 Sep 2024', side: 'LONG', price: '₹2,810.00', returnPct: '-2.1%', pnl: '-₹21,000', exitReason: 'Stop Loss Hit', status: 'LOSS' },
-    { id: 'TR-870', date: '24 Aug 2024', side: 'LONG', price: '₹2,695.00', returnPct: '+7.1%', pnl: '+₹71,400', exitReason: 'Take Profit Hit', status: 'WIN' },
-    { id: 'TR-863', date: '05 Aug 2024', side: 'LONG', price: '₹2,620.00', returnPct: '+6.2%', pnl: '+₹62,000', exitReason: 'Momentum Climax', status: 'WIN' }
-  ];
+  // Mathematical backtest calculation based on parameters
+  const years = horizon === '1Y' ? 1 : horizon === '3Y' ? 3 : 5;
+  const quarters = years * 4;
+
+  // Model edge calibration
+  const modelEdge = modelType.includes('XGBoost')
+    ? 1.0
+    : modelType.includes('LightGBM')
+    ? 0.94
+    : modelType.includes('LSTM')
+    ? 0.88
+    : 0.82;
+
+  const winRateNumber = Math.min(88, Math.max(58, Math.round((stock.confidence * 0.9 + (takeProfitPct / (takeProfitPct + stopLossPct)) * 20) * modelEdge)));
+  const cagrValue = Math.round((14.5 + (winRateNumber - 55) * 0.72) * 10) / 10;
+  const benchmarkCagr = 12.4;
+  const sharpeValue = (Math.max(1.1, (cagrValue - 6.5) / (stock.annVolatility * 0.85))).toFixed(2);
+  const maxDrawdownVal = -(Math.min(22, Math.max(5.5, stopLossPct * 2.2 + stock.annVolatility * 0.2))).toFixed(1);
+  const profitFactorVal = ((winRateNumber * takeProfitPct) / ((100 - winRateNumber) * stopLossPct)).toFixed(2);
+
+  // Compounded final equity
+  const totalStrategyMultiplier = Math.pow(1 + cagrValue / 100, years);
+  const totalBenchmarkMultiplier = Math.pow(1 + benchmarkCagr / 100, years);
+  const finalStrategyNav = Math.round(initialCapital * totalStrategyMultiplier);
+  const netReturnPct = Math.round((totalStrategyMultiplier - 1) * 1000) / 10;
+  const netBenchmarkPct = Math.round((totalBenchmarkMultiplier - 1) * 1000) / 10;
+
+  // Generate dynamic quarterly equity curve
+  const curveData = React.useMemo(() => {
+    const points = [];
+    const stepGain = Math.pow(totalStrategyMultiplier, 1 / quarters);
+    const benchStepGain = Math.pow(totalBenchmarkMultiplier, 1 / quarters);
+    let currentStrat = initialCapital;
+    let currentBench = initialCapital;
+
+    for (let i = 0; i <= quarters; i++) {
+      const yearIdx = Math.floor(i / 4) + 1;
+      const qIdx = (i % 4) + 1;
+      const periodLabel = i === 0 ? 'Start' : `Q${qIdx} Y${yearIdx}`;
+      points.push({
+        period: periodLabel,
+        strategy: Math.round(currentStrat),
+        benchmark: Math.round(currentBench)
+      });
+      // slight deterministic fluctuation
+      const noise = 1 + (Math.sin(i * 1.8) * 0.012);
+      currentStrat *= stepGain * noise;
+      currentBench *= benchStepGain;
+    }
+    return points;
+  }, [initialCapital, totalStrategyMultiplier, totalBenchmarkMultiplier, quarters]);
+
+  // Trade Execution Log dynamically tailored to selected stock
+  const tradeLogs = React.useMemo(() => {
+    const baseP = stock.price;
+    return [
+      {
+        id: `TR-${selectedTicker}-01`,
+        date: '14 Oct 2026',
+        side: 'LONG',
+        price: `₹${(baseP * 0.96).toFixed(2)}`,
+        returnPct: `+${takeProfitPct.toFixed(1)}%`,
+        pnl: `+₹${Math.round(initialCapital * 0.12 * (takeProfitPct / 100)).toLocaleString('en-IN')}`,
+        exitReason: 'Take Profit Target Reached',
+        status: 'WIN'
+      },
+      {
+        id: `TR-${selectedTicker}-02`,
+        date: '28 Sep 2026',
+        side: 'LONG',
+        price: `₹${(baseP * 0.94).toFixed(2)}`,
+        returnPct: `+${(takeProfitPct * 0.75).toFixed(1)}%`,
+        pnl: `+₹${Math.round(initialCapital * 0.12 * ((takeProfitPct * 0.75) / 100)).toLocaleString('en-IN')}`,
+        exitReason: 'SHAP Positive Factor Peak',
+        status: 'WIN'
+      },
+      {
+        id: `TR-${selectedTicker}-03`,
+        date: '11 Sep 2026',
+        side: 'LONG',
+        price: `₹${(baseP * 0.97).toFixed(2)}`,
+        returnPct: `-${stopLossPct.toFixed(1)}%`,
+        pnl: `-₹${Math.round(initialCapital * 0.12 * (stopLossPct / 100)).toLocaleString('en-IN')}`,
+        exitReason: 'Stop Loss Boundary Hit',
+        status: 'LOSS'
+      },
+      {
+        id: `TR-${selectedTicker}-04`,
+        date: '24 Aug 2026',
+        side: 'LONG',
+        price: `₹${(baseP * 0.91).toFixed(2)}`,
+        returnPct: `+${takeProfitPct.toFixed(1)}%`,
+        pnl: `+₹${Math.round(initialCapital * 0.12 * (takeProfitPct / 100)).toLocaleString('en-IN')}`,
+        exitReason: 'Take Profit Target Reached',
+        status: 'WIN'
+      },
+      {
+        id: `TR-${selectedTicker}-05`,
+        date: '05 Aug 2026',
+        side: 'LONG',
+        price: `₹${(baseP * 0.88).toFixed(2)}`,
+        returnPct: `+${(takeProfitPct * 0.85).toFixed(1)}%`,
+        pnl: `+₹${Math.round(initialCapital * 0.12 * ((takeProfitPct * 0.85) / 100)).toLocaleString('en-IN')}`,
+        exitReason: 'Momentum Climax Target',
+        status: 'WIN'
+      }
+    ];
+  }, [stock, selectedTicker, initialCapital, takeProfitPct, stopLossPct]);
 
   return (
     <div className="flex flex-col w-full gap-5 max-w-[1600px] xl:max-w-[1720px] mx-auto pb-12">
@@ -233,38 +323,38 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
         <div className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] flex flex-col">
           <span className="text-[11px] font-mono text-[#64748b]">CAGR Return</span>
-          <span className="text-[20px] font-mono font-bold text-emerald-400 mt-1">+27.8%</span>
-          <span className="text-[10px] text-[#64748b] mt-0.5">vs +11.2% NIFTY 50</span>
+          <span className="text-[20px] font-mono font-bold text-emerald-400 mt-1">+{cagrValue}%</span>
+          <span className="text-[10px] text-[#64748b] mt-0.5">vs +{benchmarkCagr}% NIFTY 50</span>
         </div>
 
         <div className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] flex flex-col">
           <span className="text-[11px] font-mono text-[#64748b]">Sharpe Ratio</span>
-          <span className="text-[20px] font-mono font-bold text-cyan-300 mt-1">2.14</span>
+          <span className="text-[20px] font-mono font-bold text-cyan-300 mt-1">{sharpeValue}</span>
           <span className="text-[10px] text-[#64748b] mt-0.5">Risk-adjusted benchmark</span>
         </div>
 
         <div className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] flex flex-col">
           <span className="text-[11px] font-mono text-[#64748b]">Max Drawdown</span>
-          <span className="text-[20px] font-mono font-bold text-rose-400 mt-1">-8.6%</span>
+          <span className="text-[20px] font-mono font-bold text-rose-400 mt-1">{maxDrawdownVal}%</span>
           <span className="text-[10px] text-[#64748b] mt-0.5">Bench peak: -17.4%</span>
         </div>
 
         <div className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] flex flex-col">
           <span className="text-[11px] font-mono text-[#64748b]">Win Rate</span>
-          <span className="text-[20px] font-mono font-bold text-emerald-400 mt-1">74.2%</span>
-          <span className="text-[10px] text-[#64748b] mt-0.5">89 of 120 Trades</span>
+          <span className="text-[20px] font-mono font-bold text-emerald-400 mt-1">{winRateNumber}%</span>
+          <span className="text-[10px] text-[#64748b] mt-0.5">{Math.round(winRateNumber * 1.2)} of 120 Trades</span>
         </div>
 
         <div className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] flex flex-col">
           <span className="text-[11px] font-mono text-[#64748b]">Profit Factor</span>
-          <span className="text-[20px] font-mono font-bold text-cyan-400 mt-1">2.68</span>
+          <span className="text-[20px] font-mono font-bold text-cyan-400 mt-1">{profitFactorVal}</span>
           <span className="text-[10px] text-[#64748b] mt-0.5">Gross Win / Gross Loss</span>
         </div>
 
         <div className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] flex flex-col">
           <span className="text-[11px] font-mono text-[#64748b]">Final NAV</span>
-          <span className="text-[20px] font-mono font-bold text-white mt-1">₹20.85 L</span>
-          <span className="text-[10px] text-emerald-400 mt-0.5">+108.5% Net Profit</span>
+          <span className="text-[20px] font-mono font-bold text-white mt-1">₹{(finalStrategyNav / 100000).toFixed(2)} L</span>
+          <span className="text-[10px] text-emerald-400 mt-0.5">+{netReturnPct}% Net Profit</span>
         </div>
       </div>
 
@@ -282,11 +372,11 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
           <div className="flex items-center gap-3 text-[12px] font-mono">
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-0.5 bg-cyan-400" />
-              <span className="text-cyan-300 font-semibold">XGBoost Strategy (+108.5%)</span>
+              <span className="text-cyan-300 font-semibold">{modelType.split(' ')[0]} Strategy (+{netReturnPct}%)</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-0.5 bg-slate-500" />
-              <span className="text-[#94a3b8]">Nifty 50 (+38.0%)</span>
+              <span className="text-[#94a3b8]">Nifty 50 (+{netBenchmarkPct}%)</span>
             </div>
           </div>
         </div>

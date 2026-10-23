@@ -16,7 +16,7 @@ import {
   Filter
 } from 'lucide-react';
 import { StockData, ScreenTab } from '../types';
-import { STOCKS_DATA } from '../data/stocks';
+import { STOCKS_DATA, getAllIndianStocks } from '../data/stocks';
 
 interface ScreenerScreenProps {
   onSelectStock: (stock: StockData) => void;
@@ -35,7 +35,7 @@ export const ScreenerScreen: React.FC<ScreenerScreenProps> = ({
   const [sortBy, setSortBy] = useState<'confidence' | 'price' | 'change' | 'riskScore'>('confidence');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
-  const stockList = useMemo(() => Object.values(STOCKS_DATA), []);
+  const stockList = useMemo(() => getAllIndianStocks(), []);
 
   const sectors = useMemo(() => {
     const list = Array.from(new Set(stockList.map((s) => s.sector)));

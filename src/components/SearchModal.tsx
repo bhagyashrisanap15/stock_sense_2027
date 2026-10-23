@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { StockData } from '../types';
-import { HOTLINKED_ASSETS, STOCKS_DATA } from '../data/stocks';
+import { HOTLINKED_ASSETS, getAllIndianStocks, getStockData, STOCKS_DATA } from '../data/stocks';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -17,29 +17,31 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   watchlist,
   onToggleWatchlist
 }) => {
-  const [query, setQuery] = useState('INFY');
-  const [selectedFilter, setSelectedFilter] = useState<string>('IT / Tech');
+  const [query, setQuery] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [recentSearches, setRecentSearches] = useState([
     { ticker: 'RELIANCE', change: '+1.42%', isPositive: true },
     { ticker: 'TCS', change: '+0.85%', isPositive: true },
     { ticker: 'HDFCBANK', change: '+1.10%', isPositive: true },
-    { ticker: 'TATASTEEL', change: '-1.80%', isPositive: false }
+    { ticker: 'ICICIBANK', change: '+1.45%', isPositive: true },
+    { ticker: 'SBIN', change: '+1.95%', isPositive: true }
   ]);
+
+  const allStocks = useMemo(() => getAllIndianStocks(), []);
 
   if (!isOpen) return null;
 
   const filterOptions = [
-    { id: 'all', label: 'Exchange: NSE/BSE', icon: 'check' },
-    { id: 'IT / Tech', label: 'IT / Tech', icon: 'memory' },
-    { id: 'Large Cap', label: 'Large Cap' },
-    { id: 'Bullish (UP)', label: 'Bullish (UP)', dotColor: '#4edea3' },
-    { id: 'Neutral', label: 'Neutral', dotColor: '#adc6ff' },
-    { id: 'Banking', label: 'Banking' },
-    { id: 'Energy', label: 'Energy' }
+    { id: 'all', label: 'All NSE / BSE Equities', icon: 'check' },
+    { id: 'IT / Tech', label: 'IT & Software', icon: 'memory' },
+    { id: 'Banking', label: 'Banks & NBFCs' },
+    { id: 'Auto & Metals', label: 'Auto & Metals' },
+    { id: 'Bullish (UP)', label: 'AI Bullish', dotColor: '#4edea3' },
+    { id: 'Neutral', label: 'AI Neutral', dotColor: '#adc6ff' },
+    { id: 'Energy', label: 'Energy & Petrochem' }
   ];
 
   // Filter stocks based on query and selected category
-  const allStocks = Object.values(STOCKS_DATA);
   const filteredStocks = allStocks.filter((s) => {
     const matchesQuery =
       query.trim() === '' ||
@@ -55,8 +57,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     if (selectedFilter === 'Banking') {
       return s.sector.includes('Bank') || s.sector.includes('Finance');
     }
+    if (selectedFilter === 'Auto & Metals') {
+      return s.sector.includes('Auto') || s.sector.includes('Metal') || s.sector.includes('Steel');
+    }
     if (selectedFilter === 'Energy') {
-      return s.sector.includes('Energy');
+      return s.sector.includes('Energy') || s.sector.includes('Oil') || s.sector.includes('Petro');
     }
     if (selectedFilter === 'Bullish (UP)') {
       return s.direction === 'UP';
@@ -212,7 +217,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 >
                   <button
                     onClick={() => {
-                      const stock = STOCKS_DATA[item.ticker];
+                      const stock = getStockData(item.ticker);
                       if (stock) handleSelect(stock);
                     }}
                     className="font-mono hover:text-[#adc6ff] transition-colors font-medium"

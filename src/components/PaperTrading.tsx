@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { StockData, ScreenTab, PaperTradeOrder, PaperTradePosition } from '../types';
-import { STOCKS_DATA } from '../data/stocks';
+import { STOCKS_DATA, getStockData } from '../data/stocks';
 
 interface PaperTradingProps {
   currentStock?: StockData;
@@ -141,13 +141,7 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
   // Live Position Valuations & P&L Calculations
   const positionRows = useMemo(() => {
     return Object.values(paperState.positions).map((pos) => {
-      const stock = STOCKS_DATA[pos.ticker] || {
-        ticker: pos.ticker,
-        name: pos.companyName,
-        price: pos.avgBuyPrice,
-        change: 0,
-        changePercent: 0
-      };
+      const stock = getStockData(pos.ticker);
 
       const currentVal = pos.shares * stock.price;
       const totalCost = pos.shares * pos.avgBuyPrice;

@@ -1,5 +1,5 @@
 import { ScreenTab, StockData } from '../types';
-import { STOCKS_DATA, INDICES_DATA } from '../data/stocks';
+import { STOCKS_DATA, INDICES_DATA, getStockData } from '../data/stocks';
 import { NSE500_SECTORS_DATA } from '../data/nse500';
 import { STOCK_HEADLINES_DATABASE } from '../data/news';
 
@@ -309,7 +309,7 @@ export function exportCurrentViewFinancialData(
       ];
 
       const rows = watchlist.map((ticker) => {
-        const stock = STOCKS_DATA[ticker] || STOCKS_DATA['RELIANCE'];
+        const stock = getStockData(ticker);
         return [
           stock.ticker,
           stock.name,
