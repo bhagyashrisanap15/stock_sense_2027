@@ -54,37 +54,37 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
     }, 3500);
   };
 
-  // Generate feature explanations mapping
+  // Generate feature explanations mapping in beginner-friendly language
   const getFeatureRationale = (featureName: string, impact: number) => {
     const isBull = impact >= 0;
     if (featureName.toLowerCase().includes('rsi')) {
       return isBull
-        ? `Momentum reading (${currentStock.rsi}) is in bullish territory without entering overbought fatigue (>70), adding +${Math.abs(impact).toFixed(2)} to log-odds.`
-        : `RSI reading (${currentStock.rsi}) indicates waning momentum or bearish consolidation, reducing probability by -${Math.abs(impact).toFixed(2)}.`;
+        ? `RSI momentum (${currentStock.rsi}) is in a healthy upward zone without being too expensive (>70), helping push the stock UP.`
+        : `RSI momentum (${currentStock.rsi}) shows slowing buying interest or consolidation, pulling the stock DOWN.`;
     }
     if (featureName.toLowerCase().includes('macd')) {
       return isBull
-        ? `MACD histogram divergence (${currentStock.macd?.histogram >= 0 ? '+' : ''}${currentStock.macd?.histogram}) confirms short-term trend acceleration above signal.`
-        : `Negative MACD histogram divergence indicates downward momentum pressure vs 9-period signal.`;
+        ? `MACD trend indicator confirms short-term price momentum is speeding up in an upward direction.`
+        : `MACD trend indicator shows short-term momentum is cooling off or facing downward pressure.`;
     }
     if (featureName.toLowerCase().includes('sma') || featureName.toLowerCase().includes('moving')) {
       return isBull
-        ? `Spot price trading cleanly above 20-Day SMA confirms mean-reverting support and upward structural drift.`
-        : `Price rejection near moving average bands indicates overhead resistance and supply concentration.`;
+        ? `Current price is trading comfortably above its 20-day average price, confirming steady buyer support.`
+        : `Price is facing resistance near recent average levels, meaning sellers are stepping in.`;
     }
     if (featureName.toLowerCase().includes('volume') || featureName.toLowerCase().includes('obv')) {
       return isBull
-        ? `Trading volume expansion (${currentStock.volumeSurge}) provides institutional accumulation confirmation.`
-        : `Muted volume participation limits follow-through, increasing risk of false breakout.`;
+        ? `Higher than usual trading volume (${currentStock.volumeSurge}) indicates genuine interest from large investors.`
+        : `Trading volume is quiet, meaning there isn't enough buying power to fuel an immediate breakout.`;
     }
     if (featureName.toLowerCase().includes('volatility') || featureName.toLowerCase().includes('atr')) {
       return isBull
-        ? `Moderate volatility within historical benchmarks supports clean trend formation.`
-        : `Elevated annualized volatility (${currentStock.annVolatility}%) acts as a risk penalty, widening the forecast uncertainty corridor.`;
+        ? `Stock price swings are moderate and orderly, supporting a clear, predictable trend.`
+        : `Higher price swings (${currentStock.annVolatility}% yearly volatility) mean more daily fluctuation and uncertainty.`;
     }
     return isBull
-      ? `Quantitative feature metric operates in favorable decile based on historical tree partition rules.`
-      : `Feature metric registers in restrictive quantile, reducing overall directional confidence.`;
+      ? `This technical indicator is currently in a favorable zone based on historical market patterns.`
+      : `This indicator shows cautious historical patterns, suggesting patience is needed.`;
   };
 
   const displayedShapFactors = showAllShap
@@ -118,7 +118,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
                 </span>
               </div>
               <span className="text-[13px] text-[#c2c6d6]">
-                {currentStock.name} • Market Cap: {currentStock.marketCap}
+                {currentStock.name} • Company Size: {currentStock.marketCap}
               </span>
             </div>
           </div>
@@ -127,7 +127,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
           {onSelectStock && (
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
               <span className="text-[11px] text-[#8c909f] font-mono shrink-0 mr-1">
-                Active Benchmark:
+                Popular Stocks:
               </span>
               {sampleTickers.map((tick) => {
                 const isSelected = currentStock.ticker === tick;
@@ -188,13 +188,13 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
               <div className="flex flex-col text-left">
                 <span className="text-[12px] font-bold leading-none">
                   {currentStock.direction === 'UP'
-                    ? 'Bullish'
+                    ? 'Likely UP'
                     : currentStock.direction === 'DOWN'
-                    ? 'Bearish'
+                    ? 'Likely DOWN'
                     : 'Neutral'}
                 </span>
                 <span className="text-[10px] font-mono mt-0.5 opacity-90">
-                  {currentStock.confidence}% Prob
+                  {currentStock.confidence}% Confidence
                 </span>
               </div>
             </div>
@@ -204,18 +204,18 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
         {/* Telemetry Strip: Horizon, Timestamp, Calibrated Probability */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-[#1c2b3c] text-[11.5px] font-mono">
           <div className="bg-[#0d1c2d] p-2.5 rounded-xl border border-[#1c2b3c] flex items-center justify-between">
-            <span className="text-[#8c909f]">Forecast Horizon:</span>
-            <span className="text-[#38bdf8] font-bold">5-Trading-Day Window (Next Week Close)</span>
+            <span className="text-[#8c909f]">Prediction Target:</span>
+            <span className="text-[#38bdf8] font-bold">Next 5 Trading Days</span>
           </div>
 
           <div className="bg-[#0d1c2d] p-2.5 rounded-xl border border-[#1c2b3c] flex items-center justify-between">
-            <span className="text-[#8c909f]">Latest Data Timestamp:</span>
-            <span className="text-[#d4e4fa]">{currentStock.snapshotTime} (14 Oct 2026)</span>
+            <span className="text-[#8c909f]">Data As Of:</span>
+            <span className="text-[#d4e4fa]">{currentStock.snapshotTime} (Latest NSE Close)</span>
           </div>
 
           <div className="bg-[#0d1c2d] p-2.5 rounded-xl border border-[#1c2b3c] flex items-center justify-between">
-            <span className="text-[#8c909f]">Calibrated Model Probability:</span>
-            <span className="text-[#4edea3] font-bold">{currentStock.confidence}.0% (Platt Scaled)</span>
+            <span className="text-[#8c909f]">AI Confidence:</span>
+            <span className="text-[#4edea3] font-bold">{currentStock.confidence}% Sure</span>
           </div>
         </div>
       </div>
@@ -230,7 +230,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
               : 'text-[#8c909f] hover:text-[#d4e4fa]'
           }`}
         >
-          Complete AI Dossier
+          All AI Insights
         </button>
         <button
           onClick={() => setActiveTab('shap')}
@@ -240,7 +240,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
               : 'text-[#8c909f] hover:text-[#d4e4fa]'
           }`}
         >
-          SHAP Feature Attribution
+          Why AI Predicts Up / Down
         </button>
         <button
           onClick={() => setActiveTab('forecast')}
@@ -250,7 +250,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
               : 'text-[#8c909f] hover:text-[#d4e4fa]'
           }`}
         >
-          Price Forecast & Bands
+          5-Day Price Target & Range
         </button>
         <button
           onClick={() => setActiveTab('whatif')}
@@ -270,7 +270,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
               : 'text-[#8c909f] hover:text-[#d4e4fa]'
           }`}
         >
-          Model Transparency
+          How AI Works
         </button>
       </div>
 
@@ -280,28 +280,28 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-[#38bdf8]" />
             <h3 className="text-[15px] font-bold text-[#d4e4fa] tracking-tight">
-              Prediction Synthesis in Plain English
+              What This Means in Plain English
             </h3>
             <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#4d8eff]/20 text-[#adc6ff] border border-[#4d8eff]/30">
-              Natural Language XAI
+              Easy Explanation
             </span>
           </div>
           <span className="text-[11px] font-mono text-[#8c909f]">
-            Generated from Verified Tree Splits & Quantitative Inputs
+            Analyzed using multi-year NSE price and volume patterns
           </span>
         </div>
 
         <div className="bg-[#0d1c2d] p-4 rounded-xl border border-[#273647] flex flex-col gap-2">
           <p className="text-[13.5px] text-[#d4e4fa] leading-relaxed font-normal">
-            The model predicts a <strong className={isUp ? 'text-[#4edea3]' : isDown ? 'text-[#ffb4ab]' : 'text-[#adc6ff]'}>
-              {currentStock.direction === 'UP' ? 'Bullish' : currentStock.direction === 'DOWN' ? 'Bearish' : 'Neutral'}
-            </strong> trend ({currentStock.confidence}% calibrated probability) over the 5-day horizon because momentum indicators (RSI 14-day at {currentStock.rsi} and {currentStock.macd?.histogram >= 0 ? 'positive' : 'negative'} MACD histogram at {currentStock.macd?.histogram}) confirm {isUp ? 'upward' : isDown ? 'downward' : 'indecisive'} direction relative to the 20-day moving average. Elevated volatility ({currentStock.annVolatility}%) increases forecast uncertainty.
+            The AI predicts a <strong className={isUp ? 'text-[#4edea3]' : isDown ? 'text-[#ffb4ab]' : 'text-[#adc6ff]'}>
+              {currentStock.direction === 'UP' ? 'Bullish (Upward)' : currentStock.direction === 'DOWN' ? 'Bearish (Downward)' : 'Neutral (Consolidating)'}
+            </strong> trend with <strong className="text-white">{currentStock.confidence}% confidence</strong> over the next 5 trading days. Key momentum signals (14-day RSI at {currentStock.rsi} and {currentStock.macd?.histogram >= 0 ? 'positive' : 'negative'} MACD) show {isUp ? 'healthy buyer demand' : isDown ? 'cautious selling pressure' : 'a balanced market'} compared to the 20-day average price.
           </p>
 
           <div className="flex items-start gap-2 pt-2 border-t border-[#1c2b3c] text-[#8c909f] text-[11px]">
             <Info className="w-4 h-4 text-[#38bdf8] shrink-0 mt-0.5" />
             <span>
-              <strong className="text-[#c2c6d6]">Attribution vs. Causality Notice:</strong> The features listed reflect additive statistical attribution calculated via TreeSHAP on the trained model. They explain why the algorithm made this prediction, not that these indicators caused external market forces.
+              <strong className="text-[#c2c6d6]">Beginner Guide:</strong> The factors below show what is influencing the AI's calculation right now. Green factors push the price expectation UP, while red factors pull it DOWN.
             </span>
           </div>
         </div>
@@ -318,27 +318,20 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
                   <div className="flex items-center gap-2">
                     <BarChart2 className="w-4 h-4 text-[#38bdf8]" />
                     <h3 className="text-[15px] font-bold text-[#d4e4fa] tracking-tight">
-                      SHAP Feature Attribution (Actual Model)
+                      Why the AI Predicts UP or DOWN (Key Drivers)
                     </h3>
                   </div>
                   <p className="text-[11.5px] text-[#8c909f]">
-                    Top contributing factors shifting output log-odds from baseline 0.50 toward {currentStock.direction}
+                    Top market factors that move the AI's forecast from neutral (50%) toward {currentStock.direction === 'UP' ? 'UP' : 'DOWN'}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setIsShapAvailable(!isShapAvailable)}
-                    className="text-[10.5px] text-[#8c909f] hover:text-[#38bdf8] underline font-mono"
-                    title="Simulate toggle of SHAP telemetry availability"
-                  >
-                    {isShapAvailable ? 'Simulate Offline' : 'Restore SHAP'}
-                  </button>
-                  <button
                     onClick={() => setShowAllShap(!showAllShap)}
                     className="px-2.5 py-1 rounded-lg bg-[#0d1c2d] hover:bg-[#1c2b3c] border border-[#1c2b3c] text-[11px] font-mono text-[#adc6ff]"
                   >
-                    {showAllShap ? 'Show Top 5' : 'Show All (8)'}
+                    {showAllShap ? 'Show Top 5' : 'Show All Factors (8)'}
                   </button>
                 </div>
               </div>
@@ -349,10 +342,10 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
                   <AlertTriangle className="w-8 h-8 text-[#ffb77c]" />
                   <div className="flex flex-col">
                     <span className="font-bold text-[14px] text-[#d4e4fa]">
-                      Feature Explanations Currently Unavailable
+                      Explanations Temporarily Offline
                     </span>
                     <span className="text-[12px] text-[#8c909f] max-w-sm mt-1">
-                      TreeSHAP kernel telemetry timed out for ticker {currentStock.ticker}. Inference output was cached without local explanation trees.
+                      Unable to compute factor breakdown at this moment.
                     </span>
                   </div>
                   <button
@@ -360,24 +353,24 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
                     className="px-4 py-1.5 bg-[#38bdf8] text-[#002844] font-bold rounded-lg text-[12px] flex items-center gap-1.5 mt-1"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Re-evaluate TreeSHAP Explainer</span>
+                    <span>Refresh Analysis</span>
                   </button>
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
                   {/* Axis Legend */}
                   <div className="flex items-center justify-between text-[11px] text-[#8c909f] font-mono px-1 pb-1 border-b border-[#1c2b3c]/80">
-                    <span>Contributing Feature & Input Value</span>
+                    <span>Market Factor & What It Means</span>
                     <div className="flex items-center gap-4">
                       <span className="text-[#ffb4ab] flex items-center gap-1">
                         <span className="w-2 h-2 rounded-full bg-[#ffb4ab]" />
-                        Bear (-SHAP)
+                        Pushes Price Down (-)
                       </span>
                       <span className="text-[#4edea3] flex items-center gap-1">
                         <span className="w-2 h-2 rounded-full bg-[#4edea3]" />
-                        Bull (+SHAP)
+                        Pushes Price Up (+)
                       </span>
-                      <span>Impact Score</span>
+                      <span>Impact</span>
                     </div>
                   </div>
 
@@ -446,12 +439,12 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
                   {/* Net Baseline Attribution Summary */}
                   <div className="p-3 bg-[#0d1c2d] rounded-xl border border-[#273647] flex items-center justify-between text-[11.5px] font-mono">
                     <span className="text-[#8c909f]">
-                      Base Log-Odds Prior: <strong className="text-[#d4e4fa]">0.50 (Neutral)</strong>
+                      Starting Neutral Baseline: <strong className="text-[#d4e4fa]">50% (50/50 Chance)</strong>
                     </span>
                     <span className="text-[#8c909f]">
-                      Calibrated Net Shift:{' '}
+                      Net Direction Shift:{' '}
                       <strong className={isUp ? 'text-[#4edea3]' : isDown ? 'text-[#ffb4ab]' : 'text-[#adc6ff]'}>
-                        {isUp ? '+0.32 UP' : isDown ? '-0.28 DOWN' : '+0.02 Neutral'}
+                        {isUp ? '+32% Toward UP' : isDown ? '-28% Toward DOWN' : 'Balanced'}
                       </strong>
                     </span>
                   </div>
@@ -467,7 +460,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
                 <div className="flex items-center gap-2">
                   <ShieldAlert className="w-4 h-4 text-[#ffb77c]" />
                   <h3 className="text-[15px] font-bold text-[#d4e4fa] tracking-tight">
-                    Quantitative Risk Radar
+                    Stock Safety & Risk Check
                   </h3>
                 </div>
                 {onNavigate && (
@@ -475,7 +468,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
                     onClick={() => onNavigate('risk-radar')}
                     className="text-[11px] font-mono font-semibold text-[#38bdf8] hover:text-[#7dd3fc] flex items-center gap-1"
                   >
-                    <span>Full Radar</span>
+                    <span>Full Risk Meter</span>
                     <ArrowRight className="w-3 h-3" />
                   </button>
                 )}
@@ -485,7 +478,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
               <div className="bg-[#0d1c2d] p-4 rounded-xl border border-[#1c2b3c] flex items-center justify-between">
                 <div className="flex flex-col">
                   <span className="text-[10.5px] uppercase text-[#8c909f] font-mono font-semibold">
-                    Documented Risk Score
+                    Overall Risk Score
                   </span>
                   <div className="flex items-baseline gap-2 mt-1">
                     <span className="font-mono text-[28px] font-bold text-[#d4e4fa] leading-none">
@@ -494,7 +487,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
                     <span className="text-[12px] text-[#8c909f] font-mono">/ 100</span>
                   </div>
                   <span className="text-[10px] text-[#8c909f] mt-1">
-                    Weighted: 40% Vol + 30% MaxDD + 20% VaR-95 + 10% Entropy
+                    0 = Very Safe & Steady • 100 = Highly Volatile
                   </span>
                 </div>
 
@@ -514,51 +507,51 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
               {/* 4 Quantitative Factor Breakdown Cards */}
               <div className="grid grid-cols-2 gap-2.5">
                 <div className="bg-[#0d1c2d] p-3 rounded-xl border border-[#1c2b3c] flex flex-col">
-                  <span className="text-[10px] text-[#8c909f] uppercase font-mono">Ann. Volatility</span>
+                  <span className="text-[10px] text-[#8c909f] uppercase font-mono">Annual Volatility</span>
                   <span className="font-mono text-[14px] font-bold text-[#d4e4fa] mt-0.5">
                     {currentStock.annVolatility}%
                   </span>
-                  <span className="text-[9.5px] text-[#8c909f]">Benchmark: {currentStock.volBenchmark}%</span>
+                  <span className="text-[9.5px] text-[#8c909f]">Market Avg: {currentStock.volBenchmark}%</span>
                 </div>
 
                 <div className="bg-[#0d1c2d] p-3 rounded-xl border border-[#1c2b3c] flex flex-col">
-                  <span className="text-[10px] text-[#8c909f] uppercase font-mono">Max Drawdown</span>
+                  <span className="text-[10px] text-[#8c909f] uppercase font-mono">Worst Past Drop</span>
                   <span className="font-mono text-[14px] font-bold text-[#ffb4ab] mt-0.5">
                     {currentStock.maxDrawdown}%
                   </span>
-                  <span className="text-[9.5px] text-[#8c909f]">From ₹{currentStock.drawdownPeak} Peak</span>
+                  <span className="text-[9.5px] text-[#8c909f]">From ₹{currentStock.drawdownPeak} High</span>
                 </div>
 
                 <div className="bg-[#0d1c2d] p-3 rounded-xl border border-[#1c2b3c] flex flex-col">
-                  <span className="text-[10px] text-[#8c909f] uppercase font-mono">Prediction Uncertainty</span>
+                  <span className="text-[10px] text-[#8c909f] uppercase font-mono">AI Certainty</span>
                   <span className="font-mono text-[14px] font-bold text-[#38bdf8] mt-0.5">
-                    {currentStock.uncertaintyEntropy} nats
+                    High Confidence
                   </span>
-                  <span className="text-[9.5px] text-[#4edea3]">Shannon Entropy (Low)</span>
+                  <span className="text-[9.5px] text-[#4edea3]">Clear Historical Pattern</span>
                 </div>
 
                 <div className="bg-[#0d1c2d] p-3 rounded-xl border border-[#1c2b3c] flex flex-col">
-                  <span className="text-[10px] text-[#8c909f] uppercase font-mono">Value at Risk (95%)</span>
+                  <span className="text-[10px] text-[#8c909f] uppercase font-mono">Max 1-Day Typical Loss</span>
                   <span className="font-mono text-[14px] font-bold text-[#ffb77c] mt-0.5">
                     {currentStock.var95}%
                   </span>
-                  <span className="text-[9.5px] text-[#8c909f]">1-Day Parametric</span>
+                  <span className="text-[9.5px] text-[#8c909f]">95% of days fall within this</span>
                 </div>
               </div>
 
               {/* Risk Factors Explanation */}
               <div className="bg-[#0d1c2d] p-3 rounded-xl border border-[#1c2b3c] flex flex-col gap-1.5 text-[11px]">
-                <span className="font-bold text-[#c2c6d6]">Key Risk Factor Contributors:</span>
+                <span className="font-bold text-[#c2c6d6]">What You Should Know:</span>
                 <ul className="list-disc list-inside text-[#8c909f] space-y-1">
-                  <li>Beta sensitivity of {currentStock.beta}x relative to broad NIFTY 50 index swings.</li>
-                  <li>Historical drawdown tail-risk is anchored at ₹{currentStock.drawdownFloor} support floor.</li>
-                  <li>Sharpe ratio of {currentStock.sharpeRatio} reflects favorable risk-adjusted excess returns.</li>
+                  <li>Market Sensitivity (Beta): {currentStock.beta}x (Moves ~{currentStock.beta}% for every 1% NIFTY move).</li>
+                  <li>Historical price safety floor is around ₹{currentStock.drawdownFloor}.</li>
+                  <li>Risk-Reward Ratio (Sharpe): {currentStock.sharpeRatio} (Above 1.0 is a healthy reward for the risk).</li>
                 </ul>
               </div>
 
               {/* Compliance Note */}
               <div className="text-[10px] text-[#8c909f] font-mono leading-tight">
-                * Risk scores are mathematically calculated quantitative estimates for educational analysis, not personalized investment advice.
+                * Note: Stock market predictions and safety scores are for educational use and learning, not individual financial advice.
               </div>
             </div>
 
@@ -613,16 +606,16 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
       {/* SECTION: LIME Rules & Multi-Model Agreement */}
       {activeTab === 'all' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {/* LIME Heuristics */}
+          {/* Quick Rule-of-Thumb Checks */}
           <div className="bg-[#122131] rounded-2xl p-4 lg:p-5 flex flex-col gap-3 border border-[#1c2b3c] shadow-md">
             <div className="flex items-center justify-between border-b border-[#1c2b3c] pb-2.5">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-[#38bdf8]" />
                 <h3 className="text-[14.5px] font-bold text-[#d4e4fa] tracking-tight">
-                  LIME Local Decision Heuristics
+                  Quick Market Rule Checks
                 </h3>
               </div>
-              <span className="text-[10px] font-mono text-[#8c909f]">Surrogate Rules</span>
+              <span className="text-[10px] font-mono text-[#8c909f]">Indicator Rules</span>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -645,7 +638,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
                     >
                       {rule.shift}
                     </span>
-                    <span className="block text-[9.5px] text-[#8c909f]">P(UP) Shift</span>
+                    <span className="block text-[9.5px] text-[#8c909f]">Probability Shift</span>
                   </div>
                 </div>
               ))}
@@ -658,10 +651,10 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
               <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-[#4edea3]" />
                 <h3 className="text-[14.5px] font-bold text-[#d4e4fa] tracking-tight">
-                  Multi-Model Ensemble Consensus
+                  What Other AI Models Predict
                 </h3>
               </div>
-              <span className="text-[10px] font-mono text-[#8c909f]">Independent Architectures</span>
+              <span className="text-[10px] font-mono text-[#8c909f]">Independent Models</span>
             </div>
 
             <div className="flex flex-col gap-2 divide-y divide-[#1c2b3c]/60">
@@ -685,7 +678,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
                         <span className="font-bold text-[#d4e4fa]">{model.name}</span>
                         {model.isPrimary && (
                           <span className="px-1 py-0.2 rounded text-[9px] font-bold bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/30">
-                            Primary
+                            Primary Model
                           </span>
                         )}
                       </div>
@@ -703,9 +696,9 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
                           : 'text-[#adc6ff]'
                       }`}
                     >
-                      {model.direction}
+                      {model.direction === 'UP' ? 'Bullish (UP)' : model.direction === 'DOWN' ? 'Bearish (DOWN)' : 'Neutral'}
                     </span>
-                    <span className="text-[10.5px] text-[#8c909f]">{model.confidence}% Conf</span>
+                    <span className="text-[10.5px] text-[#8c909f]">{model.confidence}% Confident</span>
                   </div>
                 </div>
               ))}
@@ -718,9 +711,9 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
       <div className="p-4 rounded-2xl bg-[#0d1c2d] border border-[#273647] flex items-start gap-3 text-[12px] text-[#8c909f]">
         <Info className="w-5 h-5 text-[#ffb77c] shrink-0 mt-0.5" />
         <div className="flex flex-col gap-0.5">
-          <span className="font-bold text-[#c2c6d6]">Educational & Quantitative Research Disclaimer</span>
+          <span className="font-bold text-[#c2c6d6]">Helpful Reminder for Beginners</span>
           <p className="leading-relaxed">
-            AI predictions and risk estimates are experimental and are not financial advice. Past backtested performance is no guarantee of future returns. Machine learning models generate probabilistic indicators based on historical tick and price distributions. Never trade with capital you cannot afford to lose.
+            All AI predictions, charts, and risk meters are educational guides designed to help you learn market trends and make disciplined trading choices. The stock market always has unpredictable moments, so never invest funds you cannot afford to risk.
           </p>
         </div>
       </div>

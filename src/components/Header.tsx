@@ -46,19 +46,19 @@ export const Header: React.FC<HeaderProps> = ({
 
   // Tab display name mapping
   const tabTitles: Record<ScreenTab, string> = {
-    'ai-predict': 'AI Insights & Explainability',
-    'dashboard': 'Institutional Dashboard',
-    'markets': 'Real-Time Market Monitor',
-    'risk-radar': 'Portfolio Risk Radar',
-    'watchlist': 'Priority Watchlist',
-    'portfolio': 'Position & Portfolio Allocation',
-    'paper-trading': 'Virtual Execution Simulator',
-    'backtesting': 'Quantitative Strategy Backtest',
-    'heatmap': 'Sectoral Market Heatmap',
-    'screener': 'Quantitative Stock Screener',
-    'news-sentiment': 'News & Institutional Sentiment',
-    'technical-analysis': 'Technical Multi-Indicator Analysis',
-    'overview': 'Executive Market Overview'
+    'ai-predict': 'AI Predictions & Insights (Why Stocks Move)',
+    'dashboard': 'Market Dashboard Overview',
+    'markets': 'Live Market Prices & Indices',
+    'risk-radar': 'Risk & Safety Meter',
+    'watchlist': 'My Watchlist',
+    'portfolio': 'My Portfolio & Holdings',
+    'paper-trading': 'Practice Trading (Virtual Money)',
+    'backtesting': 'Strategy Tester (Past Results)',
+    'heatmap': 'Sector Performance Heatmap',
+    'screener': 'Easy Stock Finder & Screener',
+    'news-sentiment': 'Market News & Sentiment',
+    'technical-analysis': 'Price Trends & Technical Charts',
+    'overview': 'Market Summary'
   };
 
   return (
@@ -86,7 +86,7 @@ export const Header: React.FC<HeaderProps> = ({
               {tabTitles[currentTab] || 'Platform'}
             </span>
             <span className="hidden lg:inline-flex items-center gap-1 ml-2 px-1.5 py-0.2 rounded bg-[#111e33] text-[10px] text-[#94a3b8] border border-[#1b2f4f]">
-              Target: <strong className="text-white">{currentStockTicker}</strong>
+              Stock: <strong className="text-white">{currentStockTicker}</strong>
             </span>
           </div>
           <div className="hidden sm:flex items-center gap-2 mt-0.5">
@@ -128,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
                   </span>
                   <span className="text-[#334155] text-[10px] hidden md:inline">·</span>
                   <span className="text-[10px] font-mono text-[#94a3b8] hidden md:inline">
-                    India VIX 12.84 (-3.4%)
+                    Market Volatility (VIX) 12.84
                   </span>
                 </div>
               );
@@ -146,7 +146,7 @@ export const Header: React.FC<HeaderProps> = ({
           className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] hover:border-cyan-500/40 text-[#94a3b8] hover:text-[#f8fafc] text-[13px] transition-all shadow-sm group"
         >
           <Search className="w-4 h-4 text-[#64748b] group-hover:text-cyan-400 transition-colors" />
-          <span className="hidden md:inline font-normal">Search symbols...</span>
+          <span className="hidden md:inline font-normal">Search stocks...</span>
           <span className="md:hidden">Search</span>
           <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-[#1a2a42] text-[#7dd3fc] rounded border border-[#233857]">
             ⌘K
@@ -159,8 +159,8 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onExportCSV}
             className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] hover:border-cyan-500/50 text-[#94a3b8] hover:text-white text-[13px] font-medium transition-all shadow-sm group"
-            title={`Export current view (${tabTitles[currentTab] || 'financial dataset'}) to CSV for offline quantitative analysis`}
-            aria-label="Export financial data to CSV"
+            title="Download this data as a CSV spreadsheet"
+            aria-label="Export data to CSV"
           >
             <Download className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
             <span className="hidden sm:inline">Export CSV</span>
@@ -199,7 +199,7 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onOpenShortcuts}
             className="w-9 h-9 rounded-lg bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] hover:border-cyan-500/40 text-[#94a3b8] hover:text-cyan-400 flex items-center justify-center transition-colors shadow-sm"
-            title="Keyboard shortcuts & command palette (Press ?)"
+            title="Keyboard shortcuts & helper (Press ?)"
             aria-label="Open keyboard shortcuts helper"
           >
             <Keyboard className="w-4 h-4" />
@@ -217,14 +217,14 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-lg bg-[#0e1a2d] hover:bg-[#14233c] border border-[#1a2e4c] hover:border-[#273d61] transition-all"
           >
             <div className="w-7 h-7 rounded-md bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
-              QP
+              SS
             </div>
             <div className="hidden sm:flex flex-col text-left leading-none">
               <span className="text-[12px] font-semibold text-white tracking-tight">
-                Quant Desk
+                My Account
               </span>
               <span className="text-[9.5px] font-mono text-cyan-400 font-medium">
-                Institutional
+                Member
               </span>
             </div>
             <ChevronDown className="w-3.5 h-3.5 text-[#64748b]" />
@@ -240,32 +240,32 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="absolute right-0 top-full mt-2 w-64 rounded-xl bg-[#0a1424] border border-[#1c304d] shadow-2xl p-3 z-50 text-[#e2e8f0] animate-in fade-in zoom-in-95 duration-150">
                 <div className="flex items-center gap-3 pb-3 border-b border-[#14233c]">
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center text-white font-bold text-[14px]">
-                    QP
+                    SS
                   </div>
                   <div className="flex flex-col min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="font-bold text-[13px] text-white truncate">
-                        Quant Desk Alpha
+                        Investor Account
                       </span>
                       <ShieldCheck className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     </div>
                     <span className="text-[11px] text-[#64748b] truncate">
-                      institutional@stocksense.ai
+                      investor@stocksense.ai
                     </span>
                     <span className="text-[10px] font-mono text-cyan-400 font-semibold mt-0.5">
-                      Tier: Multi-Factor Pro
+                      Plan: All Features Unlocked
                     </span>
                   </div>
                 </div>
 
                 <div className="py-2 space-y-1 text-[12px]">
                   <div className="px-2 py-1.5 text-[#94a3b8] flex items-center justify-between">
-                    <span>ML Pipeline Status</span>
-                    <span className="font-mono text-emerald-400 font-semibold">Ready (18ms)</span>
+                    <span>AI Prediction Engine</span>
+                    <span className="font-mono text-emerald-400 font-semibold">Active & Ready</span>
                   </div>
                   <div className="px-2 py-1.5 text-[#94a3b8] flex items-center justify-between">
-                    <span>SHAP Kernel</span>
-                    <span className="font-mono text-cyan-300">FastTreeSHAP</span>
+                    <span>Indian Markets</span>
+                    <span className="font-mono text-cyan-300">NSE & BSE</span>
                   </div>
                 </div>
 

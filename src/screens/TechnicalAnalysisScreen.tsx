@@ -285,14 +285,14 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[20px] font-bold text-white tracking-tight">
-                Technical Analysis & Indicator Workspace
+                Price Trends & Technical Charts
               </h1>
               <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[11px] font-mono font-bold">
-                Multi-Timeframe
+                Beginner Friendly
               </span>
             </div>
             <p className="text-[13px] text-[#94a3b8] mt-0.5">
-              Oscillator confluence, trend-following moving average bands, and volatility envelope telemetry.
+              Clear price charts, moving averages, and momentum indicators explained simply for new investors.
             </p>
           </div>
         </div>
@@ -320,7 +320,7 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
       <div className="bg-[#122131] rounded-2xl p-4 border border-[#1c2b3c] flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div>
-            <span className="text-[11px] font-mono text-[#64748b] uppercase tracking-wider block">Target Asset</span>
+            <span className="text-[11px] font-mono text-[#64748b] uppercase tracking-wider block">Selected Stock</span>
             <span className="text-[18px] font-bold text-white">{stock.ticker}</span>
             <span className="text-[12px] text-[#94a3b8] ml-2 font-normal">({stock.name})</span>
           </div>
@@ -328,7 +328,7 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
           <div className="h-8 w-[1px] bg-[#1c2b3c] hidden sm:block" />
 
           <div>
-            <span className="text-[11px] font-mono text-[#64748b] uppercase tracking-wider block">Spot Price</span>
+            <span className="text-[11px] font-mono text-[#64748b] uppercase tracking-wider block">Current Price</span>
             <div className="flex items-baseline gap-2">
               <span className="text-[18px] font-mono font-bold text-white">
                 ₹{stock.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -354,7 +354,7 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
                 <span>{trendStrengthLabel}</span>
               </span>
               <span className="text-[11px] font-mono text-[#8c909f] hidden xl:inline">
-                (50 SMA {isSma50Above200 ? '≥' : '<'} 200 SMA)
+                ({isSma50Above200 ? '50-day average is above 200-day average' : '50-day average is below 200-day average'})
               </span>
             </div>
           </div>
@@ -363,9 +363,9 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
         {/* Confluence Rating */}
         <div className="flex items-center gap-3 bg-[#0a1424] px-4 py-2 rounded-xl border border-[#1c2b3c]">
           <div className="flex flex-col text-right">
-            <span className="text-[11px] font-mono text-[#64748b]">Technical Confluence</span>
+            <span className="text-[11px] font-mono text-[#64748b]">Indicator Consensus</span>
             <span className="text-[14px] font-mono font-bold text-cyan-400">
-              {bullishIndicators} of {totalIndicators} Bullish ({confluencePct}%)
+              {bullishIndicators} of {totalIndicators} Indicators are Bullish ({confluencePct}%)
             </span>
           </div>
           <button
@@ -373,7 +373,7 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
             onClick={() => onNavigate('ai-predict')}
             className="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-[12px] font-medium flex items-center gap-1.5 transition-colors"
           >
-            <span>View SHAP Attribution</span>
+            <span>Why AI Predicts Up / Down</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -388,17 +388,17 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
         <div className="bg-[#122131] rounded-2xl p-5 border border-[#1c2b3c] flex flex-col justify-between shadow-sm">
           <div>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[12px] font-mono font-semibold text-[#64748b] uppercase">Relative Strength (14)</span>
+              <span className="text-[12px] font-mono font-semibold text-[#64748b] uppercase">RSI Momentum (14 Days)</span>
               <span className={`text-[11px] font-mono px-2 py-0.5 rounded font-bold ${
                 stock.rsi > 70 ? 'bg-amber-500/20 text-amber-400' : stock.rsi < 30 ? 'bg-cyan-500/20 text-cyan-300' : 'bg-emerald-500/20 text-emerald-400'
               }`}>
-                {stock.rsi > 70 ? 'OVERBOUGHT (>70)' : stock.rsi < 30 ? 'OVERSOLD (<30)' : 'EQUILIBRIUM'}
+                {stock.rsi > 70 ? 'OVERBOUGHT (>70)' : stock.rsi < 30 ? 'OVERSOLD (<30)' : 'HEALTHY ZONE (30-70)'}
               </span>
             </div>
 
             <div className="flex items-baseline gap-2 mb-2">
               <span className="text-[28px] font-mono font-extrabold text-white">{stock.rsi.toFixed(1)}</span>
-              <span className="text-[12px] text-[#94a3b8]">/ 100 Index</span>
+              <span className="text-[12px] text-[#94a3b8]">/ 100 Meter</span>
             </div>
 
             {/* Interactive Gauge Bar with Overbought/Oversold Zone Markers */}
@@ -406,11 +406,11 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
               <div className="flex items-center justify-between text-[10.5px] font-mono text-[#8c909f] mb-1">
                 <span className="flex items-center gap-1 text-cyan-300">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                  Oversold &lt;30
+                  Cheap / Bargain &lt;30
                 </span>
-                <span className="text-[#64748b]">50 Median</span>
+                <span className="text-[#64748b]">50 Middle</span>
                 <span className="flex items-center gap-1 text-amber-400">
-                  Overbought &gt;70
+                  Pricey &gt;70
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                 </span>
               </div>
@@ -430,8 +430,8 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
             {/* 14-Period RSI Momentum Line Chart Visualization with Interactive Zones */}
             <div className="my-3">
               <div className="flex items-center justify-between mb-1.5 text-[11px] font-mono">
-                <span className="text-[#94a3b8]">14-Period RSI Momentum Trend:</span>
-                <span className="text-cyan-300 font-semibold">T-13 → Now</span>
+                <span className="text-[#94a3b8]">14-Day RSI Momentum History:</span>
+                <span className="text-cyan-300 font-semibold">14 Days Ago → Today</span>
               </div>
               <RsiMomentumLineChart
                 data={rsi14Data}
@@ -445,16 +445,18 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
             </div>
 
             <p className="text-[12px] text-[#94a3b8] leading-relaxed mt-2">
-              {stock.rsi >= 50
-                ? 'Oscillator demonstrates structural bullish momentum above the 50 median without overbought fatigue.'
-                : 'Oscillator reads in defensive lower quartile, reflecting downward pressure and mean-reverting potential.'}
+              {stock.rsi >= 70
+                ? 'What this means: The stock has climbed rapidly and is above 70 (Overbought). Buyers may take a break or take profit soon.'
+                : stock.rsi <= 30
+                ? 'What this means: The stock is below 30 (Oversold). It has been heavily sold down and is now at a level where bargain buyers frequently step in.'
+                : 'What this means: RSI is in a healthy, steady range between 30 and 70, showing orderly price movement without extreme fever.'}
             </p>
           </div>
 
           <div className="mt-4 pt-3 border-t border-[#1a293b] text-[11px] font-mono text-[#64748b] flex justify-between">
-            <span>Oversold: 30.0</span>
-            <span>Median: 50.0</span>
-            <span>Overbought: 70.0</span>
+            <span>Oversold: Under 30</span>
+            <span>Balanced: 50</span>
+            <span>Overbought: Over 70</span>
           </div>
         </div>
 
@@ -462,17 +464,17 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
         <div className="bg-[#122131] rounded-2xl p-5 border border-[#1c2b3c] flex flex-col justify-between shadow-sm">
           <div>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[12px] font-mono font-semibold text-[#64748b] uppercase">MACD (12, 26, 9)</span>
+              <span className="text-[12px] font-mono font-semibold text-[#64748b] uppercase">MACD Trend Speed</span>
               <span className={`text-[11px] font-mono px-2 py-0.5 rounded font-bold ${
                 (stock.macd?.histogram ?? 0) >= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
               }`}>
-                {(stock.macd?.histogram ?? 0) >= 0 ? 'BULLISH DIVERGENCE' : 'BEARISH CROSS'}
+                {(stock.macd?.histogram ?? 0) >= 0 ? 'BULLISH (UPWARD SPEED)' : 'BEARISH (SLOWING DOWN)'}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 py-2 mb-3 bg-[#0a1424] p-3 rounded-xl border border-[#1a293b]">
               <div>
-                <span className="text-[10px] font-mono text-[#64748b] block">MACD Line</span>
+                <span className="text-[10px] font-mono text-[#64748b] block">Fast Line</span>
                 <span className="text-[14px] font-mono font-bold text-cyan-300">{stock.macd?.macdLine?.toFixed(2)}</span>
               </div>
               <div>
@@ -480,7 +482,7 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
                 <span className="text-[14px] font-mono font-bold text-[#94a3b8]">{stock.macd?.signalLine?.toFixed(2)}</span>
               </div>
               <div>
-                <span className="text-[10px] font-mono text-[#64748b] block">Histogram</span>
+                <span className="text-[10px] font-mono text-[#64748b] block">Momentum Bar</span>
                 <span className={`text-[14px] font-mono font-bold ${
                   (stock.macd?.histogram ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'
                 }`}>
@@ -491,13 +493,13 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
 
             <p className="text-[12px] text-[#94a3b8] leading-relaxed">
               {(stock.macd?.histogram ?? 0) >= 0
-                ? 'Fast moving average is outpacing the signal line, confirming upward acceleration across 12-day window.'
-                : 'Histogram registers below zero datum line, showing short-term momentum deceleration relative to 26-day anchor.'}
+                ? 'What this means: The fast trend line is above the signal line. Short-term buying speed is accelerating upwards.'
+                : 'What this means: The momentum bar is below zero. Short-term price speed is cooling off compared to recent weeks.'}
             </p>
           </div>
 
           <div className="mt-4 pt-3 border-t border-[#1a293b] text-[11px] font-mono text-[#64748b]">
-            Trigger: Exponential 9-Day EMA Signal
+            Signal: Comparing 12-day vs 26-day price speed
           </div>
         </div>
 
@@ -541,7 +543,7 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
                   ₹{stock.sma50.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
                 <span className="text-[9.5px] font-mono text-[#8c909f]">
-                  Intermediate Cycle Anchor
+                  Medium-Term Trend (50 Days)
                 </span>
               </div>
 
@@ -560,7 +562,7 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
                   ₹{stock.sma200.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
                 <span className="text-[9.5px] font-mono text-[#8c909f]">
-                  Institutional Secular Baseline
+                  Long-Term Benchmark (200 Days)
                 </span>
               </div>
             </div>
@@ -574,11 +576,11 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
               <div className="flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-full animate-pulse ${isSma50Above200 ? 'bg-emerald-400' : 'bg-rose-400'}`} />
                 <span className="font-semibold text-white">
-                  {isSma50Above200 ? 'Golden Cross Active' : 'Death Cross Active'}
+                  {isSma50Above200 ? 'Golden Cross Active (Bullish Trend)' : 'Death Cross Active (Bearish Trend)'}
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[#8c909f]">SMA Spread:</span>
+                <span className="text-[#8c909f]">Difference:</span>
                 <span className={`font-bold ${isSma50Above200 ? 'text-emerald-400' : 'text-rose-400'}`}>
                   {isSma50Above200 ? '+' : '-'}₹{Math.abs(smaSpread).toFixed(2)} ({isSma50Above200 ? '+' : '-'}{smaSpreadPct}%)
                 </span>
@@ -588,18 +590,18 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
             {/* Contextual Trend Explanation */}
             <p className="text-[12px] text-[#94a3b8] leading-relaxed">
               {isSma50Above200
-                ? `Crossover state is Bullish: The 50-day SMA trades above the 200-day baseline by ${smaSpreadPct}%, confirming sustained structural accumulation and upward trend strength.`
-                : `Crossover state is Bearish: The 50-day SMA trades below the 200-day baseline by ${smaSpreadPct}%, confirming structural downward momentum and long-term overhead resistance.`}
+                ? `What this means: The 50-day average is higher than the 200-day average by ${smaSpreadPct}%. This is known as a 'Golden Cross' and signals a strong, sustained upward trend.`
+                : `What this means: The 50-day average has dipped below the 200-day average by ${smaSpreadPct}%. This is known as a 'Death Cross' and signals long-term downward pressure.`}
             </p>
 
             {/* Short-term 20-Day SMA sub-note */}
             <div className="mt-2.5 pt-2 border-t border-[#1a293b]/70 flex items-center justify-between text-[10.5px] font-mono text-[#8c909f]">
               <span className="flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                <span>20-Day SMA: ₹{stock.sma20.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                <span>20-Day Average: ₹{stock.sma20.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
               </span>
               <span className={Number(priceVsSma20) >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
-                Spot vs 20-SMA: {Number(priceVsSma20) >= 0 ? '+' : ''}{priceVsSma20}%
+                Current Price vs 20-SMA: {Number(priceVsSma20) >= 0 ? '+' : ''}{priceVsSma20}%
               </span>
             </div>
 
@@ -608,10 +610,10 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-mono font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
                   <Bell className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Crossover Alerts (50 / 200 SMA)</span>
+                  <span>Trend Shift Alerts (50 / 200 SMA)</span>
                 </span>
                 <span className="text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-[#0a1424] text-cyan-300 border border-[#1a293b]">
-                  {toastAlertEnabled && emailAlertEnabled ? 'Toast & Email Active' : toastAlertEnabled ? 'Toast Active' : emailAlertEnabled ? 'Email Active' : 'Muted'}
+                  {toastAlertEnabled && emailAlertEnabled ? 'Pop-up & Email On' : toastAlertEnabled ? 'Pop-up On' : emailAlertEnabled ? 'Email On' : 'Alerts Muted'}
                 </span>
               </div>
 
@@ -634,8 +636,8 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
                       <BellRing className="w-3.5 h-3.5" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-semibold">Toast Alerts</span>
-                      <span className="text-[9.5px] text-[#94a3b8]">In-app banner on crossover</span>
+                      <span className="text-[11px] font-semibold">Pop-up Alerts</span>
+                      <span className="text-[9.5px] text-[#94a3b8]">Banner when trend flips</span>
                     </div>
                   </div>
                   <div className={`w-8 h-4 rounded-full transition-colors relative shrink-0 ${
@@ -665,7 +667,7 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[11px] font-semibold">Email Alerts</span>
-                      <span className="text-[9.5px] text-[#94a3b8]">Direct to user inbox</span>
+                      <span className="text-[9.5px] text-[#94a3b8]">Direct to your inbox</span>
                     </div>
                   </div>
                   <div className={`w-8 h-4 rounded-full transition-colors relative shrink-0 ${
@@ -734,16 +736,16 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
                   title="Test crossover notification dispatch"
                 >
                   <Sparkles className="w-3 h-3 text-cyan-400" />
-                  <span>Test Alert Trigger</span>
+                  <span>Send Test Alert</span>
                 </button>
               </div>
             </div>
           </div>
 
           <div className="mt-3 pt-2.5 border-t border-[#1a293b] text-[11px] font-mono text-[#64748b] flex justify-between items-center">
-            <span>Crossover Rule: 50-Day vs 200-Day SMA</span>
+            <span>Indicator: 50-Day vs 200-Day Moving Average</span>
             <span className={`font-semibold ${isSma50Above200 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              State: {trendStrengthLabel}
+              Trend: {trendStrengthLabel}
             </span>
           </div>
         </div>
@@ -752,34 +754,34 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
         <div className="bg-[#122131] rounded-2xl p-5 border border-[#1c2b3c] flex flex-col justify-between shadow-sm">
           <div>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[12px] font-mono font-semibold text-[#64748b] uppercase">Bollinger Bands (20, 2)</span>
+              <span className="text-[12px] font-mono font-semibold text-[#64748b] uppercase">Bollinger Bands (Price Channels)</span>
               <span className="text-[11px] font-mono text-cyan-300 font-bold">
-                %B = {stock.bollinger?.pb?.toFixed(2) ?? '0.70'}
+                Position: {stock.bollinger?.pb?.toFixed(2) ?? '0.70'}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 text-center p-3 rounded-xl bg-[#0a1424] border border-[#1a293b] mb-3 text-[11px] font-mono">
               <div>
-                <span className="text-[#64748b] block">Lower Band</span>
+                <span className="text-[#64748b] block">Lower Floor</span>
                 <span className="text-white font-bold">₹{stock.bollinger?.lower?.toLocaleString()}</span>
               </div>
               <div>
-                <span className="text-cyan-400 block">Middle (SMA)</span>
+                <span className="text-cyan-400 block">Middle Average</span>
                 <span className="text-white font-bold">₹{stock.bollinger?.middle?.toLocaleString()}</span>
               </div>
               <div>
-                <span className="text-[#64748b] block">Upper Band</span>
+                <span className="text-[#64748b] block">Upper Ceiling</span>
                 <span className="text-white font-bold">₹{stock.bollinger?.upper?.toLocaleString()}</span>
               </div>
             </div>
 
             <p className="text-[12px] text-[#94a3b8] leading-relaxed">
-              Price trades at the upper quartile of the 2-standard-deviation envelope, indicating strong expansion with low contraction risk.
+              What this means: Bollinger Bands show normal expected price ranges. Right now, price is trading near the upper channel, indicating strong buying momentum.
             </p>
           </div>
 
           <div className="mt-4 pt-3 border-t border-[#1a293b] text-[11px] font-mono text-[#64748b]">
-            Bandwidth: 2 Standard Deviations
+            Normal range: Between Lower Floor & Upper Ceiling
           </div>
         </div>
 
@@ -787,7 +789,7 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
         <div className="bg-[#122131] rounded-2xl p-5 border border-[#1c2b3c] flex flex-col justify-between shadow-sm">
           <div>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[12px] font-mono font-semibold text-[#64748b] uppercase">Volume & Liquidity Flow</span>
+              <span className="text-[12px] font-mono font-semibold text-[#64748b] uppercase">Trading Volume & Big Buyer Flow</span>
               <span className="text-[11px] font-mono text-emerald-400 font-bold">
                 {stock.volumeSurge}
               </span>
@@ -795,26 +797,26 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
 
             <div className="space-y-2 mb-3">
               <div className="flex justify-between items-center text-[12px]">
-                <span className="text-[#94a3b8]">24h Volume</span>
+                <span className="text-[#94a3b8]">Today's Volume</span>
                 <span className="font-mono font-bold text-white">{stock.volume24h}</span>
               </div>
               <div className="flex justify-between items-center text-[12px]">
-                <span className="text-[#94a3b8]">20-Day Avg Volume</span>
+                <span className="text-[#94a3b8]">20-Day Average Volume</span>
                 <span className="font-mono font-bold text-[#94a3b8]">{stock.vol20dAvg}</span>
               </div>
               <div className="flex justify-between items-center text-[12px]">
-                <span className="text-[#94a3b8]">Institutional Flow</span>
-                <span className="font-mono font-bold text-cyan-400">Net Accumulation</span>
+                <span className="text-[#94a3b8]">Large Investor Flow</span>
+                <span className="font-mono font-bold text-cyan-400">Net Buying (Accumulation)</span>
               </div>
             </div>
 
             <p className="text-[12px] text-[#94a3b8] leading-relaxed">
-              Volume surge confirms active participation and validates the current price vector against false breakout noise.
+              What this means: Higher trading volume confirms real investor participation. When price rises with heavy volume, it shows genuine institutional backing.
             </p>
           </div>
 
           <div className="mt-4 pt-3 border-t border-[#1a293b] text-[11px] font-mono text-[#64748b]">
-            Surge Threshold: &gt; +10% vs 20-Day Baseline
+            Volume surge: Over 10% above recent 20-day average
           </div>
         </div>
 
@@ -822,27 +824,27 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
         <div className="bg-[#122131] rounded-2xl p-5 border border-[#1c2b3c] flex flex-col justify-between shadow-sm">
           <div>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[12px] font-mono font-semibold text-[#64748b] uppercase">Annualized Volatility</span>
+              <span className="text-[12px] font-mono font-semibold text-[#64748b] uppercase">Annual Volatility (Price Swings)</span>
               <span className={`text-[11px] font-mono px-2 py-0.5 rounded font-bold ${
                 stock.annVolatility > 20 ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'
               }`}>
-                {stock.annVolatility > 20 ? 'HIGH VOL' : 'NORMAL REGIME'}
+                {stock.annVolatility > 20 ? 'HIGH SWINGS' : 'CALM & STEADY'}
               </span>
             </div>
 
             <div className="flex items-baseline gap-2 mb-2">
               <span className="text-[28px] font-mono font-extrabold text-white">{stock.annVolatility}%</span>
-              <span className="text-[12px] text-[#94a3b8]">vs {stock.volBenchmark}% Benchmark</span>
+              <span className="text-[12px] text-[#94a3b8]">vs {stock.volBenchmark}% Market Average</span>
             </div>
 
             <p className="text-[12px] text-[#94a3b8] leading-relaxed">
-              Daily price dispersion standard deviation annualized across 252 trading sessions. Feeds directly into SHAP uncertainty penalty calculations.
+              What this means: Volatility measures how dramatically the stock's price jumps up and down. Lower volatility stocks provide a smoother, less stressful ride for beginners.
             </p>
           </div>
 
           <div className="mt-4 pt-3 border-t border-[#1a293b] text-[11px] font-mono text-[#64748b] flex justify-between">
-            <span>Drawdown: {stock.maxDrawdown}%</span>
-            <span>Beta: {stock.beta}</span>
+            <span>Worst Past Drop: {stock.maxDrawdown}%</span>
+            <span>Market Sensitivity (Beta): {stock.beta}</span>
           </div>
         </div>
       </div>

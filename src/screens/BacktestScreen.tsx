@@ -190,14 +190,14 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[20px] font-bold text-white tracking-tight">
-                Quantitative Strategy Backtesting Engine
+                Strategy Tester (Past Results)
               </h1>
               <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[11px] font-mono font-bold">
-                Walk-Forward Tested
+                Zero Risk Test
               </span>
             </div>
             <p className="text-[13px] text-[#94a3b8] mt-0.5">
-              Simulate machine learning alpha signals against historical tick data with transaction cost and slippage modeling.
+              See how this trading strategy would have performed over the past 1 to 5 years before risking real money.
             </p>
           </div>
         </div>
@@ -226,22 +226,22 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
           {/* Strategy Model */}
           <div>
-            <label className="text-[11px] font-mono text-[#64748b] block mb-1">Alpha Model</label>
+            <label className="text-[11px] font-mono text-[#64748b] block mb-1">Trading Strategy</label>
             <select
               value={modelType}
               onChange={(e) => setModelType(e.target.value)}
               className="w-full px-3 py-2 bg-[#0a1424] border border-[#1c2b3c] rounded-xl text-[13px] text-white focus:outline-none focus:border-cyan-400 transition-colors"
             >
-              <option value="XGBoost Multi-Factor Ensemble">XGBoost Multi-Factor Ensemble</option>
-              <option value="LightGBM Momentum Drift">LightGBM Momentum Drift</option>
-              <option value="LSTM Sequential Attention">LSTM Sequential Attention</option>
-              <option value="Mean Reversion + SHAP Filter">Mean Reversion + SHAP Filter</option>
+              <option value="XGBoost Multi-Factor Ensemble">AI Smart Trend Strategy</option>
+              <option value="LightGBM Momentum Drift">Fast Momentum Strategy</option>
+              <option value="LSTM Sequential Attention">Trend Following Strategy</option>
+              <option value="Mean Reversion + SHAP Filter">Bargain Rebound Strategy</option>
             </select>
           </div>
 
           {/* Time Horizon */}
           <div>
-            <label className="text-[11px] font-mono text-[#64748b] block mb-1">Horizon</label>
+            <label className="text-[11px] font-mono text-[#64748b] block mb-1">Test Period</label>
             <div className="grid grid-cols-3 gap-1 bg-[#0a1424] p-1 rounded-xl border border-[#1c2b3c]">
               {(['1Y', '3Y', '5Y'] as const).map((h) => (
                 <button
@@ -262,7 +262,7 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
 
           {/* Capital */}
           <div>
-            <label className="text-[11px] font-mono text-[#64748b] block mb-1">Initial Capital (INR)</label>
+            <label className="text-[11px] font-mono text-[#64748b] block mb-1">Starting Capital (INR)</label>
             <input
               type="number"
               value={initialCapital}
@@ -273,7 +273,7 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
 
           {/* Stop Loss & Take Profit */}
           <div>
-            <label className="text-[11px] font-mono text-[#64748b] block mb-1">Stop Loss / Take Profit</label>
+            <label className="text-[11px] font-mono text-[#64748b] block mb-1">Stop Loss : Profit Target %</label>
             <div className="flex items-center gap-2">
               <input
                 type="number"
@@ -281,7 +281,7 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
                 value={stopLossPct}
                 onChange={(e) => setStopLossPct(Number(e.target.value))}
                 className="w-1/2 px-2.5 py-2 bg-[#0a1424] border border-[#1c2b3c] rounded-xl text-[12px] font-mono text-rose-400 text-center"
-                title="Stop Loss %"
+                title="Stop Loss Cut-off %"
               />
               <span className="text-[#64748b]">:</span>
               <input
@@ -290,7 +290,7 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
                 value={takeProfitPct}
                 onChange={(e) => setTakeProfitPct(Number(e.target.value))}
                 className="w-1/2 px-2.5 py-2 bg-[#0a1424] border border-[#1c2b3c] rounded-xl text-[12px] font-mono text-emerald-400 text-center"
-                title="Take Profit %"
+                title="Profit Target %"
               />
             </div>
           </div>
@@ -306,12 +306,12 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
               {isRunning ? (
                 <>
                   <RotateCcw className="w-4 h-4 animate-spin" />
-                  <span>Computing...</span>
+                  <span>Testing...</span>
                 </>
               ) : (
                 <>
                   <Play className="w-4 h-4 fill-white" />
-                  <span>Execute Simulation</span>
+                  <span>Run Strategy Test</span>
                 </>
               )}
             </button>
@@ -322,38 +322,38 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
       {/* Performance Scorecard */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
         <div className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] flex flex-col">
-          <span className="text-[11px] font-mono text-[#64748b]">CAGR Return</span>
+          <span className="text-[11px] font-mono text-[#64748b]">Yearly Return</span>
           <span className="text-[20px] font-mono font-bold text-emerald-400 mt-1">+{cagrValue}%</span>
           <span className="text-[10px] text-[#64748b] mt-0.5">vs +{benchmarkCagr}% NIFTY 50</span>
         </div>
 
         <div className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] flex flex-col">
-          <span className="text-[11px] font-mono text-[#64748b]">Sharpe Ratio</span>
+          <span className="text-[11px] font-mono text-[#64748b]">Reward vs. Risk</span>
           <span className="text-[20px] font-mono font-bold text-cyan-300 mt-1">{sharpeValue}</span>
-          <span className="text-[10px] text-[#64748b] mt-0.5">Risk-adjusted benchmark</span>
+          <span className="text-[10px] text-[#64748b] mt-0.5">Sharpe Ratio</span>
         </div>
 
         <div className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] flex flex-col">
-          <span className="text-[11px] font-mono text-[#64748b]">Max Drawdown</span>
+          <span className="text-[11px] font-mono text-[#64748b]">Deepest Past Fall</span>
           <span className="text-[20px] font-mono font-bold text-rose-400 mt-1">{maxDrawdownVal}%</span>
-          <span className="text-[10px] text-[#64748b] mt-0.5">Bench peak: -17.4%</span>
+          <span className="text-[10px] text-[#64748b] mt-0.5">Market drop: -17.4%</span>
         </div>
 
         <div className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] flex flex-col">
           <span className="text-[11px] font-mono text-[#64748b]">Win Rate</span>
           <span className="text-[20px] font-mono font-bold text-emerald-400 mt-1">{winRateNumber}%</span>
-          <span className="text-[10px] text-[#64748b] mt-0.5">{Math.round(winRateNumber * 1.2)} of 120 Trades</span>
+          <span className="text-[10px] text-[#64748b] mt-0.5">{Math.round(winRateNumber * 1.2)} of 120 Trades Won</span>
         </div>
 
         <div className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] flex flex-col">
-          <span className="text-[11px] font-mono text-[#64748b]">Profit Factor</span>
+          <span className="text-[11px] font-mono text-[#64748b]">Profit / Loss Ratio</span>
           <span className="text-[20px] font-mono font-bold text-cyan-400 mt-1">{profitFactorVal}</span>
-          <span className="text-[10px] text-[#64748b] mt-0.5">Gross Win / Gross Loss</span>
+          <span className="text-[10px] text-[#64748b] mt-0.5">Total Wins vs Losses</span>
         </div>
 
         <div className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] flex flex-col">
-          <span className="text-[11px] font-mono text-[#64748b]">Final NAV</span>
-          <span className="text-[20px] font-mono font-bold text-white mt-1">₹{(finalStrategyNav / 100000).toFixed(2)} L</span>
+          <span className="text-[11px] font-mono text-[#64748b]">Ending Portfolio</span>
+          <span className="text-[20px] font-mono font-bold text-white mt-1">₹{(finalStrategyNav / 100000).toFixed(2)} Lakh</span>
           <span className="text-[10px] text-emerald-400 mt-0.5">+{netReturnPct}% Net Profit</span>
         </div>
       </div>
@@ -363,20 +363,20 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#1c2b3c] mb-4 gap-2">
           <div>
             <h3 className="text-[16px] font-bold text-white tracking-tight">
-              Historical Equity Growth vs Benchmark
+              Historical Growth vs NIFTY 50 Index
             </h3>
             <span className="text-[12px] text-[#94a3b8]">
-              Strategy simulation incorporates 0.05% brokerage and slippage drag.
+              Strategy test includes small trading fees and realistic market pricing.
             </span>
           </div>
           <div className="flex items-center gap-3 text-[12px] font-mono">
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-0.5 bg-cyan-400" />
-              <span className="text-cyan-300 font-semibold">{modelType.split(' ')[0]} Strategy (+{netReturnPct}%)</span>
+              <span className="text-cyan-300 font-semibold">Tested Strategy (+{netReturnPct}%)</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-0.5 bg-slate-500" />
-              <span className="text-[#94a3b8]">Nifty 50 (+{netBenchmarkPct}%)</span>
+              <span className="text-[#94a3b8]">NIFTY 50 Benchmark (+{netBenchmarkPct}%)</span>
             </div>
           </div>
         </div>
@@ -409,7 +409,7 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
                 strokeWidth={2.5}
                 dot={{ r: 3, fill: '#22d3ee' }}
                 activeDot={{ r: 6 }}
-                name="ML Alpha Strategy"
+                name="Tested Strategy"
               />
               <Line
                 type="monotone"
@@ -429,15 +429,15 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
       <div className="bg-[#122131] rounded-2xl border border-[#1c2b3c] overflow-hidden shadow-lg">
         <div className="p-4 bg-[#0b1522] border-b border-[#1c2b3c] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h3 className="text-[14px] font-bold text-white">Recent Historical Trade Executions</h3>
-            <span className="text-[11px] font-mono text-[#64748b]">· Walk-Forward Validated</span>
+            <h3 className="text-[14px] font-bold text-white">Sample Past Trades from this Strategy</h3>
+            <span className="text-[11px] font-mono text-[#64748b]">· Historical Log</span>
           </div>
           <button
             type="button"
             onClick={() => onNavigate('ai-predict')}
             className="text-[12px] text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1 transition-colors"
           >
-            <span>Compare with Live AI Prediction</span>
+            <span>See Live AI Prediction</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -446,13 +446,13 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
           <table className="w-full text-left text-[13px]">
             <thead className="bg-[#0b1522]/60 text-[#64748b] font-mono text-[11px] uppercase tracking-wider border-b border-[#182637]">
               <tr>
-                <th className="py-2.5 px-4">Trade ID</th>
+                <th className="py-2.5 px-4">Trade</th>
                 <th className="py-2.5 px-4">Date</th>
-                <th className="py-2.5 px-4">Position Vector</th>
-                <th className="py-2.5 px-4">Execution Price</th>
-                <th className="py-2.5 px-4">Exit Signal / Rationale</th>
+                <th className="py-2.5 px-4">Action</th>
+                <th className="py-2.5 px-4">Buy Price</th>
+                <th className="py-2.5 px-4">Why Trade Closed</th>
                 <th className="py-2.5 px-4 text-right">Return %</th>
-                <th className="py-2.5 px-4 text-right">Realized PnL</th>
+                <th className="py-2.5 px-4 text-right">Profit / Loss (₹)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#182637]">
@@ -464,7 +464,7 @@ export const BacktestScreen: React.FC<BacktestScreenProps> = ({
                     <span className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold ${
                       trade.side === 'LONG' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
                     }`}>
-                      {trade.side}
+                      {trade.side === 'LONG' ? 'BUY' : 'SELL'}
                     </span>
                   </td>
                   <td className="py-3 px-4 font-mono font-bold text-white">{trade.price}</td>

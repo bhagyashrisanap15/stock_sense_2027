@@ -287,15 +287,15 @@ export const Portfolio: React.FC<PortfolioProps> = ({
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
             <h1 className="text-[20px] font-bold text-[#d4e4fa] tracking-tight">
-              Watchlist Portfolio
+              My Portfolio & Holdings
             </h1>
             <span className="px-2 py-0.5 rounded-full bg-[#00a572]/20 text-[#4edea3] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 border border-[#00a572]/30">
               <span className="w-1.5 h-1.5 rounded-full bg-[#4edea3] animate-pulse"></span>
-              Live NAV
+              Live Value
             </span>
           </div>
           <p className="text-[12px] text-[#c2c6d6] mt-0.5">
-            Real-time valuation calibrated against your monitored equities
+            Real-time value and daily profit & loss of your monitored Indian stocks
           </p>
         </div>
 
@@ -303,7 +303,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
           <button
             onClick={() => setIsExportModalOpen(true)}
             className="h-9 px-3 bg-[#1c2b3c] hover:bg-[#273647] text-[#adc6ff] text-[12px] font-semibold rounded-lg flex items-center gap-1.5 transition-all shadow-sm active:scale-95 border border-[#273647]"
-            title="Export portfolio performance metrics report"
+            title="Download your portfolio report"
           >
             <span className="material-symbols-outlined text-[16px]">file_download</span>
             <span>Export Data</span>
@@ -313,7 +313,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
             className="h-9 px-3 bg-[#4d8eff] hover:bg-[#adc6ff] text-[#00285d] text-[12px] font-semibold rounded-lg flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
           >
             <span className="material-symbols-outlined text-[16px]">add</span>
-            <span>Add Position</span>
+            <span>Add Stock</span>
           </button>
         </div>
       </div>
@@ -329,7 +329,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[16px]">account_balance_wallet</span>
-          <span>Holdings ({holdingRows.length})</span>
+          <span>My Stocks ({holdingRows.length})</span>
         </button>
         <button
           onClick={() => setViewMode('paper')}
@@ -340,7 +340,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[16px] text-[#00ff9d]">candlestick_chart</span>
-          <span>Simulator</span>
+          <span>Practice Trading</span>
         </button>
         <button
           onClick={() => setViewMode('dividends')}
@@ -351,7 +351,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[16px] text-[#4edea3]">payments</span>
-          <span>Dividends</span>
+          <span>Dividend Income</span>
         </button>
         <button
           onClick={() => setViewMode('correlation')}
@@ -362,7 +362,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[16px]">hub</span>
-          <span>Correlation</span>
+          <span>Diversification</span>
         </button>
       </div>
 

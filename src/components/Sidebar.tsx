@@ -48,22 +48,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navItems: NavItem[] = [
     // Core Navigation
-    { id: 'ai-predict', label: 'AI Insights', icon: BrainCircuit, badge: 'PRIMARY', isPrimary: true, group: 'core' },
+    { id: 'ai-predict', label: 'AI Predictions', icon: BrainCircuit, badge: 'AI GUIDE', isPrimary: true, group: 'core' },
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, group: 'core' },
-    { id: 'markets', label: 'Markets', icon: TrendingUp, group: 'core' },
+    { id: 'markets', label: 'Live Markets', icon: TrendingUp, group: 'core' },
 
     // Portfolio & Analytics
     { id: 'watchlist', label: 'Watchlist', icon: Bookmark, group: 'portfolio' },
-    { id: 'portfolio', label: 'Portfolio', icon: Wallet, group: 'portfolio' },
-    { id: 'paper-trading', label: 'Portfolio Simulator', icon: CandlestickChart, group: 'portfolio' },
+    { id: 'portfolio', label: 'My Portfolio', icon: Wallet, group: 'portfolio' },
+    { id: 'paper-trading', label: 'Practice Trading', icon: CandlestickChart, badge: 'FREE CASH', group: 'portfolio' },
 
     // Analytics & Research
-    { id: 'risk-radar', label: 'Risk Radar', icon: ShieldAlert, group: 'analytics' },
-    { id: 'screener', label: 'Stock Screener', icon: SlidersHorizontal, group: 'analytics' },
-    { id: 'technical-analysis', label: 'Technical Analysis', icon: Activity, group: 'analytics' },
-    { id: 'heatmap', label: 'Heatmap', icon: Grid3X3, group: 'analytics' },
+    { id: 'risk-radar', label: 'Risk & Safety Meter', icon: ShieldAlert, group: 'analytics' },
+    { id: 'screener', label: 'Stock Finder', icon: SlidersHorizontal, group: 'analytics' },
+    { id: 'technical-analysis', label: 'Price Trends & Charts', icon: Activity, group: 'analytics' },
+    { id: 'heatmap', label: 'Sector Heatmap', icon: Grid3X3, group: 'analytics' },
     { id: 'news-sentiment', label: 'News & Sentiment', icon: Newspaper, group: 'analytics' },
-    { id: 'backtesting', label: 'Backtesting', icon: Cpu, badge: 'ML', group: 'analytics' }
+    { id: 'backtesting', label: 'Strategy Tester', icon: Cpu, badge: 'TEST', group: 'analytics' }
   ];
 
   const handleSelectTab = (tab: ScreenTab) => {
@@ -173,7 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               </div>
               <span className="text-[10.5px] text-[#64748b] tracking-wider font-mono">
-                Explainable AI Engine
+                Simple Stock Market Guide
               </span>
             </div>
           )}
@@ -221,18 +221,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div className="flex items-center gap-1.5 text-cyan-400">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span className="text-[10px] font-bold font-mono tracking-wider uppercase">
-                  Alpha Intelligence
+                  Beginner Guide
                 </span>
               </div>
               <span className="text-[9.5px] font-mono text-emerald-400 flex items-center gap-1">
                 <span className="w-1 h-1 rounded-full bg-emerald-400" />
-                18ms
+                Live
               </span>
             </div>
 
             <p className="text-[12px] font-semibold text-[#e2e8f0] leading-snug">
-              Smarter insights.
-              <span className="block text-cyan-300 font-normal">Better decisions.</span>
+              Learn as you trade.
+              <span className="block text-cyan-300 font-normal">Zero financial jargon.</span>
             </p>
 
             {/* Decorative Mini Sparkline Chart */}
@@ -263,8 +263,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             <div className="mt-1 flex items-center justify-between text-[10px] text-[#64748b] font-mono">
-              <span>SHAP XAI Active</span>
-              <span className="text-cyan-400 font-medium">99.4% SLA</span>
+              <span>AI Predictions Ready</span>
+              <span className="text-cyan-400 font-medium">NSE & BSE</span>
             </div>
           </div>
         </div>

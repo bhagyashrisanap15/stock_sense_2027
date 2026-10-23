@@ -73,11 +73,11 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
           <div className="flex items-center gap-1.5">
             <span className="material-symbols-outlined text-[#adc6ff] text-[18px]">security</span>
             <span className="text-[11px] font-semibold text-[#d4e4fa] tracking-wider uppercase">
-              Systemic Risk Score
+              Stock Risk & Safety Meter
             </span>
           </div>
           <span className="px-2 py-0.5 rounded-full bg-[#1c2b3c] text-[#c2c6d6] font-mono text-[11px] border border-[#273647]">
-            v3.4-XAI
+            Safety Check
           </span>
         </div>
 
@@ -141,18 +141,18 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
                   : 'text-[#ffb4ab]'
               }`}
             >
-              {currentStock.riskCategory}
+              {currentStock.riskCategory} RISK
             </span>
           </div>
         </div>
 
         {/* Gauge Legend Ticks */}
         <div className="w-64 flex justify-between px-2 pt-2 text-[11px] text-[#8c909f] font-semibold">
-          <span>LOW</span>
+          <span>SAFE (0)</span>
           <span className="text-[#adc6ff] font-medium font-mono">
-            {currentStock.riskCategory} ({currentStock.riskScore})
+            Score: {currentStock.riskScore} / 100
           </span>
-          <span>HIGH</span>
+          <span>HIGH RISK (100)</span>
         </div>
 
         {/* Status Pill */}
@@ -162,7 +162,7 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
             <strong className="font-semibold text-[#adc6ff]">
               {currentStock.riskCategory} RISK
             </strong>{' '}
-            — Volatility within acceptable historical bands
+            — {currentStock.riskCategory === 'LOW' ? 'Price movement is stable and suitable for conservative investors' : currentStock.riskCategory === 'HIGH' ? 'Stock has rapid price swings and wider volatility' : 'Moderate price volatility within normal market range'}
           </p>
         </div>
       </div>
@@ -172,7 +172,7 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
         {/* Metric 1: Annualized Volatility */}
         <div className="bg-[#122131] rounded-xl p-3.5 shadow-sm flex flex-col justify-between border border-[#1c2b3c]">
           <div className="flex items-center justify-between text-[#c2c6d6] mb-2">
-            <span className="text-[11px] font-semibold tracking-wide uppercase">Ann. Volatility</span>
+            <span className="text-[11px] font-semibold tracking-wide uppercase">Annual Price Swings</span>
             <span className="material-symbols-outlined text-[16px] text-[#adc6ff]">ssid_chart</span>
           </div>
           <div>
@@ -180,7 +180,7 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
               {currentStock.annVolatility}%
             </span>
             <div className="mt-1 flex items-center gap-1 text-[11px] text-[#c2c6d6]">
-              <span>Benchmark:</span>
+              <span>Market Average:</span>
               <span className="font-mono text-[#d4e4fa]">{currentStock.volBenchmark}%</span>
             </div>
           </div>
@@ -195,7 +195,7 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
         {/* Metric 2: Max Drawdown */}
         <div className="bg-[#122131] rounded-xl p-3.5 shadow-sm flex flex-col justify-between border border-[#1c2b3c]">
           <div className="flex items-center justify-between text-[#c2c6d6] mb-2">
-            <span className="text-[11px] font-semibold tracking-wide uppercase">Max Drawdown (6M)</span>
+            <span className="text-[11px] font-semibold tracking-wide uppercase">Worst Past Drop (6M)</span>
             <span className="material-symbols-outlined text-[16px] text-[#ffb4ab]">waterfall_chart</span>
           </div>
           <div>
@@ -203,7 +203,7 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
               {currentStock.maxDrawdown}%
             </span>
             <div className="mt-1 flex items-center gap-1 text-[11px] text-[#c2c6d6]">
-              <span>Peak:</span>
+              <span>From High:</span>
               <span className="font-mono text-[#d4e4fa]">₹{currentStock.drawdownPeak}</span>
             </div>
           </div>
@@ -218,7 +218,7 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
         {/* Metric 3: Value at Risk */}
         <div className="bg-[#122131] rounded-xl p-3.5 shadow-sm flex flex-col justify-between border border-[#1c2b3c]">
           <div className="flex items-center justify-between text-[#c2c6d6] mb-2">
-            <span className="text-[11px] font-semibold tracking-wide uppercase">VaR (95%, 1-Day)</span>
+            <span className="text-[11px] font-semibold tracking-wide uppercase">Max 1-Day Typical Loss</span>
             <span className="material-symbols-outlined text-[16px] text-[#4edea3]">analytics</span>
           </div>
           <div>
@@ -226,7 +226,7 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
               {currentStock.var95}%
             </span>
             <div className="mt-1 text-[11px] text-[#c2c6d6] truncate">
-              Simulated tail loss
+              95% of days stay above this
             </div>
           </div>
           <div className="w-full bg-[#1c2b3c] h-1.5 rounded-full mt-3 overflow-hidden">
@@ -240,7 +240,7 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
         {/* Metric 4: Sharpe Ratio */}
         <div className="bg-[#122131] rounded-xl p-3.5 shadow-sm flex flex-col justify-between border border-[#1c2b3c]">
           <div className="flex items-center justify-between text-[#c2c6d6] mb-2">
-            <span className="text-[11px] font-semibold tracking-wide uppercase">Sharpe Ratio</span>
+            <span className="text-[11px] font-semibold tracking-wide uppercase">Return vs. Risk Ratio</span>
             <span className="material-symbols-outlined text-[16px] text-[#4edea3]">balance</span>
           </div>
           <div>
@@ -248,7 +248,7 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
               {currentStock.sharpeRatio}
             </span>
             <div className="mt-1 text-[11px] text-[#c2c6d6] truncate">
-              Healthy risk-return
+              Above 1.0 is healthy
             </div>
           </div>
           <div className="w-full bg-[#1c2b3c] h-1.5 rounded-full mt-3 overflow-hidden">
@@ -266,10 +266,10 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
           </span>
           <div className="flex flex-col gap-1">
             <span className="text-[11px] text-[#adc6ff] uppercase tracking-wide font-semibold">
-              Regulatory & Mathematical Compliance
+              Beginner Safety Guide
             </span>
             <p className="text-[12px] text-[#c2c6d6] leading-relaxed">
-              Risk metrics are analytical estimates calculated using historical price distributions and Monte Carlo simulations. They are for academic demonstration and not personalized financial or investment advice.
+              These safety meters are calculated using historical market data and price drops to help you plan your investments and avoid sudden surprises. Always invest with caution!
             </p>
           </div>
         </div>
@@ -282,10 +282,10 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[#adc6ff] text-[18px]">tune</span>
-              <span className="font-semibold text-[15px] text-[#d4e4fa]">Stress Test Simulation</span>
+              <span className="font-semibold text-[15px] text-[#d4e4fa]">What-If Market Drop Simulator</span>
             </div>
             <span className="px-2 py-0.5 rounded-full bg-[#4d8eff]/10 text-[#adc6ff] text-[11px] font-semibold border border-[#4d8eff]/20">
-              Monte Carlo 10k
+              Interactive Test
             </span>
           </div>
 
@@ -293,7 +293,7 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
           <div className="flex flex-col gap-1">
             <div className="flex justify-between items-center text-[#d4e4fa]">
               <label className="text-[12px] text-[#c2c6d6]" htmlFor="shockSlider">
-                Macro Index Shock Scenario
+                If NIFTY 50 Market Drops By:
               </label>
               <span className="font-mono text-[13px] text-[#ffb4ab] font-bold">
                 {shockValue.toFixed(1)}%
@@ -310,8 +310,8 @@ export const RiskRadarScreen: React.FC<RiskRadarScreenProps> = ({ currentStock }
               className="w-full accent-[#adc6ff] h-2 bg-[#1c2b3c] rounded-lg cursor-pointer transition-all"
             />
             <div className="flex justify-between text-[11px] text-[#8c909f] pt-0.5 font-mono">
-              <span>-15% (Extreme Crash)</span>
-              <span>0% (Neutral)</span>
+              <span>-15% (Heavy Market Crash)</span>
+              <span>0% (No Change)</span>
             </div>
           </div>
 

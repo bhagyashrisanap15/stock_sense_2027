@@ -1063,7 +1063,7 @@ export const RsiMomentumLineChart: React.FC<{
             </div>
 
             <div className="bg-[#091523] p-2.5 rounded-xl border border-[#1b2d42] flex flex-col">
-              <span className="text-[10px] font-mono text-[#64748b] uppercase">Mean-Reversion Stat Edge</span>
+              <span className="text-[10px] font-mono text-[#64748b] uppercase">Historical Win Rate</span>
               <span className="font-mono font-bold text-[13px] text-cyan-300 mt-0.5">
                 {activeZone === 'overbought'
                   ? breachHistory.overbought.reversionRate
@@ -1256,14 +1256,14 @@ export const RsiStrategyCalculator: React.FC<RsiStrategyCalculatorProps> = ({ st
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-[17px] font-bold text-white tracking-tight">
-                RSI Strategy & Signal Calculator
+                RSI Strategy & Target Calculator
               </h2>
               <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-[10.5px] font-mono font-semibold">
-                Mean-Reversion & Momentum
+                Beginner Friendly
               </span>
             </div>
             <p className="text-[12px] text-[#94a3b8] mt-0.5">
-              Identifies algorithmic overbought/oversold regime triggers, computes risk-reward payoff, and projects reversion target boundaries for {stock.ticker}.
+              Check whether {stock.ticker} is currently overpriced or a bargain, and calculate potential target prices simply.
             </p>
           </div>
         </div>

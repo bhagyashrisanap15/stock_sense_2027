@@ -50,10 +50,10 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({
       <div className="flex items-center justify-between px-1">
         <div>
           <h1 className="text-[20px] font-bold text-[#d4e4fa] tracking-tight">
-            Institutional Watchlist
+            My Watchlist
           </h1>
           <p className="text-[12px] text-[#c2c6d6]">
-            Real-time inference feeds, confidence scores & factor telemetry
+            Track your favorite Indian stocks, live market prices, and AI trend signals
           </p>
         </div>
         <button
@@ -61,7 +61,7 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({
           className="h-9 px-3 bg-[#4d8eff] hover:bg-[#adc6ff] text-[#00285d] text-[12px] font-semibold rounded-lg flex items-center gap-1.5 transition-all active:scale-95 shadow-sm"
         >
           <span className="material-symbols-outlined text-[16px]">add</span>
-          <span>Add Equities</span>
+          <span>Add Stocks</span>
         </button>
       </div>
 
@@ -76,7 +76,7 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[17px]">format_list_bulleted</span>
-          <span>Watched Assets ({displayedStocks.length})</span>
+          <span>Watched Stocks ({displayedStocks.length})</span>
         </button>
         <button
           onClick={() => setViewMode('correlation')}
@@ -87,7 +87,7 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({
           }`}
         >
           <span className="material-symbols-outlined text-[17px]">hub</span>
-          <span>Market Correlation (Recharts)</span>
+          <span>Stock Diversification</span>
         </button>
       </div>
 

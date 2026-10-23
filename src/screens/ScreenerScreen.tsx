@@ -126,34 +126,34 @@ export const ScreenerScreen: React.FC<ScreenerScreenProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[20px] font-bold text-white tracking-tight">
-                Quantitative Stock Screener
+                Easy Stock Finder & Screener
               </h1>
               <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[11px] font-mono font-bold">
-                XAI Multi-Factor
+                Smart Filters
               </span>
             </div>
             <p className="text-[13px] text-[#94a3b8] mt-0.5">
-              Screen NSE equities filtered by ensemble ML trend conviction, calibrated probability, and VaR risk profiles.
+              Filter top Indian stocks by AI forecast, safety level, sector, and price trends to easily find great investments.
             </p>
           </div>
         </div>
 
         {/* Quick presets */}
         <div className="flex items-center flex-wrap gap-2">
-          <span className="text-[11px] font-mono text-[#64748b] mr-1">Presets:</span>
+          <span className="text-[11px] font-mono text-[#64748b] mr-1">Quick Picks:</span>
           <button
             type="button"
             onClick={() => applyPreset('high-bullish')}
             className="px-2.5 py-1 rounded-lg bg-[#1a2d47] hover:bg-[#233b5c] text-[11px] font-medium text-cyan-300 border border-[#233b5c] transition-colors"
           >
-            High Bullish (&gt;75%)
+            Strong Upward Trend (&gt;75%)
           </button>
           <button
             type="button"
             onClick={() => applyPreset('low-risk')}
             className="px-2.5 py-1 rounded-lg bg-[#1a2d47] hover:bg-[#233b5c] text-[11px] font-medium text-emerald-300 border border-[#233b5c] transition-colors"
           >
-            Low Risk
+            Safe & Steady Stocks
           </button>
           <button
             type="button"
@@ -204,10 +204,10 @@ export const ScreenerScreen: React.FC<ScreenerScreenProps> = ({
               onChange={(e) => setSelectedSignal(e.target.value)}
               className="w-full px-3 py-2 bg-[#0a1424] border border-[#1c2b3c] rounded-xl text-[13px] text-white focus:outline-none focus:border-cyan-400 transition-colors cursor-pointer"
             >
-              <option value="ALL">Trend: All Signals</option>
-              <option value="UP">Bullish (UP)</option>
-              <option value="NEUTRAL">Neutral</option>
-              <option value="DOWN">Bearish (DOWN)</option>
+              <option value="ALL">AI Direction: All Trends</option>
+              <option value="UP">Likely UP (Bullish)</option>
+              <option value="NEUTRAL">Neutral / Sideways</option>
+              <option value="DOWN">Likely DOWN (Bearish)</option>
             </select>
           </div>
 
@@ -218,17 +218,17 @@ export const ScreenerScreen: React.FC<ScreenerScreenProps> = ({
               onChange={(e) => setSelectedRisk(e.target.value)}
               className="w-full px-3 py-2 bg-[#0a1424] border border-[#1c2b3c] rounded-xl text-[13px] text-white focus:outline-none focus:border-cyan-400 transition-colors cursor-pointer"
             >
-              <option value="ALL">Risk: All Tiers</option>
-              <option value="LOW">Low Risk</option>
-              <option value="MODERATE">Moderate Risk</option>
-              <option value="HIGH">High Risk</option>
+              <option value="ALL">Safety: All Risk Levels</option>
+              <option value="LOW">Low Risk (Calm & Steady)</option>
+              <option value="MODERATE">Moderate Risk (Normal)</option>
+              <option value="HIGH">High Risk (Fast Swings)</option>
             </select>
           </div>
 
           {/* Min Confidence Slider */}
           <div className="flex flex-col justify-center px-2">
             <div className="flex items-center justify-between text-[11px] font-mono text-[#94a3b8] mb-1">
-              <span>Min Confidence:</span>
+              <span>Min AI Confidence:</span>
               <span className="text-cyan-400 font-bold">{minConfidence}%</span>
             </div>
             <input

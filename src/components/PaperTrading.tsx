@@ -259,15 +259,15 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-[17px] font-bold text-[#d4e4fa] tracking-tight leading-none">
-                Paper Trading Simulator
+                Practice Trading (Virtual Money)
               </h2>
               <span className="px-2 py-0.5 rounded-full bg-[#4d8eff]/15 text-[#adc6ff] text-[10px] font-bold font-mono border border-[#4d8eff]/30 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#4edea3] animate-pulse"></span>
-                Virtual NSE Execution
+                Zero Real Risk
               </span>
             </div>
             <p className="text-[11px] text-[#c2c6d6] mt-0.5">
-              Practice systematic algorithmic strategies with real-time mark-to-market valuations & zero financial risk
+              Practice buying and selling top Indian stocks with ₹10 Lakh in virtual cash. Real market prices, zero financial risk!
             </p>
           </div>
         </div>
@@ -276,15 +276,15 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={handleAddFunds}
-            title="Deposit ₹1,00,000 Virtual Funds"
+            title="Add ₹1,00,000 in free virtual cash"
             className="px-2.5 py-1 rounded-lg bg-[#1c2b3c] hover:bg-[#273647] text-[#4edea3] text-[11px] font-semibold border border-[#273647] flex items-center gap-1 transition-colors active:scale-95"
           >
             <span className="material-symbols-outlined text-[14px]">add_card</span>
-            <span>+₹1L Cash</span>
+            <span>+₹1L Free Cash</span>
           </button>
           <button
             onClick={() => setShowResetConfirm(true)}
-            title="Reset Portfolio to initial state"
+            title="Reset portfolio back to start"
             className="px-2.5 py-1 rounded-lg bg-[#1c2b3c] hover:bg-[#93000a]/30 text-[#ffb4ab] text-[11px] font-semibold border border-[#273647] flex items-center gap-1 transition-colors active:scale-95"
           >
             <span className="material-symbols-outlined text-[14px]">restart_alt</span>
@@ -297,7 +297,7 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-[#0d1c2d] p-3 rounded-xl border border-[#1c2b3c] relative z-10">
         {/* Net Worth */}
         <div className="flex flex-col">
-          <span className="text-[10px] text-[#8c909f] uppercase font-semibold">Total Portfolio Net Worth</span>
+          <span className="text-[10px] text-[#8c909f] uppercase font-semibold">Total Virtual Net Worth</span>
           <span className="font-mono text-[17px] font-bold text-[#d4e4fa] mt-0.5">
             ₹{totalPortfolioNetWorth.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
           </span>
@@ -317,18 +317,18 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
 
         {/* Available Cash Capital */}
         <div className="flex flex-col border-l border-[#1c2b3c] pl-2 sm:pl-3">
-          <span className="text-[10px] text-[#8c909f] uppercase font-semibold">Available Liquid Capital</span>
+          <span className="text-[10px] text-[#8c909f] uppercase font-semibold">Available Cash to Trade</span>
           <span className="font-mono text-[17px] font-bold text-[#adc6ff] mt-0.5">
             ₹{paperState.cash.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
           </span>
           <span className="text-[10px] text-[#8c909f] font-mono mt-0.5">
-            {((paperState.cash / totalPortfolioNetWorth) * 100).toFixed(0)}% in Liquid Cash
+            {((paperState.cash / totalPortfolioNetWorth) * 100).toFixed(0)}% in Free Cash
           </span>
         </div>
 
         {/* Unrealized P&L */}
         <div className="flex flex-col border-t sm:border-t-0 sm:border-l border-[#1c2b3c] pt-2 sm:pt-0 sm:pl-3">
-          <span className="text-[10px] text-[#8c909f] uppercase font-semibold">Unrealized Open P&L</span>
+          <span className="text-[10px] text-[#8c909f] uppercase font-semibold">Current Profit / Loss (Open)</span>
           <span
             className={`font-mono text-[17px] font-bold mt-0.5 ${
               totalUnrealizedPnL >= 0 ? 'text-[#4edea3]' : 'text-[#ffb4ab]'
@@ -341,13 +341,13 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
               totalUnrealizedPnLPct >= 0 ? 'text-[#4edea3]' : 'text-[#ffb4ab]'
             }`}
           >
-            {totalUnrealizedPnLPct >= 0 ? '+' : ''}{totalUnrealizedPnLPct.toFixed(2)}% ROI
+            {totalUnrealizedPnLPct >= 0 ? '+' : ''}{totalUnrealizedPnLPct.toFixed(2)}% Return
           </span>
         </div>
 
         {/* Realized P&L */}
         <div className="flex flex-col border-t sm:border-t-0 border-l border-[#1c2b3c] pt-2 sm:pt-0 pl-2 sm:pl-3">
-          <span className="text-[10px] text-[#8c909f] uppercase font-semibold">Realized Closed P&L</span>
+          <span className="text-[10px] text-[#8c909f] uppercase font-semibold">Locked-in Profit / Loss (Closed)</span>
           <span
             className={`font-mono text-[17px] font-bold mt-0.5 ${
               totalRealizedPnL >= 0 ? 'text-[#4edea3]' : 'text-[#ffb4ab]'
@@ -356,7 +356,7 @@ export const PaperTrading: React.FC<PaperTradingProps> = ({
             {totalRealizedPnL >= 0 ? '+' : ''}₹{totalRealizedPnL.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
           </span>
           <span className="text-[10px] text-[#8c909f] font-mono mt-0.5">
-            {closedSales.length} closed roundtrips
+            {closedSales.length} trades completed
           </span>
         </div>
       </div>
