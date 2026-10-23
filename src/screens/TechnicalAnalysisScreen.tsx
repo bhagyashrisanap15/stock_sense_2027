@@ -166,20 +166,35 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
               <span className="text-[12px] text-[#94a3b8]">/ 100 Index</span>
             </div>
 
-            {/* Gauge bar */}
-            <div className="relative w-full h-3 bg-[#0a1424] rounded-full overflow-hidden border border-[#1c2b3c] my-3">
-              <div
-                className="h-full bg-gradient-to-r from-cyan-500 via-emerald-400 to-amber-500 rounded-full"
-                style={{ width: `${Math.min(100, Math.max(0, stock.rsi))}%` }}
-              />
-              {/* Neutral zone markers */}
-              <div className="absolute top-0 bottom-0 left-[30%] w-[1px] bg-white/30" />
-              <div className="absolute top-0 bottom-0 left-[70%] w-[1px] bg-white/30" />
+            {/* Interactive Gauge Bar with Overbought/Oversold Zone Markers */}
+            <div className="my-3">
+              <div className="flex items-center justify-between text-[10.5px] font-mono text-[#8c909f] mb-1">
+                <span className="flex items-center gap-1 text-cyan-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                  Oversold &lt;30
+                </span>
+                <span className="text-[#64748b]">50 Median</span>
+                <span className="flex items-center gap-1 text-amber-400">
+                  Overbought &gt;70
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                </span>
+              </div>
+
+              <div className="relative w-full h-3.5 bg-[#0a1424] rounded-full overflow-hidden border border-[#1c2b3c]">
+                {/* Gradient Fill */}
+                <div
+                  className="h-full bg-gradient-to-r from-cyan-500 via-emerald-400 to-amber-500 rounded-full transition-all duration-300"
+                  style={{ width: `${Math.min(100, Math.max(0, stock.rsi))}%` }}
+                />
+                {/* Neutral zone markers */}
+                <div className="absolute top-0 bottom-0 left-[30%] w-[1px] bg-white/40 shadow-sm" />
+                <div className="absolute top-0 bottom-0 left-[70%] w-[1px] bg-white/40 shadow-sm" />
+              </div>
             </div>
 
-            {/* 14-Period RSI Momentum Line Chart Visualization */}
+            {/* 14-Period RSI Momentum Line Chart Visualization with Interactive Zones */}
             <div className="my-3">
-              <div className="flex items-center justify-between mb-1 text-[11px] font-mono">
+              <div className="flex items-center justify-between mb-1.5 text-[11px] font-mono">
                 <span className="text-[#94a3b8]">14-Period RSI Momentum Trend:</span>
                 <span className="text-cyan-300 font-semibold">T-13 → Now</span>
               </div>
@@ -188,7 +203,9 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
                 currentRsi={stock.rsi}
                 overboughtThreshold={70}
                 oversoldThreshold={30}
-                height={80}
+                height={85}
+                ticker={stock.ticker}
+                stockPrice={stock.price}
               />
             </div>
 
