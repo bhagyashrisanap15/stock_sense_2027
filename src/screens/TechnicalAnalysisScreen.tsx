@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Activity,
   TrendingUp,
@@ -11,7 +11,12 @@ import {
   Sliders,
   CheckCircle2,
   AlertTriangle,
-  Info
+  Info,
+  Bell,
+  BellRing,
+  Mail,
+  Check,
+  X
 } from 'lucide-react';
 import { StockData, ScreenTab } from '../types';
 import { STOCKS_DATA, getStockData } from '../data/stocks';
@@ -50,6 +55,158 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
   const priceVsSma50 = (((stock.price - stock.sma50) / stock.sma50) * 100).toFixed(2);
   const priceVsSma200 = (((stock.price - stock.sma200) / stock.sma200) * 100).toFixed(2);
 
+  // Trend Strength (50-Day vs 200-Day SMA Crossover)
+  const isSma50Above200 = stock.sma50 >= stock.sma200;
+  const trendStrengthLabel: 'Bullish' | 'Bearish' = isSma50Above200 ? 'Bullish' : 'Bearish';
+  const smaSpread = Number((stock.sma50 - stock.sma200).toFixed(2));
+  const smaSpreadPct = Math.abs(Number(((smaSpread / stock.sma200) * 100).toFixed(2)));
+
+  // User Notification Preferences for SMA Crossover (persisted)
+  const defaultEmail = 'poojabhagwat2525@gmail.com';
+
+  const [toastAlertEnabled, setToastAlertEnabled] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem(`stocksense_sma_toast_${stock.ticker}`);
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch {
+      return true;
+    }
+  });
+
+  const [emailAlertEnabled, setEmailAlertEnabled] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem(`stocksense_sma_email_${stock.ticker}`);
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch {
+      return true;
+    }
+  });
+
+  const [emailAddress, setEmailAddress] = useState<string>(() => {
+    try {
+      return localStorage.getItem('stocksense_crossover_email') || defaultEmail;
+    } catch {
+      return defaultEmail;
+    }
+  });
+
+  const [isEditingEmail, setIsEditingEmail] = useState<boolean>(false);
+  const [tempEmail, setTempEmail] = useState<string>(emailAddress);
+
+  const [crossoverToast, setCrossoverToast] = useState<{
+    id: string;
+    type: 'toast' | 'email' | 'both' | 'info';
+    title: string;
+    message: string;
+    detail?: string;
+    timestamp: string;
+  } | null>(null);
+
+  // Auto-dismiss toast notification after 5 seconds
+  useEffect(() => {
+    if (!crossoverToast) return;
+    const timer = setTimeout(() => {
+      setCrossoverToast(null);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [crossoverToast]);
+
+  // Toggle handlers with persistence
+  const handleToggleToast = (enabled: boolean) => {
+    setToastAlertEnabled(enabled);
+    try {
+      localStorage.setItem(`stocksense_sma_toast_${stock.ticker}`, JSON.stringify(enabled));
+    } catch {}
+    setCrossoverToast({
+      id: Date.now().toString(),
+      type: 'info',
+      title: enabled ? 'In-App Toast Alerts Active' : 'In-App Toast Alerts Muted',
+      message: enabled
+        ? `Real-time toast notifications will pop up whenever ${stock.ticker} crosses 50/200 SMA.`
+        : `Toast alerts muted for ${stock.ticker} moving average crossovers.`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
+  };
+
+  const handleToggleEmail = (enabled: boolean) => {
+    setEmailAlertEnabled(enabled);
+    try {
+      localStorage.setItem(`stocksense_sma_email_${stock.ticker}`, JSON.stringify(enabled));
+    } catch {}
+    setCrossoverToast({
+      id: Date.now().toString(),
+      type: 'info',
+      title: enabled ? 'Email Notifications Active' : 'Email Notifications Muted',
+      message: enabled
+        ? `Crossover alerts will be emailed to ${emailAddress} when ${stock.ticker} undergoes Golden/Death Cross.`
+        : `Email crossover alerts muted for ${stock.ticker}.`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
+  };
+
+  const handleSaveEmail = () => {
+    if (tempEmail && tempEmail.includes('@')) {
+      setEmailAddress(tempEmail);
+      setIsEditingEmail(false);
+      try {
+        localStorage.setItem('stocksense_crossover_email', tempEmail);
+      } catch {}
+      setCrossoverToast({
+        id: Date.now().toString(),
+        type: 'info',
+        title: 'Alert Email Updated',
+        message: `SMA crossover notifications destination updated to ${tempEmail}.`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+    }
+  };
+
+  // Test simulation trigger
+  const handleTestAlert = () => {
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const crossoverType = isSma50Above200 ? 'Golden Cross' : 'Death Cross';
+
+    if (!toastAlertEnabled && !emailAlertEnabled) {
+      setCrossoverToast({
+        id: Date.now().toString(),
+        type: 'info',
+        title: 'All Alert Channels Muted',
+        message: 'Please toggle ON either Toast or Email notifications to receive crossover alerts.',
+        timestamp: timeStr
+      });
+      return;
+    }
+
+    if (toastAlertEnabled && emailAlertEnabled) {
+      setCrossoverToast({
+        id: Date.now().toString(),
+        type: 'both',
+        title: `🚨 ${crossoverType} Crossover Alert (${stock.ticker})`,
+        message: `50-Day SMA (₹${stock.sma50.toFixed(2)}) ${isSma50Above200 ? 'surpassed' : 'fell below'} 200-Day SMA (₹${stock.sma200.toFixed(2)}).`,
+        detail: `Regime: ${trendStrengthLabel} • Dispatched via Toast & Email to ${emailAddress}`,
+        timestamp: timeStr
+      });
+    } else if (toastAlertEnabled) {
+      setCrossoverToast({
+        id: Date.now().toString(),
+        type: 'toast',
+        title: `🔔 In-App Toast: ${crossoverType} (${stock.ticker})`,
+        message: `50-Day SMA (₹${stock.sma50.toFixed(2)}) ${isSma50Above200 ? 'surpassed' : 'fell below'} 200-Day SMA (₹${stock.sma200.toFixed(2)}).`,
+        detail: `Regime: ${trendStrengthLabel} • SMA Spread: ${isSma50Above200 ? '+' : '-'}${smaSpreadPct}%`,
+        timestamp: timeStr
+      });
+    } else {
+      setCrossoverToast({
+        id: Date.now().toString(),
+        type: 'email',
+        title: `✉️ Email Alert Dispatched to ${emailAddress}`,
+        message: `Crossover alert queued for ${stock.ticker} ${crossoverType}. Spread: ${isSma50Above200 ? '+' : '-'}${smaSpreadPct}%.`,
+        detail: `50-Day SMA: ₹${stock.sma50.toFixed(2)} | 200-Day SMA: ₹${stock.sma200.toFixed(2)}`,
+        timestamp: timeStr
+      });
+    }
+  };
+
   // Technical confluence score
   const isRsiBullish = stock.rsi >= 50 && stock.rsi <= 70;
   const isMacdBullish = (stock.macd?.histogram ?? 0) > 0;
@@ -65,7 +222,60 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
   const rsi14Data = get14PeriodRsiData(stock.ticker, stock.rsi);
 
   return (
-    <div className="flex flex-col w-full gap-5 max-w-[1600px] xl:max-w-[1720px] mx-auto pb-12">
+    <div className="flex flex-col w-full gap-5 max-w-[1600px] xl:max-w-[1720px] mx-auto pb-12 relative">
+      {/* Floating In-App Toast Alert for Crossovers */}
+      {crossoverToast && (
+        <div className="fixed top-5 right-5 z-50 max-w-md w-full px-4 sm:px-0 animate-in fade-in slide-in-from-top-3 duration-200">
+          <div className={`p-4 rounded-2xl border shadow-2xl backdrop-blur-xl flex items-start justify-between gap-3 ${
+            crossoverToast.type === 'both' || crossoverToast.type === 'toast'
+              ? isSma50Above200
+                ? 'bg-[#0a201b]/95 border-emerald-500/50 shadow-[0_10px_35px_rgba(16,185,129,0.25)] text-white'
+                : 'bg-[#290e16]/95 border-rose-500/50 shadow-[0_10px_35px_rgba(244,63,94,0.25)] text-white'
+              : crossoverToast.type === 'email'
+              ? 'bg-[#0c1a2e]/95 border-blue-500/50 shadow-[0_10px_35px_rgba(59,130,246,0.25)] text-white'
+              : 'bg-[#0f1d30]/95 border-cyan-500/40 text-white shadow-[0_10px_30px_rgba(6,182,212,0.2)]'
+          }`}>
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                crossoverToast.type === 'email'
+                  ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                  : isSma50Above200
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+              }`}>
+                {crossoverToast.type === 'email' ? (
+                  <Mail className="w-4 h-4" />
+                ) : (
+                  <BellRing className="w-4 h-4 animate-bounce" />
+                )}
+              </div>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-bold text-[13px]">{crossoverToast.title}</h4>
+                  <span className="text-[10px] font-mono text-[#8c909f]">{crossoverToast.timestamp}</span>
+                </div>
+                <p className="text-[12px] text-[#cbd5e1] leading-relaxed">
+                  {crossoverToast.message}
+                </p>
+                {crossoverToast.detail && (
+                  <span className="text-[10.5px] font-mono text-cyan-300 font-semibold">
+                    {crossoverToast.detail}
+                  </span>
+                )}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setCrossoverToast(null)}
+              className="p-1 rounded-lg text-[#94a3b8] hover:text-white hover:bg-white/10 transition-colors shrink-0"
+              title="Dismiss alert"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="bg-[#122131] rounded-2xl p-5 border border-[#1c2b3c] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-md">
         <div className="flex items-center gap-3.5">
@@ -125,6 +335,26 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
               </span>
               <span className={`text-[12px] font-mono font-semibold ${stock.changePercent >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
+              </span>
+            </div>
+          </div>
+
+          <div className="h-8 w-[1px] bg-[#1c2b3c] hidden md:block" />
+
+          {/* Trend Strength Summary */}
+          <div>
+            <span className="text-[11px] font-mono text-[#64748b] uppercase tracking-wider block">Trend Strength</span>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className={`px-2.5 py-0.5 rounded text-[11.5px] font-mono font-bold flex items-center gap-1 ${
+                isSma50Above200
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+              }`}>
+                {isSma50Above200 ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+                <span>{trendStrengthLabel}</span>
+              </span>
+              <span className="text-[11px] font-mono text-[#8c909f] hidden xl:inline">
+                (50 SMA {isSma50Above200 ? '≥' : '<'} 200 SMA)
               </span>
             </div>
           </div>
@@ -271,60 +501,250 @@ export const TechnicalAnalysisScreen: React.FC<TechnicalAnalysisScreenProps> = (
           </div>
         </div>
 
-        {/* Moving Averages Card */}
+        {/* Trend Strength Indicator Card */}
         <div className="bg-[#122131] rounded-2xl p-5 border border-[#1c2b3c] flex flex-col justify-between shadow-sm">
           <div>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[12px] font-mono font-semibold text-[#64748b] uppercase">Moving Average Stack</span>
-              <span className="text-[11px] font-mono text-cyan-400 font-bold">
-                {stock.price > stock.sma200 ? 'GOLDEN REGIME' : 'DEATH CROSS ZONE'}
+              <div className="flex items-center gap-2">
+                <span className="text-[12px] font-mono font-semibold text-[#64748b] uppercase">Trend Strength</span>
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#0a1424] text-[#8c909f] border border-[#1a293b]">
+                  SMA 50 / 200
+                </span>
+              </div>
+              {/* Simple 'Bullish' or 'Bearish' label based on current crossover state */}
+              <span
+                className={`text-[11px] font-mono px-2.5 py-0.5 rounded font-bold flex items-center gap-1 ${
+                  isSma50Above200
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_10px_rgba(78,222,163,0.15)]'
+                    : 'bg-rose-500/20 text-rose-400 border border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.15)]'
+                }`}
+              >
+                {isSma50Above200 ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+                <span>{trendStrengthLabel}</span>
               </span>
             </div>
 
-            <div className="space-y-2 mb-3">
-              <div className="flex items-center justify-between p-2 rounded-lg bg-[#0a1424] border border-[#1a293b] text-[12px]">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400" />
-                  <span className="text-[#94a3b8]">20-Day SMA</span>
-                </div>
-                <div className="font-mono">
-                  <span className="text-white font-bold mr-2">₹{stock.sma20.toLocaleString()}</span>
-                  <span className={Number(priceVsSma20) >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
-                    ({Number(priceVsSma20) >= 0 ? '+' : ''}{priceVsSma20}%)
+            {/* Moving Average Values: 50-Day & 200-Day SMAs */}
+            <div className="grid grid-cols-2 gap-2.5 mb-3 bg-[#0a1424] p-3 rounded-xl border border-[#1a293b]">
+              {/* 50-Day SMA */}
+              <div className="flex flex-col">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-[#64748b] uppercase flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                    50-Day SMA
+                  </span>
+                  <span className={`text-[9.5px] font-mono ${Number(priceVsSma50) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {Number(priceVsSma50) >= 0 ? '+' : ''}{priceVsSma50}%
                   </span>
                 </div>
+                <span className="text-[16px] font-mono font-bold text-white mt-0.5">
+                  ₹{stock.sma50.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </span>
+                <span className="text-[9.5px] font-mono text-[#8c909f]">
+                  Intermediate Cycle Anchor
+                </span>
               </div>
 
-              <div className="flex items-center justify-between p-2 rounded-lg bg-[#0a1424] border border-[#1a293b] text-[12px]">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-400" />
-                  <span className="text-[#94a3b8]">50-Day SMA</span>
-                </div>
-                <div className="font-mono">
-                  <span className="text-white font-bold mr-2">₹{stock.sma50.toLocaleString()}</span>
-                  <span className={Number(priceVsSma50) >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
-                    ({Number(priceVsSma50) >= 0 ? '+' : ''}{priceVsSma50}%)
+              {/* 200-Day SMA */}
+              <div className="flex flex-col">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-[#64748b] uppercase flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                    200-Day SMA
+                  </span>
+                  <span className={`text-[9.5px] font-mono ${Number(priceVsSma200) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {Number(priceVsSma200) >= 0 ? '+' : ''}{priceVsSma200}%
                   </span>
                 </div>
+                <span className="text-[16px] font-mono font-bold text-white mt-0.5">
+                  ₹{stock.sma200.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </span>
+                <span className="text-[9.5px] font-mono text-[#8c909f]">
+                  Institutional Secular Baseline
+                </span>
+              </div>
+            </div>
+
+            {/* Crossover State & Spread Telemetry */}
+            <div className={`p-2.5 rounded-xl border mb-3 flex items-center justify-between text-[11px] font-mono ${
+              isSma50Above200
+                ? 'bg-emerald-500/10 border-emerald-500/20 text-[#d4e4fa]'
+                : 'bg-rose-500/10 border-rose-500/20 text-[#d4e4fa]'
+            }`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-2 h-2 rounded-full animate-pulse ${isSma50Above200 ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+                <span className="font-semibold text-white">
+                  {isSma50Above200 ? 'Golden Cross Active' : 'Death Cross Active'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[#8c909f]">SMA Spread:</span>
+                <span className={`font-bold ${isSma50Above200 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  {isSma50Above200 ? '+' : '-'}₹{Math.abs(smaSpread).toFixed(2)} ({isSma50Above200 ? '+' : '-'}{smaSpreadPct}%)
+                </span>
+              </div>
+            </div>
+
+            {/* Contextual Trend Explanation */}
+            <p className="text-[12px] text-[#94a3b8] leading-relaxed">
+              {isSma50Above200
+                ? `Crossover state is Bullish: The 50-day SMA trades above the 200-day baseline by ${smaSpreadPct}%, confirming sustained structural accumulation and upward trend strength.`
+                : `Crossover state is Bearish: The 50-day SMA trades below the 200-day baseline by ${smaSpreadPct}%, confirming structural downward momentum and long-term overhead resistance.`}
+            </p>
+
+            {/* Short-term 20-Day SMA sub-note */}
+            <div className="mt-2.5 pt-2 border-t border-[#1a293b]/70 flex items-center justify-between text-[10.5px] font-mono text-[#8c909f]">
+              <span className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                <span>20-Day SMA: ₹{stock.sma20.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </span>
+              <span className={Number(priceVsSma20) >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                Spot vs 20-SMA: {Number(priceVsSma20) >= 0 ? '+' : ''}{priceVsSma20}%
+              </span>
+            </div>
+
+            {/* Crossover Notification Channel Settings */}
+            <div className="mt-3 pt-3 border-t border-[#1a293b] flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                  <Bell className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Crossover Alerts (50 / 200 SMA)</span>
+                </span>
+                <span className="text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-[#0a1424] text-cyan-300 border border-[#1a293b]">
+                  {toastAlertEnabled && emailAlertEnabled ? 'Toast & Email Active' : toastAlertEnabled ? 'Toast Active' : emailAlertEnabled ? 'Email Active' : 'Muted'}
+                </span>
               </div>
 
-              <div className="flex items-center justify-between p-2 rounded-lg bg-[#0a1424] border border-[#1a293b] text-[12px]">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-indigo-400" />
-                  <span className="text-[#94a3b8]">200-Day SMA</span>
+              {/* Notification Toggle Buttons */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {/* In-App Toast Toggle */}
+                <button
+                  type="button"
+                  onClick={() => handleToggleToast(!toastAlertEnabled)}
+                  className={`p-2.5 rounded-xl border transition-all flex items-center justify-between text-left ${
+                    toastAlertEnabled
+                      ? 'bg-cyan-500/10 border-cyan-500/40 text-white shadow-sm'
+                      : 'bg-[#0a1424] border-[#1a293b] text-[#64748b] hover:border-[#273d57]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                      toastAlertEnabled ? 'bg-cyan-500/20 text-cyan-300' : 'bg-[#122131] text-[#64748b]'
+                    }`}>
+                      <BellRing className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[11px] font-semibold">Toast Alerts</span>
+                      <span className="text-[9.5px] text-[#94a3b8]">In-app banner on crossover</span>
+                    </div>
+                  </div>
+                  <div className={`w-8 h-4 rounded-full transition-colors relative shrink-0 ${
+                    toastAlertEnabled ? 'bg-cyan-500' : 'bg-[#1c2b3c]'
+                  }`}>
+                    <div className={`w-3 h-3 rounded-full bg-white absolute top-0.5 transition-all ${
+                      toastAlertEnabled ? 'left-4.5' : 'left-0.5'
+                    }`} />
+                  </div>
+                </button>
+
+                {/* Email Notification Toggle */}
+                <button
+                  type="button"
+                  onClick={() => handleToggleEmail(!emailAlertEnabled)}
+                  className={`p-2.5 rounded-xl border transition-all flex items-center justify-between text-left ${
+                    emailAlertEnabled
+                      ? 'bg-blue-500/10 border-blue-500/40 text-white shadow-sm'
+                      : 'bg-[#0a1424] border-[#1a293b] text-[#64748b] hover:border-[#273d57]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                      emailAlertEnabled ? 'bg-blue-500/20 text-blue-300' : 'bg-[#122131] text-[#64748b]'
+                    }`}>
+                      <Mail className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[11px] font-semibold">Email Alerts</span>
+                      <span className="text-[9.5px] text-[#94a3b8]">Direct to user inbox</span>
+                    </div>
+                  </div>
+                  <div className={`w-8 h-4 rounded-full transition-colors relative shrink-0 ${
+                    emailAlertEnabled ? 'bg-blue-500' : 'bg-[#1c2b3c]'
+                  }`}>
+                    <div className={`w-3 h-3 rounded-full bg-white absolute top-0.5 transition-all ${
+                      emailAlertEnabled ? 'left-4.5' : 'left-0.5'
+                    }`} />
+                  </div>
+                </button>
+              </div>
+
+              {/* Email Address Editor (Visible when Email is enabled) */}
+              {emailAlertEnabled && (
+                <div className="p-2 rounded-xl bg-[#0a1424] border border-[#1a293b] flex items-center justify-between text-[11px] font-mono">
+                  <div className="flex items-center gap-1.5 truncate mr-2">
+                    <span className="text-[#64748b]">Recipient:</span>
+                    {isEditingEmail ? (
+                      <input
+                        type="email"
+                        value={tempEmail}
+                        onChange={(e) => setTempEmail(e.target.value)}
+                        className="bg-[#122131] px-2 py-0.5 rounded border border-cyan-500/50 text-white font-mono text-[11px] focus:outline-none"
+                        placeholder="your-email@example.com"
+                        autoFocus
+                      />
+                    ) : (
+                      <span className="text-blue-300 font-semibold truncate">{emailAddress}</span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1 shrink-0">
+                    {isEditingEmail ? (
+                      <button
+                        type="button"
+                        onClick={handleSaveEmail}
+                        className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 text-[10px] font-bold"
+                      >
+                        Save
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTempEmail(emailAddress);
+                          setIsEditingEmail(true);
+                        }}
+                        className="text-[10px] text-[#64748b] hover:text-white underline"
+                      >
+                        Change
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="font-mono">
-                  <span className="text-white font-bold mr-2">₹{stock.sma200.toLocaleString()}</span>
-                  <span className={Number(priceVsSma200) >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
-                    ({Number(priceVsSma200) >= 0 ? '+' : ''}{priceVsSma200}%)
-                  </span>
-                </div>
+              )}
+
+              {/* Action Bar: Test Trigger */}
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-[10px] font-mono text-[#64748b]">
+                  Triggers on Golden Cross & Death Cross
+                </span>
+                <button
+                  type="button"
+                  onClick={handleTestAlert}
+                  className="px-2.5 py-1 rounded-lg bg-[#0a1424] hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 border border-cyan-500/30 text-[10.5px] font-mono font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Test crossover notification dispatch"
+                >
+                  <Sparkles className="w-3 h-3 text-cyan-400" />
+                  <span>Test Alert Trigger</span>
+                </button>
               </div>
             </div>
           </div>
 
-          <div className="mt-2 pt-3 border-t border-[#1a293b] text-[11px] font-mono text-[#64748b]">
-            Institutional Anchor: 200-Day Structural Trend
+          <div className="mt-3 pt-2.5 border-t border-[#1a293b] text-[11px] font-mono text-[#64748b] flex justify-between items-center">
+            <span>Crossover Rule: 50-Day vs 200-Day SMA</span>
+            <span className={`font-semibold ${isSma50Above200 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              State: {trendStrengthLabel}
+            </span>
           </div>
         </div>
 

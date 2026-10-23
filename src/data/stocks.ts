@@ -462,9 +462,9 @@ export const STOCKS_DATA: Record<string, StockData> = {
       signalLine: -1.10,
       histogram: -1.30
     },
-    sma20: 157.00,
-    sma50: 161.00,
-    sma200: 154.00,
+    sma20: 153.00,
+    sma50: 151.20,
+    sma200: 158.50,
     bollinger: {
       upper: 164.00,
       middle: 157.00,
