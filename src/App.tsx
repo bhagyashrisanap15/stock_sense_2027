@@ -508,7 +508,13 @@ export default function App() {
           />
         );
       case 'overview':
-        return <OverviewScreen onNavigate={setCurrentTab} />;
+        return (
+          <OverviewScreen
+            onNavigate={setCurrentTab}
+            currentStock={currentStock}
+            onSelectStock={handleSelectStock}
+          />
+        );
       default:
         return (
           <AIPredictScreen

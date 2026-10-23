@@ -1,11 +1,18 @@
 import React from 'react';
-import { ScreenTab } from '../types';
+import { ScreenTab, StockData } from '../types';
+import { HistoricalPriceTrends } from '../components/HistoricalPriceTrends';
 
 interface OverviewScreenProps {
   onNavigate: (tab: ScreenTab) => void;
+  currentStock?: StockData;
+  onSelectStock?: (stock: StockData) => void;
 }
 
-export const OverviewScreen: React.FC<OverviewScreenProps> = ({ onNavigate }) => {
+export const OverviewScreen: React.FC<OverviewScreenProps> = ({
+  onNavigate,
+  currentStock,
+  onSelectStock
+}) => {
   return (
     <div className="flex flex-col w-full text-[#d4e4fa] max-w-[1600px] xl:max-w-[1720px] mx-auto pb-8 space-y-8">
       {/* Laptop Hero & Live Analytics Preview Dual-Column */}
@@ -177,6 +184,13 @@ export const OverviewScreen: React.FC<OverviewScreenProps> = ({ onNavigate }) =>
           </div>
         </section>
       </div>
+
+      {/* Historical Price Trends (12-Month Closing Price Chart) */}
+      <HistoricalPriceTrends
+        currentStock={currentStock}
+        onSelectStock={onSelectStock}
+        onNavigate={onNavigate}
+      />
 
       {/* Editorial Section Divider / Intro */}
       <div className="pt-2">
