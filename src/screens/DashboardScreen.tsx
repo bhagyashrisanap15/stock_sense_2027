@@ -81,18 +81,18 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-[20px] lg:text-[22px] font-bold text-[#d4e4fa] tracking-tight truncate">
-                Quant Terminal • Dr. K. Sharma
+                Market Overview • StockSense
               </h1>
               <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#4d8eff]/15 text-[#adc6ff] text-[11px] font-semibold border border-[#4d8eff]/30">
-                Institutional Lead
+                AI Stock Insights
               </span>
               <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full bg-[#00a572]/15 text-[#4edea3] text-[11px] font-mono border border-[#00a572]/30 gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#4edea3] animate-pulse"></span>
-                FastAPI v2.8 Live
+                NSE Live
               </span>
             </div>
             <p className="text-[12px] text-[#c2c6d6] mt-0.5 truncate">
-              Active Focus: <strong className="text-[#adc6ff] font-semibold">{currentStock.ticker}</strong> ({currentStock.name}) • Market Direction: <span className="text-[#4edea3] font-semibold">{currentStock.directionLabel}</span>
+              Active Stock: <strong className="text-[#adc6ff] font-semibold">{currentStock.ticker}</strong> ({currentStock.name}) • Prediction: <span className="text-[#4edea3] font-semibold">{currentStock.directionLabel}</span>
             </p>
           </div>
         </div>
@@ -104,21 +104,21 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
             className="h-9 px-3 rounded-xl bg-[#adc6ff] hover:bg-[#d8e2ff] text-[#002e6a] text-[12px] font-semibold flex items-center gap-1.5 shadow-sm transition-all active:scale-95"
           >
             <span className="material-symbols-outlined text-[17px]">analytics</span>
-            <span>Technical Workspace</span>
+            <span>Market Today</span>
           </button>
           <button
             onClick={() => onNavigate('paper-trading')}
             className="h-9 px-3 rounded-xl bg-[#1c2b3c] hover:bg-[#273647] text-[#4edea3] text-[12px] font-semibold flex items-center gap-1.5 border border-[#273647] transition-all active:scale-95"
           >
             <span className="material-symbols-outlined text-[17px]">candlestick_chart</span>
-            <span>Paper Trading</span>
+            <span>Practice Investing</span>
           </button>
           <button
             onClick={onOpenBacktest}
             className="h-9 px-3 rounded-xl bg-[#1c2b3c] hover:bg-[#273647] text-[#c2c6d6] hover:text-[#d4e4fa] text-[12px] font-semibold flex items-center gap-1.5 border border-[#273647] transition-all active:scale-95"
           >
             <span className="material-symbols-outlined text-[17px]">model_training</span>
-            <span>Backtest 10k</span>
+            <span>Strategy Tester</span>
           </button>
         </div>
       </section>

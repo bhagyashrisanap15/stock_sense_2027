@@ -48,20 +48,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navItems: NavItem[] = [
     // Core Navigation
-    { id: 'ai-predict', label: 'AI Predictions', icon: BrainCircuit, badge: 'AI GUIDE', isPrimary: true, group: 'core' },
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, group: 'core' },
-    { id: 'markets', label: 'Live Markets', icon: TrendingUp, group: 'core' },
+    { id: 'ai-predict', label: 'Stock Insights', icon: BrainCircuit, badge: 'AI', isPrimary: true, group: 'core' },
+    { id: 'dashboard', label: 'Overview', icon: LayoutDashboard, group: 'core' },
+    { id: 'markets', label: 'Market Today', icon: TrendingUp, group: 'core' },
 
     // Portfolio & Analytics
-    { id: 'watchlist', label: 'Watchlist', icon: Bookmark, group: 'portfolio' },
-    { id: 'portfolio', label: 'My Portfolio', icon: Wallet, group: 'portfolio' },
-    { id: 'paper-trading', label: 'Practice Trading', icon: CandlestickChart, badge: 'FREE CASH', group: 'portfolio' },
+    { id: 'watchlist', label: 'My Watchlist', icon: Bookmark, group: 'portfolio' },
+    { id: 'portfolio', label: 'My Investments', icon: Wallet, group: 'portfolio' },
+    { id: 'paper-trading', label: 'Practice Investing', icon: CandlestickChart, badge: 'PRACTICE', group: 'portfolio' },
 
     // Analytics & Research
-    { id: 'risk-radar', label: 'Risk & Safety Meter', icon: ShieldAlert, group: 'analytics' },
-    { id: 'screener', label: 'Stock Finder', icon: SlidersHorizontal, group: 'analytics' },
-    { id: 'technical-analysis', label: 'Price Trends & Charts', icon: Activity, group: 'analytics' },
-    { id: 'heatmap', label: 'Sector Heatmap', icon: Grid3X3, group: 'analytics' },
+    { id: 'risk-radar', label: 'Risk Checker', icon: ShieldAlert, group: 'analytics' },
+    { id: 'screener', label: 'Find a Stock', icon: SlidersHorizontal, group: 'analytics' },
+    { id: 'technical-analysis', label: 'Price History', icon: Activity, group: 'analytics' },
+    { id: 'heatmap', label: 'Market Sectors', icon: Grid3X3, group: 'analytics' },
     { id: 'news-sentiment', label: 'News & Sentiment', icon: Newspaper, group: 'analytics' },
     { id: 'backtesting', label: 'Strategy Tester', icon: Cpu, badge: 'TEST', group: 'analytics' }
   ];

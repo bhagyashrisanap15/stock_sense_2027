@@ -166,47 +166,47 @@ export const KeyboardShortcutsModal: React.FC<KeyboardShortcutsModalProps> = ({
       {
         id: 'nav-ai-predict',
         category: 'navigation',
-        title: 'AI Insights & Explainability',
-        description: 'Target stock SHAP feature attribution and direction forecast',
+        title: 'Stock Insights',
+        description: 'AI trend outlook, plain-English reasons, and 5-day price ranges',
         keys: ['1'],
         action: () => {
           onClose();
           onNavigate('ai-predict');
         },
-        actionLabel: 'Go to AI Insights',
+        actionLabel: 'Go to Stock Insights',
         icon: Zap
       },
       {
         id: 'nav-dashboard',
         category: 'navigation',
-        title: 'Institutional Dashboard',
-        description: 'Benchmark indices, top gainers, active movers, and macro telemetry',
+        title: 'Overview',
+        description: 'Benchmark indices, top gainers, active movers, and market highlights',
         keys: ['2'],
         action: () => {
           onClose();
           onNavigate('dashboard');
         },
-        actionLabel: 'Go to Dashboard',
+        actionLabel: 'Go to Overview',
         icon: Compass
       },
       {
         id: 'nav-markets',
         category: 'navigation',
-        title: 'Real-Time Market Monitor',
-        description: 'NSE 500 sectoral heatmaps, advance/decline breadth, and quotes',
+        title: 'Market Today',
+        description: 'NSE indices, live stock prices, news, and sector movements',
         keys: ['3'],
         action: () => {
           onClose();
           onNavigate('markets');
         },
-        actionLabel: 'Go to Markets',
+        actionLabel: 'Go to Market Today',
         icon: Compass
       },
       {
         id: 'nav-watchlist',
         category: 'navigation',
-        title: 'Priority Watchlist',
-        description: 'Curated high-priority institutional monitoring basket',
+        title: 'My Watchlist',
+        description: 'Personal stock list to keep an eye on your favorite companies',
         keys: ['4'],
         action: () => {
           onClose();
@@ -218,86 +218,86 @@ export const KeyboardShortcutsModal: React.FC<KeyboardShortcutsModalProps> = ({
       {
         id: 'nav-portfolio',
         category: 'navigation',
-        title: 'Position & Portfolio Allocation',
-        description: 'Live holdings, unrealized P&L, and sector weightings',
+        title: 'My Investments',
+        description: 'Your investments, profits/losses, and company distribution',
         keys: ['5'],
         action: () => {
           onClose();
           onNavigate('portfolio');
         },
-        actionLabel: 'Go to Portfolio',
+        actionLabel: 'Go to Investments',
         icon: Compass
       },
       {
         id: 'nav-risk-radar',
         category: 'navigation',
-        title: 'Portfolio Risk Radar',
-        description: 'Value-at-Risk (VaR 95%), Sharpe, Sortino, and stress simulations',
+        title: 'Risk Checker',
+        description: 'Easy safety meter (0-100), price swing history, and drop tests',
         keys: ['6'],
         action: () => {
           onClose();
           onNavigate('risk-radar');
         },
-        actionLabel: 'Go to Risk Radar',
+        actionLabel: 'Go to Risk Checker',
         icon: Compass
       },
       {
         id: 'nav-screener',
         category: 'navigation',
-        title: 'Quantitative Stock Screener',
-        description: 'Multi-variable fundamental & technical filter engine',
+        title: 'Find a Stock',
+        description: 'Simple filters to discover stocks by price, trend, or safety',
         keys: ['7'],
         action: () => {
           onClose();
           onNavigate('screener');
         },
-        actionLabel: 'Go to Screener',
+        actionLabel: 'Go to Find a Stock',
         icon: Compass
       },
       {
         id: 'nav-technical',
         category: 'navigation',
-        title: 'Technical Multi-Indicator Analysis',
-        description: 'RSI, MACD, Bollinger Bands, and moving average regimes',
+        title: 'Price History',
+        description: 'Simple charts, momentum trends, and average price levels',
         keys: ['8'],
         action: () => {
           onClose();
           onNavigate('technical-analysis');
         },
-        actionLabel: 'Go to Technical',
+        actionLabel: 'Go to Price History',
         icon: Compass
       },
       {
         id: 'nav-backtest',
         category: 'navigation',
-        title: 'Quantitative Strategy Backtest',
-        description: 'Historical performance simulation, alpha, and max drawdowns',
+        title: 'Strategy Tester',
+        description: 'See how investment strategies performed in past market years',
         keys: ['9'],
         action: () => {
           onClose();
           onNavigate('backtesting');
         },
-        actionLabel: 'Go to Backtest',
+        actionLabel: 'Go to Strategy Tester',
         icon: Compass
       },
       {
         id: 'nav-heatmap',
         category: 'navigation',
-        title: 'Sectoral Market Heatmap',
-        description: 'Relative capital distribution across Indian industry sectors',
+        title: 'Market Sectors',
+        description: 'Visual map showing which industries are gaining or dropping today',
         keys: ['0'],
         action: () => {
           onClose();
           onNavigate('heatmap');
         },
-        actionLabel: 'Go to Heatmap',
+        actionLabel: 'Go to Market Sectors',
         icon: Compass
       },
       {
         id: 'nav-news',
         category: 'navigation',
-        title: 'News & Institutional Sentiment',
-        description: 'Real-time NLP sentiment scoring on market financial wires',
+        title: 'News & Sentiment',
+        description: 'Latest market headlines and whether news is positive or negative',
         keys: ['N'],
         action: () => {
           onClose();
@@ -309,14 +309,14 @@ export const KeyboardShortcutsModal: React.FC<KeyboardShortcutsModalProps> = ({
       {
         id: 'nav-overview',
         category: 'navigation',
-        title: 'Executive Market Overview',
-        description: 'Macro perspectives and cross-asset correlations',
+        title: 'Market Summary',
+        description: 'Easy summary of today’s market moves and broad trends',
         keys: ['O'],
         action: () => {
           onClose();
           onNavigate('overview');
         },
-        actionLabel: 'Go to Overview',
+        actionLabel: 'Go to Summary',
         icon: Compass
       }
     ],

@@ -17,13 +17,13 @@ interface NavigationProps {
 
 export const Navigation: React.FC<NavigationProps> = ({ currentTab, onTabChange }) => {
   const tabs = [
-    { id: 'dashboard' as ScreenTab, label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'markets' as ScreenTab, label: 'Markets', icon: TrendingUp },
-    { id: 'ai-predict' as ScreenTab, label: 'AI Insights', icon: BrainCircuit },
-    { id: 'risk-radar' as ScreenTab, label: 'Risk Radar', icon: ShieldAlert },
-    { id: 'watchlist' as ScreenTab, label: 'Watchlist', icon: Bookmark },
-    { id: 'portfolio' as ScreenTab, label: 'Portfolio', icon: Wallet },
-    { id: 'paper-trading' as ScreenTab, label: 'Simulator', icon: CandlestickChart }
+    { id: 'dashboard' as ScreenTab, label: 'Overview', icon: LayoutDashboard },
+    { id: 'markets' as ScreenTab, label: 'Market Today', icon: TrendingUp },
+    { id: 'ai-predict' as ScreenTab, label: 'Stock Insights', icon: BrainCircuit },
+    { id: 'risk-radar' as ScreenTab, label: 'Risk Checker', icon: ShieldAlert },
+    { id: 'watchlist' as ScreenTab, label: 'My Watchlist', icon: Bookmark },
+    { id: 'portfolio' as ScreenTab, label: 'My Investments', icon: Wallet },
+    { id: 'paper-trading' as ScreenTab, label: 'Practice Investing', icon: CandlestickChart }
   ];
 
   return (

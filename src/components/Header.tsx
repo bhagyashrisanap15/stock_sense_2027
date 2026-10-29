@@ -46,18 +46,18 @@ export const Header: React.FC<HeaderProps> = ({
 
   // Tab display name mapping
   const tabTitles: Record<ScreenTab, string> = {
-    'ai-predict': 'AI Predictions & Insights (Why Stocks Move)',
-    'dashboard': 'Market Dashboard Overview',
-    'markets': 'Live Market Prices & Indices',
-    'risk-radar': 'Risk & Safety Meter',
+    'ai-predict': 'Stock Insights',
+    'dashboard': 'Overview',
+    'markets': 'Market Today',
+    'risk-radar': 'Risk Checker',
     'watchlist': 'My Watchlist',
-    'portfolio': 'My Portfolio & Holdings',
-    'paper-trading': 'Practice Trading (Virtual Money)',
-    'backtesting': 'Strategy Tester (Past Results)',
-    'heatmap': 'Sector Performance Heatmap',
-    'screener': 'Easy Stock Finder & Screener',
-    'news-sentiment': 'Market News & Sentiment',
-    'technical-analysis': 'Price Trends & Technical Charts',
+    'portfolio': 'My Investments',
+    'paper-trading': 'Practice Investing',
+    'backtesting': 'Strategy Tester',
+    'heatmap': 'Market Sectors',
+    'screener': 'Find a Stock',
+    'news-sentiment': 'News & Sentiment',
+    'technical-analysis': 'Price History',
     'overview': 'Market Summary'
   };
 
