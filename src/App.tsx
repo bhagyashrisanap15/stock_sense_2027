@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ScreenTab, AuthScreen, StockData } from './types';
+import { ScreenTab, AuthScreen, StockData, UserProfile } from './types';
 import { STOCKS_DATA } from './data/stocks';
+import { getStoredUserProfile, saveStoredUserProfile, GUEST_USER_PROFILE } from './data/user';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { SearchModal } from './components/SearchModal';
@@ -18,6 +19,7 @@ import { MarketsScreen } from './screens/MarketsScreen';
 import { RiskRadarScreen } from './screens/RiskRadarScreen';
 import { WatchlistScreen } from './screens/WatchlistScreen';
 import { OverviewScreen } from './screens/OverviewScreen';
+import { ProfileScreen } from './screens/ProfileScreen';
 import { Portfolio } from './components/Portfolio';
 import { MarketHeatmap } from './components/MarketHeatmap';
 import { PaperTrading } from './components/PaperTrading';
@@ -108,6 +110,51 @@ export default function App() {
       document.documentElement.classList.remove('light');
     }
   }, [theme]);
+
+  // User Profile & Authentication State
+  const [userProfile, setUserProfile] = useState<UserProfile>(() => getStoredUserProfile());
+
+  useEffect(() => {
+    saveStoredUserProfile(userProfile);
+  }, [userProfile]);
+
+  const handleLoginSuccess = (name: string, email: string) => {
+    const isGuest = email.includes('guest');
+    const updated: UserProfile = {
+      ...userProfile,
+      name,
+      email,
+      avatarInitials: (name.trim()[0] || 'U').toUpperCase(),
+      accountType: isGuest ? 'Guest Explorer' : 'Investor (Pro)',
+      isGuest
+    };
+    setUserProfile(updated);
+    showToast(`Welcome back, ${name}! Signed in successfully.`);
+  };
+
+  const handleSkipLogin = () => {
+    setUserProfile(GUEST_USER_PROFILE);
+    showToast('Exploring as Guest with ₹10L Virtual Sandbox unlocked!');
+  };
+
+  const handleRegisterSuccess = (name: string, email: string) => {
+    const updated: UserProfile = {
+      ...userProfile,
+      name,
+      email,
+      avatarInitials: (name.trim()[0] || 'U').toUpperCase(),
+      accountType: 'Investor (Pro)',
+      isGuest: false,
+      memberSince: 'October 2026'
+    };
+    setUserProfile(updated);
+    showToast(`Account registered for ${name}! Welcome to StockSense.`);
+  };
+
+  const handleLogout = () => {
+    setUserProfile(GUEST_USER_PROFILE);
+    showToast('Signed out. You are now exploring in Guest mode.');
+  };
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -516,6 +563,19 @@ export default function App() {
             onNavigate={setCurrentTab}
           />
         );
+      case 'profile':
+        return (
+          <ProfileScreen
+            user={userProfile}
+            onUpdateUser={(updated) => {
+              setUserProfile(updated);
+            }}
+            onOpenLogin={() => setAuthScreen('login')}
+            onOpenRegister={() => setAuthScreen('register')}
+            onLogout={handleLogout}
+            onNavigate={setCurrentTab}
+          />
+        );
       case 'overview':
         return (
           <OverviewScreen
@@ -537,8 +597,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#08101e] text-slate-900 dark:text-slate-100 font-body selection:bg-teal-500/20 selection:text-teal-900 relative transition-colors duration-200 flex flex-col">
-      {/* 1. Fixed Left Vertical Sidebar */}
+    <div className="min-h-screen bg-[#F5F8FC] dark:bg-[#080e18] text-slate-900 dark:text-slate-100 font-body selection:bg-teal-500/20 selection:text-teal-900 relative transition-colors duration-200 flex flex-col">
+      {/* 1. Fixed Left Vertical Sidebar (250px expanded, 72px collapsed) */}
       <Sidebar
         currentTab={currentTab}
         onTabChange={setCurrentTab}
@@ -546,17 +606,18 @@ export default function App() {
         setIsCollapsed={setIsSidebarCollapsed}
         isMobileOpen={isMobileNavOpen}
         setIsMobileOpen={setIsMobileNavOpen}
-        onOpenSettings={() => setAuthScreen('login')}
+        onOpenSettings={() => setCurrentTab('profile')}
         onOpenHelp={() => setIsShortcutsOpen(true)}
+        currentUser={userProfile}
       />
 
-      {/* 2. Main Content Container (Offset by sidebar width on desktop) */}
+      {/* 2. Main Content Container (Offset by sidebar width on desktop: 250px or 72px) */}
       <div
         className={`min-h-screen flex flex-col transition-all duration-300 ease-in-out ${
-          isSidebarCollapsed ? 'md:pl-18' : 'md:pl-64'
+          isSidebarCollapsed ? 'md:pl-[72px]' : 'md:pl-[250px]'
         }`}
       >
-        {/* Compact Top Header */}
+        {/* Compact Top Header (Starts after sidebar, never overlaps it) */}
         <Header
           onOpenSearch={() => setIsSearchOpen(true)}
           onOpenAuth={() => setAuthScreen('login')}
@@ -569,20 +630,14 @@ export default function App() {
           currentTab={currentTab}
           currentStockTicker={currentStock.ticker}
           onSelectTab={setCurrentTab}
+          currentUser={userProfile}
         />
 
-        {/* Main Content Viewport */}
-        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col pb-16 md:pb-8">
+        {/* Main Content Viewport with consistent 24-32px padding */}
+        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 md:py-8 flex flex-col pb-12">
           {renderActiveScreen()}
         </main>
       </div>
-
-      {/* 3. Mobile Bottom Navigation Bar (retained for quick thumb navigation on phones) */}
-      <Navigation
-        currentTab={currentTab}
-        onTabChange={setCurrentTab}
-        onOpenProfile={() => setAuthScreen('login')}
-      />
 
       {/* Modals & Dialogs */}
       <SearchModal
@@ -598,18 +653,16 @@ export default function App() {
         onClose={() => setAuthScreen('none')}
         onSwitchToRegister={() => setAuthScreen('register')}
         onSwitchToForgot={() => setAuthScreen('forgot')}
-        onLoginSuccess={(name, email) => {
-          showToast(`Welcome back, ${name} (${email})!`);
-        }}
+        onLoginSuccess={handleLoginSuccess}
+        onSkipLogin={handleSkipLogin}
       />
 
       <RegisterModal
         isOpen={authScreen === 'register'}
         onClose={() => setAuthScreen('none')}
         onSwitchToLogin={() => setAuthScreen('login')}
-        onRegisterSuccess={(name, email) => {
-          showToast(`Account registered for ${name}! Logged into Quant Sandbox.`);
-        }}
+        onRegisterSuccess={handleRegisterSuccess}
+        onSkipRegister={handleSkipLogin}
       />
 
       <ForgotPasswordModal
