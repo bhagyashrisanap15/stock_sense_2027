@@ -110,7 +110,11 @@ export const NewsSentimentScreen: React.FC<NewsSentimentScreenProps> = ({
           </div>
         </div>
 
-        <MarketNews ticker={targetStock.ticker} stockName={targetStock.name} />
+        <MarketNews
+          ticker={targetStock.ticker}
+          stockName={targetStock.name}
+          onNavigate={onNavigate}
+        />
       </div>
     </div>
   );

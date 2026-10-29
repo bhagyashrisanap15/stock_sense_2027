@@ -154,5 +154,6 @@ export type ScreenTab =
   | 'backtesting'
   | 'screener'
   | 'news-sentiment'
-  | 'technical-analysis';
+  | 'technical-analysis'
+  | 'learn';
 export type AuthScreen = 'none' | 'login' | 'register' | 'forgot';

@@ -1,30 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import { NewsArticle } from '../types';
-import { fetchStockNews } from '../data/news';
+import {
+  Newspaper,
+  Clock,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  RefreshCw,
+  ChevronRight,
+  X,
+  ExternalLink,
+  ArrowRight,
+  Filter
+} from 'lucide-react';
+import { NewsArticle, ScreenTab } from '../types';
+import { fetchStockNews, fetchAllMarketHeadlines } from '../data/news';
 
 interface MarketNewsProps {
-  ticker: string;
-  stockName: string;
+  ticker?: string;
+  stockName?: string;
+  limit?: number;
+  onNavigate?: (tab: ScreenTab) => void;
+  showFilters?: boolean;
+  compact?: boolean;
 }
 
-export const MarketNews: React.FC<MarketNewsProps> = ({ ticker, stockName }) => {
+export const MarketNews: React.FC<MarketNewsProps> = ({
+  ticker,
+  stockName,
+  limit = 6,
+  onNavigate,
+  showFilters = true,
+  compact = false
+}) => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'bullish' | 'bearish' | 'earnings'>('all');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<'All' | 'Macro' | 'Earnings' | 'Product' | 'Regulatory'>('All');
+  const [newsScope, setNewsScope] = useState<'market' | 'stock'>(ticker ? 'market' : 'market');
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('Just now');
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const loadNews = async (showRefreshSpinner = false) => {
-    if (showRefreshSpinner) setIsRefreshing(true);
+  const loadHeadlines = async (showSpinner = false) => {
+    if (showSpinner) setIsRefreshing(true);
     else setLoading(true);
 
     try {
-      const data = await fetchStockNews(ticker);
+      let data: NewsArticle[] = [];
+      if (newsScope === 'stock' && ticker) {
+        data = await fetchStockNews(ticker);
+      } else {
+        data = await fetchAllMarketHeadlines();
+      }
       setArticles(data);
-      setLastUpdated(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+      const now = new Date();
+      setLastUpdated(
+        now.toLocaleTimeString('en-IN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        })
+      );
     } catch (err) {
-      console.error('Failed to load news:', err);
+      console.error('Failed to load market news headlines:', err);
     } finally {
       setLoading(false);
       setIsRefreshing(false);
@@ -32,300 +69,325 @@ export const MarketNews: React.FC<MarketNewsProps> = ({ ticker, stockName }) => 
   };
 
   useEffect(() => {
-    loadNews();
-  }, [ticker]);
+    loadHeadlines();
+  }, [ticker, newsScope]);
 
-  // Aggregate Sentiment Calculation
-  const totalArticles = articles.length;
-  const bullishCount = articles.filter((a) => a.sentiment === 'BULLISH').length;
-  const bearishCount = articles.filter((a) => a.sentiment === 'BEARISH').length;
-  const neutralCount = articles.filter((a) => a.sentiment === 'NEUTRAL').length;
-
-  const bullishPct = totalArticles > 0 ? (bullishCount / totalArticles) * 100 : 0;
-  const neutralPct = totalArticles > 0 ? (neutralCount / totalArticles) * 100 : 0;
-  const bearishPct = totalArticles > 0 ? (bearishCount / totalArticles) * 100 : 0;
-
-  const avgSentimentScore = totalArticles > 0
-    ? (articles.reduce((acc, a) => acc + a.sentimentScore, 0) / totalArticles).toFixed(2)
-    : '0.00';
-
+  // Filter by category
   const filteredArticles = articles.filter((a) => {
-    if (filter === 'bullish') return a.sentiment === 'BULLISH';
-    if (filter === 'bearish') return a.sentiment === 'BEARISH';
-    if (filter === 'earnings') return a.category === 'Earnings';
-    return true;
+    if (activeCategory === 'All') return true;
+    return a.category.toLowerCase() === activeCategory.toLowerCase();
   });
 
+  const displayedArticles = limit ? filteredArticles.slice(0, limit) : filteredArticles;
+
   return (
-    <section className="bg-[#122131] rounded-xl p-4 shadow-sm border border-[#1c2b3c] flex flex-col gap-3.5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#4d8eff]/15 text-[#adc6ff] flex items-center justify-center border border-[#4d8eff]/30">
-            <span className="material-symbols-outlined text-[18px]">newspaper</span>
+    <div className="bg-white dark:bg-[#121c2d] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-5">
+      {/* Header Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/60 dark:border-teal-800/60 shrink-0">
+            <Newspaper className="w-5 h-5" />
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
-              <h3 className="text-[15px] font-bold text-[#d4e4fa] leading-none">
-                Market Intelligence & News
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                Latest Market News & Headlines
               </h3>
-              <span className="px-1.5 py-0.2 rounded bg-[#0d1c2d] text-[#adc6ff] text-[10px] font-mono border border-[#1c2b3c]">
-                {ticker}
+              <span className="text-[10px] font-semibold font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                NSE • BSE
               </span>
             </div>
-            <span className="text-[11px] text-[#8c909f] mt-0.5 block">
-              FinBERT Sentiment NLP • Last sync: {lastUpdated}
-            </span>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1.5">
+              <span>Updated {lastUpdated}</span>
+              <span>•</span>
+              <span>Plain-language financial updates</span>
+            </p>
           </div>
         </div>
 
-        <button
-          onClick={() => loadNews(true)}
-          disabled={loading || isRefreshing}
-          className="h-8 px-2.5 rounded-lg bg-[#1c2b3c] hover:bg-[#273647] text-[#adc6ff] text-[11px] font-semibold flex items-center gap-1 transition-all border border-[#273647] active:scale-95 disabled:opacity-50"
-          title="Refresh real-time headlines"
-        >
-          <span
-            className={`material-symbols-outlined text-[15px] ${
-              isRefreshing ? 'animate-spin' : ''
-            }`}
-          >
-            refresh
-          </span>
-          <span className="hidden sm:inline">Refresh</span>
-        </button>
-      </div>
+        {/* Action Controls */}
+        <div className="flex items-center gap-2 self-start sm:self-center">
+          {ticker && (
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg text-xs font-medium">
+              <button
+                onClick={() => setNewsScope('market')}
+                className={`px-2.5 py-1 rounded-md transition-all ${
+                  newsScope === 'market'
+                    ? 'bg-white dark:bg-[#121c2d] text-teal-700 dark:text-teal-300 shadow-sm font-semibold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                }`}
+              >
+                All Market
+              </button>
+              <button
+                onClick={() => setNewsScope('stock')}
+                className={`px-2.5 py-1 rounded-md transition-all ${
+                  newsScope === 'stock'
+                    ? 'bg-white dark:bg-[#121c2d] text-teal-700 dark:text-teal-300 shadow-sm font-semibold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                }`}
+              >
+                {ticker}
+              </button>
+            </div>
+          )}
 
-      {/* Aggregate NLP Sentiment Bar */}
-      <div className="bg-[#0d1c2d] p-3 rounded-xl border border-[#1c2b3c] flex flex-col gap-2">
-        <div className="flex items-center justify-between text-[11px]">
-          <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[15px] text-[#4edea3]">psychology</span>
-            <span className="text-[#d4e4fa] font-semibold">Overall Media Sentiment</span>
-          </div>
-          <span
-            className={`font-mono font-bold ${
-              parseFloat(avgSentimentScore) > 0.2
-                ? 'text-[#4edea3]'
-                : parseFloat(avgSentimentScore) < -0.2
-                ? 'text-[#ffb4ab]'
-                : 'text-[#adc6ff]'
-            }`}
-          >
-            Score: {parseFloat(avgSentimentScore) > 0 ? '+' : ''}{avgSentimentScore} (
-            {parseFloat(avgSentimentScore) > 0.2 ? 'Bullish Drift' : parseFloat(avgSentimentScore) < -0.2 ? 'Bearish Drag' : 'Balanced'}
-            )
-          </span>
-        </div>
-
-        {/* Tranche distribution track */}
-        <div className="w-full h-2 rounded-full overflow-hidden flex bg-[#1c2b3c]">
-          <div
-            className="h-full bg-[#4edea3] transition-all duration-500"
-            style={{ width: `${bullishPct}%` }}
-            title={`Bullish: ${bullishPct.toFixed(0)}%`}
-          />
-          <div
-            className="h-full bg-[#3131c0] transition-all duration-500"
-            style={{ width: `${neutralPct}%` }}
-            title={`Neutral: ${neutralPct.toFixed(0)}%`}
-          />
-          <div
-            className="h-full bg-[#ffb4ab] transition-all duration-500"
-            style={{ width: `${bearishPct}%` }}
-            title={`Bearish: ${bearishPct.toFixed(0)}%`}
-          />
-        </div>
-
-        <div className="flex items-center justify-between text-[10px] text-[#8c909f] font-mono">
-          <span className="text-[#4edea3]">{bullishCount} Bullish</span>
-          <span className="text-[#adc6ff]">{neutralCount} Neutral</span>
-          <span className="text-[#ffb4ab]">{bearishCount} Bearish</span>
-          <span className="text-[#8c909f]">NLP Vector Feed: Active</span>
-        </div>
-      </div>
-
-      {/* Filter Chips */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-        {[
-          { id: 'all', label: `All News (${articles.length})` },
-          { id: 'bullish', label: 'Bullish Catalysts' },
-          { id: 'bearish', label: 'Bearish Headwinds' },
-          { id: 'earnings', label: 'Quarterly Earnings' }
-        ].map((f) => (
           <button
-            key={f.id}
-            onClick={() => setFilter(f.id as any)}
-            className={`px-3 py-1 rounded-lg text-[11px] font-semibold transition-all shrink-0 ${
-              filter === f.id
-                ? 'bg-[#273647] text-[#adc6ff] shadow-sm'
-                : 'text-[#c2c6d6] hover:text-[#d4e4fa]'
-            }`}
+            onClick={() => loadHeadlines(true)}
+            disabled={loading || isRefreshing}
+            className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-600 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50"
+            title="Refresh latest headlines"
           >
-            {f.label}
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh</span>
           </button>
-        ))}
+
+          {onNavigate && (
+            <button
+              onClick={() => onNavigate('news-sentiment')}
+              className="text-xs font-semibold text-teal-600 dark:text-teal-400 hover:text-teal-700 flex items-center gap-0.5 pl-1 transition-colors"
+            >
+              <span>View All</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Articles Stream */}
+      {/* Category Filter Chips */}
+      {showFilters && (
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+          {(['All', 'Macro', 'Earnings', 'Product', 'Regulatory'] as const).map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors shrink-0 ${
+                activeCategory === cat
+                  ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-semibold'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              {cat === 'All' ? `All Headlines (${articles.length})` : cat}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Headlines List */}
       {loading ? (
-        <div className="flex flex-col gap-2.5 py-3">
-          {[1, 2, 3].map((n) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-2">
+          {[1, 2, 3, 4].map((i) => (
             <div
-              key={n}
-              className="bg-[#0d1c2d] p-3 rounded-xl border border-[#1c2b3c] flex flex-col gap-2 animate-pulse"
+              key={i}
+              className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 animate-pulse flex flex-col gap-2.5"
             >
               <div className="flex items-center justify-between">
-                <div className="h-3 w-28 bg-[#1c2b3c] rounded" />
-                <div className="h-3 w-16 bg-[#1c2b3c] rounded" />
+                <div className="h-3 w-20 bg-slate-200 dark:bg-slate-700 rounded" />
+                <div className="h-3 w-16 bg-slate-200 dark:bg-slate-700 rounded" />
               </div>
-              <div className="h-4 w-4/5 bg-[#273647] rounded" />
-              <div className="h-3 w-full bg-[#1c2b3c] rounded" />
+              <div className="h-4 w-5/6 bg-slate-300 dark:bg-slate-600 rounded" />
+              <div className="h-3 w-full bg-slate-200 dark:bg-slate-700 rounded" />
             </div>
           ))}
         </div>
-      ) : filteredArticles.length === 0 ? (
-        <div className="bg-[#0d1c2d] p-6 rounded-xl border border-[#1c2b3c] text-center text-[#8c909f] text-[12px] flex flex-col items-center gap-1">
-          <span className="material-symbols-outlined text-[24px]">newspaper</span>
-          <span>No headlines matched the selected sentiment filter.</span>
+      ) : displayedArticles.length === 0 ? (
+        <div className="p-8 text-center flex flex-col items-center justify-center gap-2 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
+          <Newspaper className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            No headlines found for category "{activeCategory}"
+          </p>
+          <p className="text-xs text-slate-400">
+            Switch back to "All Headlines" to view recent market updates.
+          </p>
+          <button
+            onClick={() => setActiveCategory('All')}
+            className="mt-2 text-xs font-semibold text-teal-600 dark:text-teal-400 hover:underline"
+          >
+            Show All Headlines
+          </button>
         </div>
       ) : (
-        <div className="flex flex-col gap-2.5">
-          {filteredArticles.map((article) => {
-            const isBull = article.sentiment === 'BULLISH';
-            const isBear = article.sentiment === 'BEARISH';
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          {displayedArticles.map((article) => {
+            const isBullish = article.sentiment === 'BULLISH';
+            const isBearish = article.sentiment === 'BEARISH';
 
             return (
-              <article
+              <div
                 key={article.id}
                 onClick={() => setSelectedArticle(article)}
-                className="bg-[#0d1c2d] hover:bg-[#1c2b3c]/60 p-3 rounded-xl border border-[#1c2b3c] hover:border-[#273647] transition-all flex flex-col gap-2 cursor-pointer group"
+                className="group p-4 rounded-xl border border-slate-200/70 dark:border-slate-800 hover:border-teal-300 dark:hover:border-teal-700 bg-slate-50/40 dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-all cursor-pointer flex flex-col justify-between gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
               >
-                {/* Meta Row: Source, Time, Sentiment Pill */}
-                <div className="flex items-center justify-between text-[11px]">
-                  <div className="flex items-center gap-1.5 text-[#8c909f] font-mono">
-                    <span className="text-[#adc6ff] font-medium">{article.source}</span>
-                    <span>•</span>
-                    <span>{article.publishedAt}</span>
-                  </div>
+                <div className="flex flex-col gap-2">
+                  {/* Top Metadata: Source, Timestamp, and Sentiment Pill */}
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">
+                        {article.source}
+                      </span>
+                      <span className="text-slate-300 dark:text-slate-600">•</span>
+                      <span className="text-slate-400 flex items-center gap-1 shrink-0">
+                        <Clock className="w-3 h-3" />
+                        <span>{article.publishedAt}</span>
+                      </span>
+                    </div>
 
-                  {/* Sentiment Badge */}
-                  <div
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-mono flex items-center gap-1 ${
-                      isBull
-                        ? 'bg-[#00a572]/20 text-[#4edea3] border border-[#00a572]/30'
-                        : isBear
-                        ? 'bg-[#93000a]/25 text-[#ffb4ab] border border-[#93000a]/40'
-                        : 'bg-[#3131c0]/25 text-[#adc6ff] border border-[#3131c0]/40'
-                    }`}
-                  >
+                    {/* Simple, Non-intrusive Sentiment Pill */}
                     <span
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        isBull ? 'bg-[#4edea3]' : isBear ? 'bg-[#ffb4ab]' : 'bg-[#adc6ff]'
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${
+                        isBullish
+                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60'
+                          : isBearish
+                          ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/60'
+                          : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200/60 dark:border-slate-700/60'
                       }`}
-                    />
-                    <span>{article.sentiment}</span>
-                    <span>({article.sentimentScore > 0 ? '+' : ''}{article.sentimentScore.toFixed(2)})</span>
+                    >
+                      {isBullish ? (
+                        <TrendingUp className="w-2.5 h-2.5 text-emerald-600" />
+                      ) : isBearish ? (
+                        <TrendingDown className="w-2.5 h-2.5 text-rose-600" />
+                      ) : (
+                        <Minus className="w-2.5 h-2.5 text-slate-400" />
+                      )}
+                      <span>{isBullish ? 'Positive' : isBearish ? 'Cautious' : 'Neutral'}</span>
+                    </span>
                   </div>
+
+                  {/* Headline Title */}
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors leading-snug line-clamp-2">
+                    {article.title}
+                  </h4>
+
+                  {/* Summary Preview */}
+                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                    {article.summary}
+                  </p>
                 </div>
 
-                {/* Headline Title */}
-                <h4 className="text-[13px] font-bold text-[#d4e4fa] group-hover:text-[#adc6ff] transition-colors leading-snug">
-                  {article.title}
-                </h4>
+                {/* Footer Tag & Read More Prompt */}
+                <div className="pt-2 border-t border-slate-200/50 dark:border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-medium">
+                      {article.category}
+                    </span>
+                    {article.ticker && (
+                      <span className="font-mono text-[10px] text-teal-600 dark:text-teal-400 font-semibold">
+                        {article.ticker}
+                      </span>
+                    )}
+                  </div>
 
-                {/* Excerpt Snippet */}
-                <p className="text-[12px] text-[#c2c6d6] leading-relaxed line-clamp-2">
-                  {article.summary}
-                </p>
-
-                {/* Bottom Row */}
-                <div className="flex items-center justify-between pt-1 border-t border-[#1c2b3c]/60 text-[10px] text-[#8c909f]">
-                  <span className="px-1.5 py-0.2 rounded bg-[#122131] text-[#c2c6d6] border border-[#1c2b3c]">
-                    Category: {article.category}
+                  <span className="text-teal-600 dark:text-teal-400 font-semibold group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
+                    <span>Read summary</span>
+                    <ChevronRight className="w-3 h-3" />
                   </span>
-                  <div className="flex items-center gap-1 text-[#adc6ff] font-medium">
-                    <span>{article.readTime}</span>
-                    <span className="material-symbols-outlined text-[13px]">arrow_forward</span>
-                  </div>
                 </div>
-              </article>
+              </div>
             );
           })}
         </div>
       )}
 
-      {/* Article Detail Modal */}
+      {/* Modal Reader for Selected Headline */}
       {selectedArticle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-[#122131] w-full max-w-lg rounded-2xl shadow-2xl border border-[#1c2b3c] overflow-hidden flex flex-col max-h-[85vh]">
-            <div className="p-4 bg-[#1c2b3c]/60 border-b border-[#1c2b3c] flex items-center justify-between">
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white dark:bg-[#121c2d] w-full max-w-lg rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[85vh]"
+          >
+            {/* Modal Header */}
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/30">
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#4d8eff]/20 text-[#adc6ff] font-semibold border border-[#4d8eff]/30">
+                <span className="text-xs font-bold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/50 px-2 py-0.5 rounded-md border border-teal-200/60 dark:border-teal-800/60">
                   {selectedArticle.source}
                 </span>
-                <span className="text-[11px] text-[#8c909f] font-mono">
-                  {selectedArticle.publishedAt}
+                <span className="text-xs text-slate-400 flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  <span>{selectedArticle.publishedAt}</span>
                 </span>
               </div>
               <button
                 onClick={() => setSelectedArticle(null)}
-                className="w-8 h-8 rounded-lg text-[#c2c6d6] hover:text-[#d4e4fa] hover:bg-[#273647] flex items-center justify-center"
+                className="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-colors"
+                aria-label="Close modal"
               >
-                <span className="material-symbols-outlined text-[18px]">close</span>
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-5 space-y-3.5 overflow-y-auto">
+            {/* Modal Content */}
+            <div className="p-5 overflow-y-auto space-y-4">
               <div className="flex items-center gap-2">
                 <span
-                  className={`px-2 py-0.5 rounded-full text-[11px] font-bold font-mono ${
+                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                     selectedArticle.sentiment === 'BULLISH'
-                      ? 'bg-[#00a572]/20 text-[#4edea3] border border-[#00a572]/30'
+                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60'
                       : selectedArticle.sentiment === 'BEARISH'
-                      ? 'bg-[#93000a]/25 text-[#ffb4ab] border border-[#93000a]/40'
-                      : 'bg-[#3131c0]/25 text-[#adc6ff] border border-[#3131c0]/40'
+                      ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200/60'
+                      : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200/60'
                   }`}
                 >
-                  FinBERT: {selectedArticle.sentiment} ({selectedArticle.sentimentScore > 0 ? '+' : ''}{selectedArticle.sentimentScore.toFixed(2)})
+                  {selectedArticle.sentiment === 'BULLISH' ? (
+                    <TrendingUp className="w-3 h-3" />
+                  ) : selectedArticle.sentiment === 'BEARISH' ? (
+                    <TrendingDown className="w-3 h-3" />
+                  ) : (
+                    <Minus className="w-3 h-3" />
+                  )}
+                  <span>
+                    Market Impact:{' '}
+                    {selectedArticle.sentiment === 'BULLISH'
+                      ? 'Positive (Bullish)'
+                      : selectedArticle.sentiment === 'BEARISH'
+                      ? 'Negative (Bearish)'
+                      : 'Neutral'}
+                  </span>
                 </span>
-                <span className="text-[11px] text-[#8c909f] font-mono">{selectedArticle.readTime}</span>
+                <span className="text-xs text-slate-400">{selectedArticle.readTime}</span>
               </div>
 
-              <h3 className="text-[16px] font-bold text-[#d4e4fa] leading-snug">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white leading-snug">
                 {selectedArticle.title}
               </h3>
 
-              <div className="p-3 rounded-lg bg-[#0d1c2d] border border-[#1c2b3c] text-[12px] text-[#d4e4fa] leading-relaxed">
-                {selectedArticle.summary}
-              </div>
-
-              <div className="space-y-1.5 text-[12px] text-[#c2c6d6] leading-relaxed">
-                <p>
-                  Institutional analysts highlight that the development carries quantitative weight across forward earnings projections and order book volatility models.
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
+                  Plain-English Summary
                 </p>
-                <p>
-                  The FinBERT natural language transformer automatically converts this textual release into positive momentum attribution vectors inside the XGBoost daily prediction ensemble.
+                <p className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
+                  {selectedArticle.summary}
                 </p>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#010f1f] border border-[#1c2b3c] text-[11px] text-[#8c909f] font-mono flex items-center justify-between">
-                <span>Model Feature Vector: #14 (FinBERT_NLP)</span>
-                <span className="text-[#4edea3]">Confidence: 94.2%</span>
+              <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed space-y-2">
+                <p>
+                  This headline provides context on ongoing developments in the Indian stock market. Market participants track news to understand company earnings, regulatory updates from SEBI or RBI, and broader sector momentum.
+                </p>
+                <p>
+                  Remember that single news stories can cause short-term price reactions. Always review company fundamentals and avoid making impulsive trading decisions based on breaking headlines alone.
+                </p>
               </div>
             </div>
 
-            <div className="p-3 bg-[#1c2b3c]/40 border-t border-[#1c2b3c] flex items-center justify-end">
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/30">
+              <span className="text-xs text-slate-400 font-mono">
+                Category: {selectedArticle.category}
+              </span>
               <button
                 onClick={() => setSelectedArticle(null)}
-                className="px-4 py-2 rounded-lg bg-[#4d8eff] hover:bg-[#adc6ff] text-[#00285d] font-semibold text-[12px]"
+                className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs transition-colors"
               >
-                Done
+                Close Reader
               </button>
             </div>
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 };

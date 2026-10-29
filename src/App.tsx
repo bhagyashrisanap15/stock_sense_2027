@@ -25,12 +25,14 @@ import { ScreenerScreen } from './screens/ScreenerScreen';
 import { NewsSentimentScreen } from './screens/NewsSentimentScreen';
 import { TechnicalAnalysisScreen } from './screens/TechnicalAnalysisScreen';
 import { BacktestScreen } from './screens/BacktestScreen';
+import { LearnScreen } from './screens/LearnScreen';
+import { Navigation } from './components/Navigation';
 import { exportCurrentViewFinancialData } from './utils/csvExport';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 
 export default function App() {
-  // Make AI Insights ('ai-predict') the primary default page
-  const [currentTab, setCurrentTab] = useState<ScreenTab>('ai-predict');
+  // Make Home Dashboard the primary default page
+  const [currentTab, setCurrentTab] = useState<ScreenTab>('dashboard');
   const [currentStock, setCurrentStock] = useState<StockData>(STOCKS_DATA.RELIANCE);
   const [watchlist, setWatchlist] = useState<string[]>(() => {
     try {
@@ -89,7 +91,7 @@ export default function App() {
     } catch (e) {
       // ignore
     }
-    return 'dark';
+    return 'light';
   });
 
   useEffect(() => {
@@ -411,6 +413,8 @@ export default function App() {
             onOpenJsonDossier={() => setIsJsonDossierOpen(true)}
             onSelectStock={handleSelectStock}
             onNavigate={setCurrentTab}
+            watchlist={watchlist}
+            onToggleWatchlist={handleToggleWatchlist}
           />
         );
       case 'dashboard':
@@ -422,8 +426,11 @@ export default function App() {
             onOpenSearch={() => setIsSearchOpen(true)}
             onOpenBacktest={() => setIsBacktestOpen(true)}
             watchlist={watchlist}
+            onToggleWatchlist={handleToggleWatchlist}
           />
         );
+      case 'learn':
+        return <LearnScreen onNavigate={setCurrentTab} />;
       case 'markets':
         return (
           <MarketsScreen
@@ -528,50 +535,33 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060e1a] text-[#d4e4fa] font-body selection:bg-cyan-500/30 selection:text-white relative transition-colors duration-200">
-      {/* 1. Fixed Left Vertical Sidebar */}
-      <Sidebar
+    <div className="min-h-screen bg-slate-50 dark:bg-[#08101e] text-slate-900 dark:text-slate-100 font-body selection:bg-teal-500/20 selection:text-teal-900 relative transition-colors duration-200 flex flex-col pb-16 md:pb-6">
+      {/* 1. Clean Top Navigation Bar */}
+      <Header
+        onOpenSearch={() => setIsSearchOpen(true)}
+        onOpenAuth={() => setAuthScreen('login')}
+        onNotificationClick={() => setIsPriceAlertOpen(true)}
+        onExportCSV={handleExportCSV}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
+        theme={theme}
+        toggleTheme={toggleTheme}
+        onToggleMobileMenu={() => setIsMobileNavOpen(true)}
         currentTab={currentTab}
-        onTabChange={setCurrentTab}
-        isCollapsed={isSidebarCollapsed}
-        setIsCollapsed={setIsSidebarCollapsed}
-        isMobileOpen={isMobileNavOpen}
-        setIsMobileOpen={setIsMobileNavOpen}
+        currentStockTicker={currentStock.ticker}
+        onSelectTab={setCurrentTab}
       />
 
-      {/* 2. Main Scrollable Content Container (Offset by sidebar width on desktop) */}
-      <div
-        className={`min-h-screen flex flex-col transition-all duration-300 ease-in-out ${
-          isSidebarCollapsed ? 'md:pl-18' : 'md:pl-64'
-        }`}
-      >
-        {/* Top Header - Aligned with main content, does not cover sidebar */}
-        <Header
-          onOpenSearch={() => setIsSearchOpen(true)}
-          onOpenAuth={() => setAuthScreen('login')}
-          onNotificationClick={() => setIsPriceAlertOpen(true)}
-          onExportCSV={handleExportCSV}
-          onOpenShortcuts={() => setIsShortcutsOpen(true)}
-          theme={theme}
-          toggleTheme={toggleTheme}
-          onToggleMobileMenu={() => setIsMobileNavOpen(true)}
-          currentTab={currentTab}
-          currentStockTicker={currentStock.ticker}
-        />
+      {/* 2. Main Content Area */}
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col">
+        {renderActiveScreen()}
+      </main>
 
-        {/* Live Financial News Ticker Marquee */}
-        <div className="w-full bg-[#0a1424] border-b border-[#14233c] shrink-0">
-          <LiveNewsTicker
-            onSelectStock={handleSelectStock}
-            onNavigate={setCurrentTab}
-          />
-        </div>
-
-        {/* Main Content Area */}
-        <main className="flex-1 w-full px-4 lg:px-8 py-5 flex flex-col">
-          {renderActiveScreen()}
-        </main>
-      </div>
+      {/* 3. Mobile Bottom Navigation Bar */}
+      <Navigation
+        currentTab={currentTab}
+        onTabChange={setCurrentTab}
+        onOpenProfile={() => setAuthScreen('login')}
+      />
 
       {/* Modals & Dialogs */}
       <SearchModal

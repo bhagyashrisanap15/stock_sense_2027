@@ -70,9 +70,14 @@
     width: 100%;
     margin: 0;
     padding: 0;
-    background-color: #051424;
-    color: #d4e4fa;
+    background-color: #f8fafc;
+    color: #0f172a;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  html.dark, body.dark {
+    background-color: #08101e;
+    color: #f1f5f9;
   }
   
   .font-data-mono {
