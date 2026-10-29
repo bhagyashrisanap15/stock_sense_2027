@@ -427,7 +427,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
             onClick={() => onNavigate('markets')}
             className="text-[#adc6ff] hover:text-[#d4e4fa] hover:underline flex items-center gap-0.5 font-semibold transition-colors"
           >
-            <span>Full Multi-Timeframe Candlestick Chart</span>
+            <span>View Live Interactive Line Chart</span>
             <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
           </button>
         )}
