@@ -179,7 +179,7 @@ export const AIPredictScreen: React.FC<AIPredictScreenProps> = ({
   }, [currentStock]);
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-6 md:py-8 flex flex-col gap-6 text-slate-800 dark:text-slate-100">
+    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-2 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 flex flex-col gap-6 text-slate-800 dark:text-slate-100">
       
       {/* Back Navigation Bar */}
       {onNavigate && (

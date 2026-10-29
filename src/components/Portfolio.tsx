@@ -539,7 +539,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
             <span className="text-[11px] text-[#8c909f] font-mono">By Asset Allocation</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
             {sectorDistribution.map((sec, i) => (
               <div key={sec.sector} className="bg-[#0d1c2d] p-2 rounded-lg border border-[#1c2b3c] flex flex-col gap-1">
                 <div className="flex justify-between items-center text-[11px]">

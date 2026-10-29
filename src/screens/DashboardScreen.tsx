@@ -24,6 +24,7 @@ import {
 import { StockData, ScreenTab, IndexData } from '../types';
 import { INDICES_DATA, STOCKS_DATA, getAllIndianStocks, getStockData } from '../data/stocks';
 import { MarketNews } from '../components/MarketNews';
+import { PortfolioSummary } from '../components/PortfolioSummary';
 
 interface DashboardScreenProps {
   currentStock: StockData;
@@ -157,7 +158,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-6 md:py-8 flex flex-col gap-8 text-slate-800 dark:text-slate-100">
+    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-2 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 flex flex-col gap-6 sm:gap-8 text-slate-800 dark:text-slate-100">
       
       {/* ========================================================
           SECTION A: MARKET OVERVIEW
@@ -282,6 +283,17 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
             );
           })}
         </div>
+      </section>
+
+      {/* ========================================================
+          SECTION: PROMINENT PORTFOLIO SUMMARY
+          ======================================================== */}
+      <section className="flex flex-col gap-3">
+        <PortfolioSummary
+          onNavigate={onNavigate}
+          onSelectStock={onSelectStock}
+          watchlist={watchlist}
+        />
       </section>
 
       {/* ========================================================
@@ -417,7 +429,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
         </div>
 
         {/* Compact List of Saved Stocks */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {watchlistStocks.slice(0, 8).map((stock) => {
             const isPos = stock.changePercent >= 0;
             const isSelected = currentStock.ticker === stock.ticker;
@@ -664,7 +676,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
         </div>
 
         {/* List of Movers */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {(activeMoverTab === 'gainers' ? topGainers : topLosers).map((stock) => {
             const isPos = stock.changePercent >= 0;
             return (
@@ -740,7 +752,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
         </div>
 
         {/* 4 Informative Mini-Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
           <div className="bg-white dark:bg-[#121c2d] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col gap-2">
             <span className="text-xs font-bold text-teal-700 dark:text-teal-300">
               💡 What is AI Outlook?

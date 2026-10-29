@@ -127,7 +127,7 @@ export const LearnScreen: React.FC<LearnScreenProps> = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-6 md:py-8 flex flex-col gap-8 text-slate-800 dark:text-slate-100">
+    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-2 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 flex flex-col gap-6 sm:gap-8 text-slate-800 dark:text-slate-100">
       {/* Header Banner */}
       <div className="bg-white dark:bg-[#121c2d] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex flex-col gap-2 max-w-xl">

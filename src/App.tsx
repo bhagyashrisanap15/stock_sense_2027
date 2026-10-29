@@ -535,7 +535,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#08101e] text-slate-900 dark:text-slate-100 font-body selection:bg-teal-500/20 selection:text-teal-900 relative transition-colors duration-200 flex flex-col pb-16 md:pb-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#08101e] text-slate-900 dark:text-slate-100 font-body selection:bg-teal-500/20 selection:text-teal-900 relative transition-colors duration-200 flex flex-col pb-24 sm:pb-20 md:pb-8">
       {/* 1. Clean Top Navigation Bar */}
       <Header
         onOpenSearch={() => setIsSearchOpen(true)}
@@ -552,7 +552,7 @@ export default function App() {
       />
 
       {/* 2. Main Content Area */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col">
+      <main className="flex-1 w-full max-w-[1680px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col">
         {renderActiveScreen()}
       </main>
 
