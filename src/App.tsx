@@ -425,6 +425,8 @@ export default function App() {
             onNavigate={setCurrentTab}
             onOpenSearch={() => setIsSearchOpen(true)}
             onOpenBacktest={() => setIsBacktestOpen(true)}
+            onOpenPriceAlert={() => setIsPriceAlertOpen(true)}
+            onShare={() => showToast(`Stock analysis link for ${currentStock.ticker} copied to clipboard!`)}
             watchlist={watchlist}
             onToggleWatchlist={handleToggleWatchlist}
           />
@@ -535,28 +537,47 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#08101e] text-slate-900 dark:text-slate-100 font-body selection:bg-teal-500/20 selection:text-teal-900 relative transition-colors duration-200 flex flex-col pb-24 sm:pb-20 md:pb-8">
-      {/* 1. Clean Top Navigation Bar */}
-      <Header
-        onOpenSearch={() => setIsSearchOpen(true)}
-        onOpenAuth={() => setAuthScreen('login')}
-        onNotificationClick={() => setIsPriceAlertOpen(true)}
-        onExportCSV={handleExportCSV}
-        onOpenShortcuts={() => setIsShortcutsOpen(true)}
-        theme={theme}
-        toggleTheme={toggleTheme}
-        onToggleMobileMenu={() => setIsMobileNavOpen(true)}
+    <div className="min-h-screen bg-slate-50 dark:bg-[#08101e] text-slate-900 dark:text-slate-100 font-body selection:bg-teal-500/20 selection:text-teal-900 relative transition-colors duration-200 flex flex-col">
+      {/* 1. Fixed Left Vertical Sidebar */}
+      <Sidebar
         currentTab={currentTab}
-        currentStockTicker={currentStock.ticker}
-        onSelectTab={setCurrentTab}
+        onTabChange={setCurrentTab}
+        isCollapsed={isSidebarCollapsed}
+        setIsCollapsed={setIsSidebarCollapsed}
+        isMobileOpen={isMobileNavOpen}
+        setIsMobileOpen={setIsMobileNavOpen}
+        onOpenSettings={() => setAuthScreen('login')}
+        onOpenHelp={() => setIsShortcutsOpen(true)}
       />
 
-      {/* 2. Main Content Area */}
-      <main className="flex-1 w-full max-w-[1680px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col">
-        {renderActiveScreen()}
-      </main>
+      {/* 2. Main Content Container (Offset by sidebar width on desktop) */}
+      <div
+        className={`min-h-screen flex flex-col transition-all duration-300 ease-in-out ${
+          isSidebarCollapsed ? 'md:pl-18' : 'md:pl-64'
+        }`}
+      >
+        {/* Compact Top Header */}
+        <Header
+          onOpenSearch={() => setIsSearchOpen(true)}
+          onOpenAuth={() => setAuthScreen('login')}
+          onNotificationClick={() => setIsPriceAlertOpen(true)}
+          onExportCSV={handleExportCSV}
+          onOpenShortcuts={() => setIsShortcutsOpen(true)}
+          theme={theme}
+          toggleTheme={toggleTheme}
+          onToggleMobileMenu={() => setIsMobileNavOpen(true)}
+          currentTab={currentTab}
+          currentStockTicker={currentStock.ticker}
+          onSelectTab={setCurrentTab}
+        />
 
-      {/* 3. Mobile Bottom Navigation Bar */}
+        {/* Main Content Viewport */}
+        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col pb-16 md:pb-8">
+          {renderActiveScreen()}
+        </main>
+      </div>
+
+      {/* 3. Mobile Bottom Navigation Bar (retained for quick thumb navigation on phones) */}
       <Navigation
         currentTab={currentTab}
         onTabChange={setCurrentTab}

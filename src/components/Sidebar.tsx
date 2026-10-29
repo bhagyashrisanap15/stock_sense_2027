@@ -1,22 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  BrainCircuit,
-  LayoutDashboard,
+  Home,
   TrendingUp,
-  ShieldAlert,
   Bookmark,
+  Sparkles,
   Wallet,
+  BookOpen,
+  Layers,
   CandlestickChart,
-  Cpu,
-  Grid3X3,
+  ShieldAlert,
   SlidersHorizontal,
-  Newspaper,
   Activity,
+  Grid3X3,
+  Newspaper,
+  Cpu,
+  Settings,
+  HelpCircle,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   X,
-  Sparkles,
-  Zap
+  LogOut,
+  User
 } from 'lucide-react';
 import { ScreenTab } from '../types';
 
@@ -27,6 +33,8 @@ interface SidebarProps {
   setIsCollapsed: (value: boolean | ((prev: boolean) => boolean)) => void;
   isMobileOpen: boolean;
   setIsMobileOpen: (open: boolean) => void;
+  onOpenSettings?: () => void;
+  onOpenHelp?: () => void;
 }
 
 interface NavItem {
@@ -34,8 +42,6 @@ interface NavItem {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: string;
-  isPrimary?: boolean;
-  group?: 'core' | 'portfolio' | 'analytics';
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -44,27 +50,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed,
   setIsCollapsed,
   isMobileOpen,
-  setIsMobileOpen
+  setIsMobileOpen,
+  onOpenSettings,
+  onOpenHelp
 }) => {
-  const navItems: NavItem[] = [
-    // Core Navigation
-    { id: 'ai-predict', label: 'Stock Insights', icon: BrainCircuit, badge: 'AI', isPrimary: true, group: 'core' },
-    { id: 'dashboard', label: 'Overview', icon: LayoutDashboard, group: 'core' },
-    { id: 'markets', label: 'Market Today', icon: TrendingUp, group: 'core' },
-
-    // Portfolio & Analytics
-    { id: 'watchlist', label: 'My Watchlist', icon: Bookmark, group: 'portfolio' },
-    { id: 'portfolio', label: 'My Investments', icon: Wallet, group: 'portfolio' },
-    { id: 'paper-trading', label: 'Practice Investing', icon: CandlestickChart, badge: 'PRACTICE', group: 'portfolio' },
-
-    // Analytics & Research
-    { id: 'risk-radar', label: 'Risk Checker', icon: ShieldAlert, group: 'analytics' },
-    { id: 'screener', label: 'Find a Stock', icon: SlidersHorizontal, group: 'analytics' },
-    { id: 'technical-analysis', label: 'Price History', icon: Activity, group: 'analytics' },
-    { id: 'heatmap', label: 'Market Sectors', icon: Grid3X3, group: 'analytics' },
-    { id: 'news-sentiment', label: 'News & Sentiment', icon: Newspaper, group: 'analytics' },
-    { id: 'backtesting', label: 'Strategy Tester', icon: Cpu, badge: 'TEST', group: 'analytics' }
+  // Primary navigation items requested
+  const primaryNavItems: NavItem[] = [
+    { id: 'dashboard', label: 'Home', icon: Home },
+    { id: 'markets', label: 'Markets', icon: TrendingUp },
+    { id: 'watchlist', label: 'Watchlist', icon: Bookmark },
+    { id: 'ai-predict', label: 'AI Insights', icon: Sparkles, badge: 'AI' },
+    { id: 'portfolio', label: 'Portfolio', icon: Wallet },
+    { id: 'learn', label: 'Learn', icon: BookOpen }
   ];
+
+  // Secondary tools in expandable dropdown
+  const secondaryNavItems: NavItem[] = [
+    { id: 'paper-trading', label: 'Practice Trading', icon: CandlestickChart, badge: 'VIRTUAL' },
+    { id: 'risk-radar', label: 'Risk & Safety Meter', icon: ShieldAlert },
+    { id: 'screener', label: 'Stock Finder', icon: SlidersHorizontal },
+    { id: 'technical-analysis', label: 'Technical Charts', icon: Activity },
+    { id: 'heatmap', label: 'Sector Heatmap', icon: Grid3X3 },
+    { id: 'news-sentiment', label: 'Market News', icon: Newspaper },
+    { id: 'backtesting', label: 'Strategy Tester', icon: Cpu }
+  ];
+
+  // Check if current tab is in secondary tools
+  const isSecondaryActive = secondaryNavItems.some((item) => item.id === currentTab);
+  const [isMoreToolsExpanded, setIsMoreToolsExpanded] = useState<boolean>(isSecondaryActive);
 
   const handleSelectTab = (tab: ScreenTab) => {
     onTabChange(tab);
@@ -73,107 +86,94 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const renderNavList = () => (
-    <div className="flex flex-col gap-1 px-2.5 py-2">
-      {navItems.map((item, index) => {
-        const Icon = item.icon;
-        const isActive = currentTab === item.id;
-        const prevGroup = index > 0 ? navItems[index - 1].group : null;
-        const isNewGroup = prevGroup && prevGroup !== item.group;
+  const renderNavButton = (item: NavItem, isSubItem = false) => {
+    const Icon = item.icon;
+    const isActive = currentTab === item.id;
 
-        return (
-          <React.Fragment key={item.id}>
-            {isNewGroup && (
-              <div className="my-1.5 mx-2 border-t border-[#14233c]/80" />
-            )}
-            <div className="relative group/navitem">
-              <button
-                type="button"
-                onClick={() => handleSelectTab(item.id)}
-                className={`w-full flex items-center gap-3 py-2 px-2.5 rounded-lg text-left text-[13px] font-medium transition-all duration-150 relative ${
-                  isActive
-                    ? 'bg-cyan-500/10 text-cyan-300 font-semibold shadow-[inset_0_1px_0_0_rgba(56,189,248,0.15)]'
-                    : 'text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#111e33]/80'
-                } ${isCollapsed ? 'justify-center px-2' : ''}`}
-              >
-                {/* Thin cyan active indicator on the left */}
-                {isActive && (
-                  <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] bg-cyan-400 rounded-r shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
-                )}
+    return (
+      <div key={item.id} className="relative group/navitem">
+        <button
+          type="button"
+          onClick={() => handleSelectTab(item.id)}
+          className={`w-full flex items-center gap-3 py-2.5 rounded-xl text-left text-xs font-semibold transition-all duration-150 relative ${
+            isSubItem ? 'pl-8 pr-3' : 'px-3'
+          } ${
+            isActive
+              ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/60'
+          } ${isCollapsed ? 'justify-center px-2' : ''}`}
+        >
+          {/* Active left indicator line */}
+          {isActive && (
+            <span className="absolute left-0 top-2 bottom-2 w-1 bg-teal-600 dark:bg-teal-400 rounded-r-full" />
+          )}
 
-                <div className="shrink-0 flex items-center justify-center">
-                  <Icon
-                    className={`w-[18px] h-[18px] transition-transform duration-150 ${
-                      isActive
-                        ? 'text-cyan-400 scale-105'
-                        : 'text-[#64748b] group-hover/navitem:text-[#38bdf8]'
-                    }`}
-                  />
-                </div>
-
-                {!isCollapsed && (
-                  <div className="flex items-center justify-between flex-1 min-w-0">
-                    <span className="truncate tracking-wide">{item.label}</span>
-                    {item.badge && (
-                      <span
-                        className={`text-[9.5px] font-mono uppercase px-1.5 py-0.5 rounded tracking-wider shrink-0 ${
-                          item.isPrimary
-                            ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold'
-                            : 'bg-[#1c2e4a] text-[#7dd3fc] border border-[#273d61]'
-                        }`}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </button>
-
-              {/* Floating Tooltip in Collapsed Mode */}
-              {isCollapsed && (
-                <div className="hidden md:group-hover/navitem:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-[#0a1424] text-white text-[12px] font-medium shadow-xl border border-[#1e3453] pointer-events-none whitespace-nowrap">
-                  <span>{item.label}</span>
-                  {item.badge && (
-                    <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                      {item.badge}
-                    </span>
-                  )}
-                  <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0a1424] border-l border-b border-[#1e3453] rotate-45" />
-                </div>
-              )}
-            </div>
-          </React.Fragment>
-        );
-      })}
-    </div>
-  );
-
-  const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#08101e] border-r border-[#14233c] select-none text-[#e2e8f0]">
-      {/* Top Header Section */}
-      <div className="h-16 px-4 flex items-center justify-between border-b border-[#14233c] shrink-0">
-        <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
-          {/* Logo Mark */}
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 via-blue-600/20 to-indigo-600/30 border border-cyan-500/30 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(6,182,212,0.15)]">
-            <BrainCircuit className="w-5 h-5 text-cyan-400" />
+          <div className="shrink-0 flex items-center justify-center">
+            <Icon
+              className={`w-4 h-4 transition-transform duration-150 ${
+                isActive
+                  ? 'text-teal-600 dark:text-teal-400 scale-105'
+                  : 'text-slate-400 group-hover/navitem:text-slate-700 dark:group-hover/navitem:text-slate-200'
+              }`}
+            />
           </div>
 
           {!isCollapsed && (
-            <div className="flex flex-col min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-[16px] tracking-tight bg-gradient-to-r from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent">
-                  StockSense
+            <div className="flex items-center justify-between flex-1 min-w-0">
+              <span className="truncate tracking-tight">{item.label}</span>
+              {item.badge && (
+                <span
+                  className={`text-[9.5px] font-mono uppercase px-1.5 py-0.5 rounded tracking-wider shrink-0 ${
+                    isActive
+                      ? 'bg-teal-100 dark:bg-teal-900/60 text-teal-800 dark:text-teal-200 font-bold'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                  }`}
+                >
+                  {item.badge}
                 </span>
-                {/* LIVE Market Status Chip */}
-                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[10px] font-bold font-mono tracking-wider text-emerald-400">
-                    LIVE
-                  </span>
-                </div>
-              </div>
-              <span className="text-[10.5px] text-[#64748b] tracking-wider font-mono">
-                Simple Stock Market Guide
+              )}
+            </div>
+          )}
+        </button>
+
+        {/* Floating Tooltip in Collapsed Mode */}
+        {isCollapsed && (
+          <div className="hidden md:group-hover/navitem:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium shadow-xl border border-slate-800 pointer-events-none whitespace-nowrap">
+            <span>{item.label}</span>
+            {item.badge && (
+              <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-teal-500/20 text-teal-300">
+                {item.badge}
+              </span>
+            )}
+            <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-slate-900 border-l border-b border-slate-800 rotate-45" />
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const sidebarContent = (
+    <div className="flex flex-col h-full bg-white dark:bg-[#0c1524] border-r border-slate-200/90 dark:border-slate-800 select-none text-slate-800 dark:text-slate-200 transition-colors">
+      {/* Brand & Collapse Header */}
+      <div className="h-16 px-4 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800 shrink-0">
+        <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
+          {/* Logo Mark */}
+          <button
+            type="button"
+            onClick={() => handleSelectTab('dashboard')}
+            className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-sm transition-transform hover:scale-105 focus:outline-none"
+            title="StockSense Home"
+          >
+            <Sparkles className="w-5 h-5" />
+          </button>
+
+          {!isCollapsed && (
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold text-base tracking-tight text-slate-900 dark:text-white leading-none">
+                StockSense
+              </span>
+              <span className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold tracking-wide mt-0.5">
+                AI Market Guide
               </span>
             </div>
           )}
@@ -184,18 +184,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             type="button"
             onClick={() => setIsMobileOpen(false)}
-            className="md:hidden w-8 h-8 rounded-lg text-[#94a3b8] hover:text-white hover:bg-[#132238] flex items-center justify-center transition-colors"
+            className="md:hidden w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-colors"
+            aria-label="Close navigation"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         )}
 
-        {/* Desktop Collapse Toggle */}
+        {/* Desktop Collapse / Expand Toggle */}
         <button
           type="button"
           onClick={() => setIsCollapsed((prev) => !prev)}
-          className="hidden md:flex w-7 h-7 rounded-lg text-[#64748b] hover:text-cyan-300 hover:bg-[#111e33] items-center justify-center transition-colors"
+          className="hidden md:flex w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 items-center justify-center transition-colors"
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? (
             <ChevronRight className="w-4 h-4" />
@@ -205,82 +207,140 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
       </div>
 
-      {/* Main Navigation Scroll Area */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[#1e293b] scrollbar-track-transparent">
-        {renderNavList()}
+      {/* Main Navigation Items */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2.5 flex flex-col gap-1 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
+        {/* Primary Items */}
+        {primaryNavItems.map((item) => renderNavButton(item))}
+
+        {/* Expandable "More Tools" Section */}
+        <div className="pt-2 mt-1 border-t border-slate-100 dark:border-slate-800/80">
+          {!isCollapsed ? (
+            <div>
+              <button
+                type="button"
+                onClick={() => setIsMoreToolsExpanded(!isMoreToolsExpanded)}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  isSecondaryActive
+                    ? 'text-teal-700 dark:text-teal-300 bg-teal-50/50 dark:bg-teal-950/20'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-800/40'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Layers className="w-4 h-4 text-slate-400" />
+                  <span>More Tools</span>
+                </div>
+                {isMoreToolsExpanded ? (
+                  <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                ) : (
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                )}
+              </button>
+
+              {isMoreToolsExpanded && (
+                <div className="flex flex-col gap-0.5 mt-1 animate-in fade-in duration-150">
+                  {secondaryNavItems.map((item) => renderNavButton(item, true))}
+                </div>
+              )}
+            </div>
+          ) : (
+            // In Collapsed Mode: show secondary items directly as icons
+            <div className="flex flex-col gap-1">
+              {secondaryNavItems.map((item) => renderNavButton(item))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Bottom Sidebar Alpha Card & Kernel Status */}
-      {!isCollapsed ? (
-        <div className="p-3 border-t border-[#14233c] shrink-0 bg-[#060c17]/60">
-          <div className="alpha-intelligence-card rounded-xl p-3 bg-gradient-to-b from-[#0f1d33] to-[#0a1424] border border-[#1b2f4f] shadow-lg relative overflow-hidden group">
-            {/* Ambient background glow */}
-            <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-cyan-500/10 blur-xl pointer-events-none" />
-
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-center gap-1.5 text-cyan-400">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-bold font-mono tracking-wider uppercase">
-                  Beginner Guide
-                </span>
-              </div>
-              <span className="text-[9.5px] font-mono text-emerald-400 flex items-center gap-1">
-                <span className="w-1 h-1 rounded-full bg-emerald-400" />
-                Live
-              </span>
-            </div>
-
-            <p className="text-[12px] font-semibold text-[#e2e8f0] leading-snug">
-              Learn as you trade.
-              <span className="block text-cyan-300 font-normal">Zero financial jargon.</span>
-            </p>
-
-            {/* Decorative Mini Sparkline Chart */}
-            <div className="mt-2 pt-1 border-t border-[#192b45] flex items-end justify-between gap-1">
-              <svg className="w-full h-8 overflow-visible" viewBox="0 0 100 32" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="miniChartGlow" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#0284c7" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-                {/* Area under curve */}
-                <path
-                  d="M 0 28 Q 15 24 28 20 T 55 12 T 80 16 T 100 4 L 100 32 L 0 32 Z"
-                  fill="url(#miniChartGlow)"
-                />
-                {/* Stroke curve */}
-                <path
-                  d="M 0 28 Q 15 24 28 20 T 55 12 T 80 16 T 100 4"
-                  fill="none"
-                  stroke="#38bdf8"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                {/* Accent point at the end */}
-                <circle cx="100" cy="4" r="2.5" fill="#22d3ee" className="animate-pulse" />
-              </svg>
-            </div>
-
-            <div className="mt-1 flex items-center justify-between text-[10px] text-[#64748b] font-mono">
-              <span>AI Predictions Ready</span>
-              <span className="text-cyan-400 font-medium">NSE & BSE</span>
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* Collapsed mode bottom controls */
-        <div className="p-2 border-t border-[#14233c] flex flex-col items-center gap-1.5 shrink-0 bg-[#060c17]/60">
-          {/* Collapsed Live Kernel Status */}
-          <div
-            className="w-10 h-10 rounded-xl bg-[#0f1d33] border border-[#1e3453] flex items-center justify-center text-cyan-400 group/pulse relative cursor-pointer"
-            title="Smarter insights. Better decisions. (FastAPI ML Live)"
+      {/* Bottom Section: Settings, Help & User Profile */}
+      <div className="p-2.5 border-t border-slate-200/80 dark:border-slate-800 shrink-0 flex flex-col gap-1 bg-slate-50/50 dark:bg-[#09101c]/50">
+        {/* Settings button */}
+        <div className="relative group/navitem">
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            className={`w-full flex items-center gap-3 py-2 px-3 rounded-xl text-left text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ${
+              isCollapsed ? 'justify-center px-2' : ''
+            }`}
           >
-            <Zap className="w-4 h-4 animate-pulse" />
-            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-400" />
-          </div>
+            <Settings className="w-4 h-4 text-slate-400 shrink-0" />
+            {!isCollapsed && <span>Settings</span>}
+          </button>
+          {isCollapsed && (
+            <div className="hidden md:group-hover/navitem:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 items-center px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium shadow-xl pointer-events-none whitespace-nowrap">
+              <span>Settings</span>
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Help button */}
+        <div className="relative group/navitem">
+          <button
+            type="button"
+            onClick={onOpenHelp}
+            className={`w-full flex items-center gap-3 py-2 px-3 rounded-xl text-left text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ${
+              isCollapsed ? 'justify-center px-2' : ''
+            }`}
+          >
+            <HelpCircle className="w-4 h-4 text-slate-400 shrink-0" />
+            {!isCollapsed && <span>Help & Shortcuts</span>}
+          </button>
+          {isCollapsed && (
+            <div className="hidden md:group-hover/navitem:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 items-center px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium shadow-xl pointer-events-none whitespace-nowrap">
+              <span>Help & Shortcuts (?)</span>
+            </div>
+          )}
+        </div>
+
+        {/* User Profile Card at Bottom */}
+        <div className="pt-1.5 mt-1 border-t border-slate-200/60 dark:border-slate-800/80">
+          {!isCollapsed ? (
+            <div
+              onClick={onOpenSettings}
+              className="p-2 rounded-xl flex items-center justify-between gap-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300 flex items-center justify-center font-bold text-xs border border-teal-200 dark:border-teal-800 shrink-0">
+                  P
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    Pooja Bhagwat
+                  </span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
+                    Investor · Pro Member
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onOpenSettings) onOpenSettings();
+                }}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+                title="Account Settings"
+              >
+                <User className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <div className="relative group/profile flex justify-center py-1">
+              <button
+                type="button"
+                onClick={onOpenSettings}
+                className="w-9 h-9 rounded-full bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300 flex items-center justify-center font-bold text-xs border border-teal-200 dark:border-teal-800 shadow-xs"
+                title="Pooja Bhagwat (Investor Account)"
+              >
+                P
+              </button>
+              <div className="hidden md:group-hover/profile:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 flex-col px-3 py-2 rounded-xl bg-slate-900 text-white text-xs shadow-xl pointer-events-none whitespace-nowrap">
+                <span className="font-bold">Pooja Bhagwat</span>
+                <span className="text-[10px] text-slate-400">Investor Account</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 
@@ -300,7 +360,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="md:hidden fixed inset-0 z-50 flex">
           {/* Backdrop Overlay */}
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
             onClick={() => setIsMobileOpen(false)}
           />
 
