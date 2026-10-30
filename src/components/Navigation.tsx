@@ -5,7 +5,8 @@ import {
   Bookmark,
   Sparkles,
   Wallet,
-  Layers
+  Layers,
+  User
 } from 'lucide-react';
 import { ScreenTab } from '../types';
 
@@ -23,9 +24,8 @@ export const Navigation: React.FC<NavigationProps> = ({
     { id: 'dashboard' as ScreenTab, label: 'Home', icon: Home },
     { id: 'markets' as ScreenTab, label: 'Markets', icon: TrendingUp },
     { id: 'watchlist' as ScreenTab, label: 'Watchlist', icon: Bookmark },
-    { id: 'ai-predict' as ScreenTab, label: 'AI Insights', icon: Sparkles },
     { id: 'portfolio' as ScreenTab, label: 'Portfolio', icon: Wallet },
-    { id: 'learn' as ScreenTab, label: 'Learn', icon: Layers }
+    { id: 'profile' as ScreenTab, label: 'Profile', icon: User }
   ];
 
   return (

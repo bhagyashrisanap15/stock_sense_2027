@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ScreenTab, AuthScreen, StockData, UserProfile } from './types';
 import { STOCKS_DATA } from './data/stocks';
-import { getStoredUserProfile, saveStoredUserProfile, GUEST_USER_PROFILE } from './data/user';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { SearchModal } from './components/SearchModal';
@@ -19,7 +18,6 @@ import { MarketsScreen } from './screens/MarketsScreen';
 import { RiskRadarScreen } from './screens/RiskRadarScreen';
 import { WatchlistScreen } from './screens/WatchlistScreen';
 import { OverviewScreen } from './screens/OverviewScreen';
-import { ProfileScreen } from './screens/ProfileScreen';
 import { Portfolio } from './components/Portfolio';
 import { MarketHeatmap } from './components/MarketHeatmap';
 import { PaperTrading } from './components/PaperTrading';
@@ -28,14 +26,93 @@ import { NewsSentimentScreen } from './screens/NewsSentimentScreen';
 import { TechnicalAnalysisScreen } from './screens/TechnicalAnalysisScreen';
 import { BacktestScreen } from './screens/BacktestScreen';
 import { LearnScreen } from './screens/LearnScreen';
+import { ProfileScreen } from './screens/ProfileScreen';
 import { Navigation } from './components/Navigation';
 import { exportCurrentViewFinancialData } from './utils/csvExport';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
+
+const DEFAULT_PROFILE: UserProfile = {
+  name: 'Pooja Bhagwat',
+  email: 'poojabhagwat2525@gmail.com',
+  phone: '+91 98765 43210',
+  isGuest: false,
+  panNumber: 'ABCDE1234F',
+  kycStatus: 'Verified',
+  dematAccount: '1208160004928172',
+  broker: 'StockSense SmartDesk (CDSL)',
+  bankAccount: 'HDFC Bank •••• 4092',
+  city: 'Mumbai, Maharashtra',
+  occupation: 'Software Engineer & Investor',
+  tradingExperience: 'Beginner',
+  riskProfile: 'Balanced',
+  virtualCapital: 1000000,
+  totalTrades: 14,
+  winRate: 71.4,
+  preferredExchange: 'NSE',
+  chartDefaultStyle: 'line',
+  notificationsEnabled: true,
+  priceAlertsEnabled: true,
+  biometricLogin: false,
+  twoFactorEnabled: true,
+  joinDate: 'Oct 2024'
+};
 
 export default function App() {
   // Make Home Dashboard the primary default page
   const [currentTab, setCurrentTab] = useState<ScreenTab>('dashboard');
   const [currentStock, setCurrentStock] = useState<StockData>(STOCKS_DATA.RELIANCE);
+
+  // User Profile with LocalStorage persistence
+  const [userProfile, setUserProfile] = useState<UserProfile>(() => {
+    try {
+      const saved = localStorage.getItem('stocksense_user_profile_v2');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      // ignore
+    }
+    return DEFAULT_PROFILE;
+  });
+
+  const handleUpdateProfile = (updated: Partial<UserProfile>) => {
+    setUserProfile((prev) => {
+      const next = { ...prev, ...updated };
+      try {
+        localStorage.setItem('stocksense_user_profile_v2', JSON.stringify(next));
+      } catch (e) {
+        // ignore
+      }
+      return next;
+    });
+  };
+
+  const handleLoginSuccess = (name: string, email: string, isGuest: boolean = false) => {
+    handleUpdateProfile({
+      name,
+      email,
+      isGuest,
+      kycStatus: isGuest ? 'Not Started' : 'Verified'
+    });
+    if (isGuest) {
+      showToast('👋 Welcome! Exploring StockSense as Guest with ₹10,00,000 demo capital.');
+    } else {
+      showToast(`Welcome back, ${name}!`);
+    }
+  };
+
+  const handleSkipToGuest = () => {
+    handleLoginSuccess('Guest Investor', 'guest@stocksense.in', true);
+  };
+
+  const handleLogout = () => {
+    handleUpdateProfile({
+      name: 'Guest Investor',
+      email: 'guest@stocksense.in',
+      isGuest: true,
+      kycStatus: 'Not Started'
+    });
+    showToast('Signed out. Continuing in Guest sandbox mode.');
+  };
+
   const [watchlist, setWatchlist] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('stocksense_watchlist_v2');
@@ -110,51 +187,6 @@ export default function App() {
       document.documentElement.classList.remove('light');
     }
   }, [theme]);
-
-  // User Profile & Authentication State
-  const [userProfile, setUserProfile] = useState<UserProfile>(() => getStoredUserProfile());
-
-  useEffect(() => {
-    saveStoredUserProfile(userProfile);
-  }, [userProfile]);
-
-  const handleLoginSuccess = (name: string, email: string) => {
-    const isGuest = email.includes('guest');
-    const updated: UserProfile = {
-      ...userProfile,
-      name,
-      email,
-      avatarInitials: (name.trim()[0] || 'U').toUpperCase(),
-      accountType: isGuest ? 'Guest Explorer' : 'Investor (Pro)',
-      isGuest
-    };
-    setUserProfile(updated);
-    showToast(`Welcome back, ${name}! Signed in successfully.`);
-  };
-
-  const handleSkipLogin = () => {
-    setUserProfile(GUEST_USER_PROFILE);
-    showToast('Exploring as Guest with ₹10L Virtual Sandbox unlocked!');
-  };
-
-  const handleRegisterSuccess = (name: string, email: string) => {
-    const updated: UserProfile = {
-      ...userProfile,
-      name,
-      email,
-      avatarInitials: (name.trim()[0] || 'U').toUpperCase(),
-      accountType: 'Investor (Pro)',
-      isGuest: false,
-      memberSince: 'October 2026'
-    };
-    setUserProfile(updated);
-    showToast(`Account registered for ${name}! Welcome to StockSense.`);
-  };
-
-  const handleLogout = () => {
-    setUserProfile(GUEST_USER_PROFILE);
-    showToast('Signed out. You are now exploring in Guest mode.');
-  };
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -295,6 +327,11 @@ export default function App() {
         case 'O':
           setCurrentTab('overview');
           showToast('Navigated to Overview (O)');
+          break;
+        case 'u':
+        case 'U':
+          setCurrentTab('profile');
+          showToast('Navigated to User Profile (U)');
           break;
         case 't':
         case 'T':
@@ -563,25 +600,35 @@ export default function App() {
             onNavigate={setCurrentTab}
           />
         );
-      case 'profile':
-        return (
-          <ProfileScreen
-            user={userProfile}
-            onUpdateUser={(updated) => {
-              setUserProfile(updated);
-            }}
-            onOpenLogin={() => setAuthScreen('login')}
-            onOpenRegister={() => setAuthScreen('register')}
-            onLogout={handleLogout}
-            onNavigate={setCurrentTab}
-          />
-        );
       case 'overview':
         return (
           <OverviewScreen
             onNavigate={setCurrentTab}
             currentStock={currentStock}
             onSelectStock={handleSelectStock}
+          />
+        );
+      case 'profile':
+        return (
+          <ProfileScreen
+            userProfile={userProfile}
+            onUpdateProfile={handleUpdateProfile}
+            onResetPortfolio={() => {
+              try {
+                localStorage.removeItem('stocksense_paper_orders');
+                localStorage.removeItem('stocksense_paper_positions');
+              } catch (e) {
+                // ignore
+              }
+              handleUpdateProfile({ virtualCapital: 1000000, totalTrades: 0, winRate: 0 });
+            }}
+            onLogout={handleLogout}
+            onOpenAuth={() => setAuthScreen('login')}
+            onNavigate={setCurrentTab}
+            theme={theme}
+            toggleTheme={toggleTheme}
+            watchlistCount={watchlist.length}
+            onExportCSV={handleExportCSV}
           />
         );
       default:
@@ -597,8 +644,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F8FC] dark:bg-[#080e18] text-slate-900 dark:text-slate-100 font-body selection:bg-teal-500/20 selection:text-teal-900 relative transition-colors duration-200 flex flex-col">
-      {/* 1. Fixed Left Vertical Sidebar (250px expanded, 72px collapsed) */}
+    <div className="min-h-screen bg-slate-50 dark:bg-[#08101e] text-slate-900 dark:text-slate-100 font-body selection:bg-teal-500/20 selection:text-teal-900 relative transition-colors duration-200 flex flex-col">
+      {/* 1. Fixed Left Vertical Sidebar */}
       <Sidebar
         currentTab={currentTab}
         onTabChange={setCurrentTab}
@@ -608,16 +655,16 @@ export default function App() {
         setIsMobileOpen={setIsMobileNavOpen}
         onOpenSettings={() => setCurrentTab('profile')}
         onOpenHelp={() => setIsShortcutsOpen(true)}
-        currentUser={userProfile}
+        userProfile={userProfile}
       />
 
-      {/* 2. Main Content Container (Offset by sidebar width on desktop: 250px or 72px) */}
+      {/* 2. Main Content Container (Offset by sidebar width on desktop) */}
       <div
         className={`min-h-screen flex flex-col transition-all duration-300 ease-in-out ${
-          isSidebarCollapsed ? 'md:pl-[72px]' : 'md:pl-[250px]'
+          isSidebarCollapsed ? 'md:pl-18' : 'md:pl-64'
         }`}
       >
-        {/* Compact Top Header (Starts after sidebar, never overlaps it) */}
+        {/* Compact Top Header */}
         <Header
           onOpenSearch={() => setIsSearchOpen(true)}
           onOpenAuth={() => setAuthScreen('login')}
@@ -630,14 +677,21 @@ export default function App() {
           currentTab={currentTab}
           currentStockTicker={currentStock.ticker}
           onSelectTab={setCurrentTab}
-          currentUser={userProfile}
+          userProfile={userProfile}
         />
 
-        {/* Main Content Viewport with consistent 24-32px padding */}
-        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 md:py-8 flex flex-col pb-12">
+        {/* Main Content Viewport */}
+        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col pb-16 md:pb-8">
           {renderActiveScreen()}
         </main>
       </div>
+
+      {/* 3. Mobile Bottom Navigation Bar (retained for quick thumb navigation on phones) */}
+      <Navigation
+        currentTab={currentTab}
+        onTabChange={setCurrentTab}
+        onOpenProfile={() => setCurrentTab('profile')}
+      />
 
       {/* Modals & Dialogs */}
       <SearchModal
@@ -654,15 +708,15 @@ export default function App() {
         onSwitchToRegister={() => setAuthScreen('register')}
         onSwitchToForgot={() => setAuthScreen('forgot')}
         onLoginSuccess={handleLoginSuccess}
-        onSkipLogin={handleSkipLogin}
+        onSkipToGuest={handleSkipToGuest}
       />
 
       <RegisterModal
         isOpen={authScreen === 'register'}
         onClose={() => setAuthScreen('none')}
         onSwitchToLogin={() => setAuthScreen('login')}
-        onRegisterSuccess={handleRegisterSuccess}
-        onSkipRegister={handleSkipLogin}
+        onRegisterSuccess={handleLoginSuccess}
+        onSkipToGuest={handleSkipToGuest}
       />
 
       <ForgotPasswordModal

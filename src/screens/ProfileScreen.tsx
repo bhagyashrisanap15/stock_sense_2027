@@ -4,226 +4,234 @@ import {
   ShieldCheck,
   ShieldAlert,
   Wallet,
+  CheckCircle2,
+  AlertCircle,
+  TrendingUp,
   Settings,
   Bell,
-  Mail,
-  Phone,
   Lock,
-  LogOut,
-  Edit3,
-  CheckCircle2,
-  Calendar,
+  Smartphone,
   CreditCard,
   Building,
-  TrendingUp,
-  Sliders,
-  Smartphone,
-  ExternalLink,
-  ChevronRight,
-  ArrowRight,
+  Edit3,
+  Save,
+  RotateCcw,
+  LogOut,
+  LogIn,
   Download,
-  AlertCircle,
+  Moon,
+  Sun,
   Eye,
   EyeOff,
   Sparkles,
-  Key,
-  Save,
-  X
+  ExternalLink,
+  ChevronRight,
+  Layers,
+  Award,
+  Clock,
+  HelpCircle
 } from 'lucide-react';
 import { UserProfile, ScreenTab } from '../types';
 
 interface ProfileScreenProps {
-  user: UserProfile;
-  onUpdateUser: (updatedUser: UserProfile) => void;
-  onOpenLogin: () => void;
-  onOpenRegister: () => void;
+  userProfile: UserProfile;
+  onUpdateProfile: (updated: Partial<UserProfile>) => void;
+  onResetPortfolio: () => void;
   onLogout: () => void;
+  onOpenAuth: () => void;
   onNavigate: (tab: ScreenTab) => void;
+  theme: 'dark' | 'light';
+  toggleTheme: () => void;
+  watchlistCount?: number;
+  onExportCSV?: () => void;
 }
 
-type ProfileTab = 'overview' | 'kyc' | 'preferences' | 'security';
-
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
-  user,
-  onUpdateUser,
-  onOpenLogin,
-  onOpenRegister,
+  userProfile,
+  onUpdateProfile,
+  onResetPortfolio,
   onLogout,
-  onNavigate
+  onOpenAuth,
+  onNavigate,
+  theme,
+  toggleTheme,
+  watchlistCount = 8,
+  onExportCSV
 }) => {
-  const [activeTab, setActiveTab] = useState<ProfileTab>('overview');
   const [isEditing, setIsEditing] = useState(false);
   const [showPan, setShowPan] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [successToast, setSuccessToast] = useState<string | null>(null);
 
-  // Edit form state
-  const [editName, setEditName] = useState(user.name);
-  const [editEmail, setEditEmail] = useState(user.email);
-  const [editPhone, setEditPhone] = useState(user.phone || '');
-  const [editRiskTolerance, setEditRiskTolerance] = useState(user.riskTolerance);
-  const [editHorizon, setEditHorizon] = useState(user.investmentHorizon);
-  const [editExperience, setEditExperience] = useState(user.tradingExperience);
-  const [editExchange, setEditExchange] = useState(user.preferredExchange);
+  // Form edit states
+  const [name, setName] = useState(userProfile.name);
+  const [email, setEmail] = useState(userProfile.email);
+  const [phone, setPhone] = useState(userProfile.phone);
+  const [city, setCity] = useState(userProfile.city || 'Mumbai, Maharashtra');
+  const [occupation, setOccupation] = useState(userProfile.occupation || 'Private Sector / Tech');
+  const [experience, setExperience] = useState(userProfile.tradingExperience);
+  const [riskProfile, setRiskProfile] = useState(userProfile.riskProfile);
+  const [chartStyle, setChartStyle] = useState(userProfile.chartDefaultStyle);
+  const [exchange, setExchange] = useState(userProfile.preferredExchange);
 
-  const showNotification = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+  const triggerToast = (msg: string) => {
+    setSuccessToast(msg);
+    setTimeout(() => {
+      setSuccessToast(null);
+    }, 3000);
   };
 
-  const handleSaveProfile = (e: React.FormEvent) => {
-    e.preventDefault();
-    const updated: UserProfile = {
-      ...user,
-      name: editName.trim() || user.name,
-      email: editEmail.trim() || user.email,
-      phone: editPhone.trim(),
-      avatarInitials: (editName.trim()[0] || 'U').toUpperCase(),
-      riskTolerance: editRiskTolerance,
-      investmentHorizon: editHorizon,
-      tradingExperience: editExperience,
-      preferredExchange: editExchange
-    };
-    onUpdateUser(updated);
+  const handleSaveProfile = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    onUpdateProfile({
+      name,
+      email,
+      phone,
+      city,
+      occupation,
+      tradingExperience: experience,
+      riskProfile,
+      chartDefaultStyle: chartStyle,
+      preferredExchange: exchange
+    });
     setIsEditing(false);
-    showNotification('Profile information updated successfully!');
+    triggerToast('Profile and preferences updated successfully!');
   };
 
-  const handleToggleTwoFactor = () => {
-    const updated: UserProfile = {
-      ...user,
-      twoFactorEnabled: !user.twoFactorEnabled
-    };
-    onUpdateUser(updated);
-    showNotification(
-      updated.twoFactorEnabled ? 'Two-Factor Authentication enabled!' : 'Two-Factor Authentication disabled.'
-    );
+  const handleAddVirtualCash = () => {
+    const updatedFunds = userProfile.virtualCapital + 100000;
+    onUpdateProfile({ virtualCapital: updatedFunds });
+    triggerToast('Added ₹1,00,000 practice funds to your Demat balance.');
   };
 
-  const handleToggleEmailAlerts = () => {
-    const updated: UserProfile = {
-      ...user,
-      emailAlerts: !user.emailAlerts
-    };
-    onUpdateUser(updated);
-    showNotification(
-      updated.emailAlerts ? 'Email price alerts turned ON.' : 'Email price alerts turned OFF.'
-    );
+  const handleResetFunds = () => {
+    if (window.confirm('Reset virtual practice balance to ₹10,00,000?')) {
+      onResetPortfolio();
+      onUpdateProfile({ virtualCapital: 1000000 });
+      triggerToast('Portfolio reset to initial ₹10,00,000 balance.');
+    }
   };
+
+  const maskedPan = showPan
+    ? userProfile.panNumber
+    : `${userProfile.panNumber.slice(0, 3)}••••${userProfile.panNumber.slice(-2)}`;
 
   return (
-    <div className="w-full flex flex-col gap-6 text-slate-800 dark:text-slate-100 animate-fadeIn">
-      
-      {/* Toast alert */}
-      {toastMessage && (
-        <div className="fixed top-20 right-6 z-50 bg-teal-600 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 animate-bounce">
+    <div className="flex flex-col w-full max-w-5xl mx-auto space-y-6 pb-12 animate-in fade-in duration-200">
+      {/* Toast Notification */}
+      {successToast && (
+        <div className="fixed top-20 right-6 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold animate-in slide-in-from-top-2">
           <CheckCircle2 className="w-4 h-4" />
-          <span>{toastMessage}</span>
+          <span>{successToast}</span>
         </div>
       )}
 
-      {/* Guest Mode Banner */}
-      {user.isGuest && (
-        <div className="bg-gradient-to-r from-teal-50 via-cyan-50 to-blue-50 dark:from-teal-950/40 dark:via-cyan-950/30 dark:to-blue-950/40 border border-teal-200/80 dark:border-teal-800/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+      {/* Guest Mode Alert Banner */}
+      {userProfile.isGuest && (
+        <div className="bg-gradient-to-r from-teal-500/10 via-cyan-500/10 to-blue-500/10 border border-teal-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-sm text-slate-900 dark:text-white">
-                You are currently exploring as a Guest Explorer
+              <span className="text-sm font-bold text-slate-900 dark:text-white">
+                You are currently exploring as a Guest
               </span>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Create an account or log in to sync custom watchlists, unlock AI portfolio backtests, and save price alerts.
-              </p>
+              <span className="text-xs text-slate-600 dark:text-slate-400">
+                You have full access to ₹10,00,000 practice trading and AI predictions. Sign in to sync across devices.
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-2.5 shrink-0">
-            <button
-              onClick={onOpenLogin}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-            >
-              Sign In
-            </button>
-            <button
-              onClick={onOpenRegister}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-teal-600 hover:bg-teal-700 text-white shadow-xs transition-colors cursor-pointer"
-            >
-              Register Free
-            </button>
-          </div>
+          <button
+            onClick={onOpenAuth}
+            className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs shrink-0 flex items-center gap-1.5 cursor-pointer"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Sign In / Create Account</span>
+          </button>
         </div>
       )}
 
-      {/* 1. Header Profile Card */}
-      <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
-        {/* Left: Avatar & Info */}
-        <div className="flex items-start sm:items-center gap-4">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-teal-600 to-teal-400 text-white flex items-center justify-center text-3xl font-extrabold shadow-md shrink-0 border-2 border-white dark:border-slate-800">
-            {user.avatarInitials}
+      {/* 1. Profile Header Card */}
+      <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="flex items-center gap-4 min-w-0">
+          {/* Avatar with status indicator */}
+          <div className="relative shrink-0">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white flex items-center justify-center text-3xl font-extrabold shadow-md border-2 border-white dark:border-[#121c2d]">
+              {userProfile.name.charAt(0).toUpperCase()}
+            </div>
+            <span
+              className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white dark:border-[#121c2d] flex items-center justify-center text-[10px] text-white ${
+                userProfile.isGuest ? 'bg-amber-500' : 'bg-emerald-500'
+              }`}
+              title={userProfile.isGuest ? 'Guest Session' : 'Active Account'}
+            >
+              ✓
+            </span>
           </div>
 
-          <div className="flex flex-col">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                {user.name}
+          {/* User Details */}
+          <div className="flex flex-col min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight truncate">
+                {userProfile.name}
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border border-teal-200/70 dark:border-teal-800/60">
-                {user.accountType}
+              <span
+                className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1 border ${
+                  userProfile.kycStatus === 'Verified'
+                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                    : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-300 dark:border-amber-700'
+                }`}
+              >
+                {userProfile.kycStatus === 'Verified' ? (
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                ) : (
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                )}
+                <span>KYC {userProfile.kycStatus}</span>
               </span>
-              {user.kycStatus === 'VERIFIED' ? (
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>KYC Verified</span>
-                </span>
-              ) : (
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/60 flex items-center gap-1">
-                  <ShieldAlert className="w-3.5 h-3.5 text-amber-600" />
-                  <span>KYC Pending</span>
-                </span>
-              )}
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border border-teal-200/80 dark:border-teal-800">
+                {userProfile.isGuest ? 'Sandbox Guest' : 'Pro Investor Tier'}
+              </span>
             </div>
 
-            <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-500 dark:text-slate-400 mt-1.5">
-              <span className="flex items-center gap-1">
-                <Mail className="w-3.5 h-3.5 text-slate-400" />
-                {user.email}
-              </span>
-              {user.phone && (
-                <span className="flex items-center gap-1">
-                  <Phone className="w-3.5 h-3.5 text-slate-400" />
-                  {user.phone}
-                </span>
-              )}
-              <span className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                Joined {user.memberSince}
+            <div className="flex flex-wrap items-center gap-y-1 gap-x-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <span>{userProfile.email}</span>
+              <span>•</span>
+              <span>{userProfile.phone}</span>
+              <span>•</span>
+              <span>Joined {userProfile.joinDate}</span>
+            </div>
+
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                CDSL BO: {userProfile.dematAccount}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Right: Quick Action Controls */}
-        <div className="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
+        {/* Action Controls */}
+        <div className="flex flex-wrap items-center gap-2 self-stretch md:self-auto justify-end border-t md:border-t-0 pt-4 md:pt-0 border-slate-100 dark:border-slate-800">
           <button
             onClick={() => setIsEditing(!isEditing)}
-            className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5 text-teal-600" />
             <span>{isEditing ? 'Cancel Edit' : 'Edit Profile'}</span>
           </button>
 
-          {user.isGuest ? (
+          {userProfile.isGuest ? (
             <button
-              onClick={onOpenLogin}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-teal-600 hover:bg-teal-700 text-white shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              onClick={onOpenAuth}
+              className="px-4 py-2 rounded-xl text-xs font-semibold bg-teal-600 hover:bg-teal-700 text-white flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
             >
-              <User className="w-3.5 h-3.5" />
+              <LogIn className="w-3.5 h-3.5" />
               <span>Log In</span>
             </button>
           ) : (
             <button
               onClick={onLogout}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-300 border border-rose-200/80 dark:border-rose-800/80 flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>
@@ -232,535 +240,508 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         </div>
       </div>
 
-      {/* Inline Edit Profile Modal / Section */}
-      {isEditing && (
-        <form
-          onSubmit={handleSaveProfile}
-          className="bg-white dark:bg-[#121c2d] border border-teal-300 dark:border-teal-700 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-4 animate-scaleIn"
-        >
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Edit3 className="w-4 h-4 text-teal-600" />
-              <span>Edit Account Information</span>
-            </h3>
+      {/* 2. Virtual Capital & Demat Holdings Snapshot */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Available Virtual Funds */}
+        <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              Practice Funds Balance
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+              <Wallet className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="my-2">
+            <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white tabular-nums">
+              ₹{userProfile.virtualCapital.toLocaleString('en-IN')}
+            </div>
+            <span className="text-[11px] text-teal-600 dark:text-teal-400 font-medium">
+              Demo capital for zero-risk practice
+            </span>
+          </div>
+          <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
             <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="text-slate-400 hover:text-slate-600"
+              onClick={handleAddVirtualCash}
+              className="flex-1 py-1.5 px-2 rounded-lg bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/40 dark:hover:bg-teal-900/50 text-teal-700 dark:text-teal-300 text-[11px] font-semibold text-center transition-colors cursor-pointer"
             >
-              <X className="w-4 h-4" />
+              + Add ₹1 Lakh
+            </button>
+            <button
+              onClick={handleResetFunds}
+              title="Reset to ₹10,00,000"
+              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 transition-colors cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
             </button>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+        {/* Total Trades & Experience */}
+        <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              Paper Trading Activity
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="my-2">
+            <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white">
+              {userProfile.totalTrades} Orders
+            </div>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+              Win rate: <strong className="text-emerald-600">{userProfile.winRate}%</strong> across NSE
+            </span>
+          </div>
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+            <button
+              onClick={() => onNavigate('paper-trading')}
+              className="w-full py-1.5 px-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold text-center transition-colors cursor-pointer flex items-center justify-center gap-1"
+            >
+              <span>View Trade Book</span>
+              <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+
+        {/* Watchlist & Portfolio */}
+        <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              Saved Stocks Watchlist
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <Award className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="my-2">
+            <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white">
+              {watchlistCount} Tickers
+            </div>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+              Live tracking NIFTY 50 leaders
+            </span>
+          </div>
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+            <button
+              onClick={() => onNavigate('watchlist')}
+              className="w-full py-1.5 px-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold text-center transition-colors cursor-pointer flex items-center justify-center gap-1"
+            >
+              <span>Open Watchlist</span>
+              <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+
+        {/* Risk Tolerance Profile */}
+        <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              Risk Profile & Style
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="my-2">
+            <div className="text-2xl font-bold text-slate-900 dark:text-white">
+              {userProfile.riskProfile}
+            </div>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+              {userProfile.tradingExperience} Level • {userProfile.chartDefaultStyle === 'line' ? 'Line Chart' : 'Candlestick'}
+            </span>
+          </div>
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+            <button
+              onClick={() => onNavigate('risk-radar')}
+              className="w-full py-1.5 px-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold text-center transition-colors cursor-pointer flex items-center justify-center gap-1"
+            >
+              <span>Check Risk Radar</span>
+              <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Main Content: Edit Form vs View Mode */}
+      {isEditing ? (
+        <form
+          onSubmit={handleSaveProfile}
+          className="bg-white dark:bg-[#121c2d] border border-teal-500/40 rounded-2xl p-6 shadow-md flex flex-col gap-6"
+        >
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-2">
+              <Edit3 className="w-5 h-5 text-teal-600" />
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                Edit Personal & Investment Profile
+              </h2>
+            </div>
+            <span className="text-xs text-slate-400">
+              Changes are saved to your local session
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Full Name */}
             <div className="flex flex-col gap-1.5">
-              <label className="font-semibold text-slate-600 dark:text-slate-300">
-                Full Legal Name
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Full Name
               </label>
               <input
                 type="text"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white outline-none focus:border-teal-500 transition-colors"
               />
             </div>
 
+            {/* Email */}
             <div className="flex flex-col gap-1.5">
-              <label className="font-semibold text-slate-600 dark:text-slate-300">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Email Address
               </label>
               <input
                 type="email"
-                value={editEmail}
-                onChange={(e) => setEditEmail(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white outline-none focus:border-teal-500 transition-colors"
               />
             </div>
 
+            {/* Phone */}
             <div className="flex flex-col gap-1.5">
-              <label className="font-semibold text-slate-600 dark:text-slate-300">
-                Phone Number (WhatsApp Alert Linked)
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Mobile Number (+91)
               </label>
               <input
                 type="text"
-                value={editPhone}
-                onChange={(e) => setEditPhone(e.target.value)}
-                placeholder="+91 98765 43210"
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white outline-none focus:border-teal-500 transition-colors"
               />
             </div>
 
+            {/* City */}
             <div className="flex flex-col gap-1.5">
-              <label className="font-semibold text-slate-600 dark:text-slate-300">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                City / Location
+              </label>
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white outline-none focus:border-teal-500 transition-colors"
+              />
+            </div>
+
+            {/* Trading Experience Level */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Stock Market Experience
+              </label>
+              <select
+                value={experience}
+                onChange={(e) => setExperience(e.target.value as any)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white outline-none focus:border-teal-500 transition-colors"
+              >
+                <option value="Beginner">Beginner (Learning the basics)</option>
+                <option value="Intermediate">Intermediate (1-3 years of investing)</option>
+                <option value="Advanced">Advanced (Experienced active trader)</option>
+              </select>
+            </div>
+
+            {/* Risk Profile */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Risk Tolerance
               </label>
               <select
-                value={editRiskTolerance}
-                onChange={(e) => setEditRiskTolerance(e.target.value as any)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 cursor-pointer"
+                value={riskProfile}
+                onChange={(e) => setRiskProfile(e.target.value as any)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white outline-none focus:border-teal-500 transition-colors"
               >
-                <option value="Conservative">Conservative (Preservation First)</option>
-                <option value="Moderate">Moderate (Steady Growth & Quality)</option>
-                <option value="Aggressive">Aggressive (High Momentum & Alpha)</option>
+                <option value="Conservative">Conservative (Prioritize capital safety, lower volatility)</option>
+                <option value="Balanced">Balanced (Steady long-term growth with moderate risk)</option>
+                <option value="Aggressive">Aggressive (High growth focus, comfortable with market swings)</option>
               </select>
             </div>
 
+            {/* Default Chart View */}
             <div className="flex flex-col gap-1.5">
-              <label className="font-semibold text-slate-600 dark:text-slate-300">
-                Investment Horizon
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Default Chart Display
               </label>
               <select
-                value={editHorizon}
-                onChange={(e) => setEditHorizon(e.target.value as any)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 cursor-pointer"
+                value={chartStyle}
+                onChange={(e) => setChartStyle(e.target.value as any)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white outline-none focus:border-teal-500 transition-colors"
               >
-                <option value="Short-Term (< 1 yr)">Short-Term (&lt; 1 Year)</option>
-                <option value="Medium-Term (1-3 yrs)">Medium-Term (1-3 Years)</option>
-                <option value="Long-Term (3-5+ yrs)">Long-Term (3-5+ Years)</option>
+                <option value="line">Line / Area Chart (Simple & beginner-friendly)</option>
+                <option value="candlestick">Candlestick Chart (Open, High, Low, Close)</option>
               </select>
             </div>
 
+            {/* Preferred Exchange */}
             <div className="flex flex-col gap-1.5">
-              <label className="font-semibold text-slate-600 dark:text-slate-300">
-                Preferred Exchange
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Primary Indian Exchange
               </label>
               <select
-                value={editExchange}
-                onChange={(e) => setEditExchange(e.target.value as any)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 cursor-pointer"
+                value={exchange}
+                onChange={(e) => setExchange(e.target.value as any)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white outline-none focus:border-teal-500 transition-colors"
               >
-                <option value="NSE">NSE (National Stock Exchange)</option>
+                <option value="NSE">NSE (National Stock Exchange of India)</option>
                 <option value="BSE">BSE (Bombay Stock Exchange)</option>
-                <option value="BOTH">Dual Exchange (NSE + BSE)</option>
+                <option value="BOTH">Both (NSE & BSE)</option>
               </select>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
             <button
               type="button"
               onClick={() => setIsEditing(false)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 cursor-pointer"
+              className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-teal-600 hover:bg-teal-700 text-white shadow-xs flex items-center gap-1.5 cursor-pointer"
+              className="px-5 py-2 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
             >
               <Save className="w-3.5 h-3.5" />
               <span>Save Changes</span>
             </button>
           </div>
         </form>
-      )}
-
-      {/* 2. Navigation Tabs for Profile Deep-Dive */}
-      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-1 overflow-x-auto no-scrollbar">
-        {[
-          { id: 'overview' as ProfileTab, label: 'Overview & Stats', icon: TrendingUp },
-          { id: 'kyc' as ProfileTab, label: 'KYC & Demat Account', icon: CreditCard },
-          { id: 'preferences' as ProfileTab, label: 'Trading & AI Preferences', icon: Sliders },
-          { id: 'security' as ProfileTab, label: 'Security & Access Log', icon: Lock }
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                isActive
-                  ? 'bg-teal-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 3. Tab Contents */}
-
-      {/* TAB 1: OVERVIEW & STATS */}
-      {activeTab === 'overview' && (
-        <div className="flex flex-col gap-6">
-          {/* Key Account Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 rounded-2xl bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-              <div className="flex items-center justify-between text-xs text-slate-500">
-                <span className="font-semibold">Virtual Sandbox Cash</span>
-                <Wallet className="w-4 h-4 text-teal-600" />
-              </div>
-              <div className="mt-2">
-                <span className="text-xl font-bold font-mono text-slate-900 dark:text-white">
-                  ₹{user.virtualCash.toLocaleString('en-IN')}
-                </span>
-                <p className="text-[11px] text-slate-400 mt-0.5">Available for Practice Trading</p>
-              </div>
-              <button
-                onClick={() => onNavigate('paper-trading')}
-                className="mt-3 text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1 cursor-pointer"
-              >
-                <span>Open Sandbox</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-              <div className="flex items-center justify-between text-xs text-slate-500">
-                <span className="font-semibold">Risk Profile</span>
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              </div>
-              <div className="mt-2">
-                <span className="text-xl font-bold text-slate-900 dark:text-white">
-                  {user.riskTolerance}
-                </span>
-                <p className="text-[11px] text-slate-400 mt-0.5">Balanced capital preservation</p>
-              </div>
-              <button
-                onClick={() => onNavigate('risk-radar')}
-                className="mt-3 text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1 cursor-pointer"
-              >
-                <span>Inspect Risk Radar</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-              <div className="flex items-center justify-between text-xs text-slate-500">
-                <span className="font-semibold">Investment Horizon</span>
-                <Calendar className="w-4 h-4 text-blue-600" />
-              </div>
-              <div className="mt-2">
-                <span className="text-base font-bold text-slate-900 dark:text-white">
-                  {user.investmentHorizon}
-                </span>
-                <p className="text-[11px] text-slate-400 mt-0.5">Optimal for compounding</p>
-              </div>
-              <button
-                onClick={() => onNavigate('portfolio')}
-                className="mt-3 text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1 cursor-pointer"
-              >
-                <span>View Portfolio NAV</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-              <div className="flex items-center justify-between text-xs text-slate-500">
-                <span className="font-semibold">AI Prediction Tier</span>
-                <Sparkles className="w-4 h-4 text-purple-600" />
-              </div>
-              <div className="mt-2">
-                <span className="text-xl font-bold text-slate-900 dark:text-white">
-                  XGBoost + LSTM
-                </span>
-                <p className="text-[11px] text-slate-400 mt-0.5">Dual-Ensemble SHAP Enabled</p>
-              </div>
-              <button
-                onClick={() => onNavigate('ai-predict')}
-                className="mt-3 text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1 cursor-pointer"
-              >
-                <span>Explore Forecasts</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Shortcuts to Platform Modules */}
-          <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col gap-4">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-              Platform Features & Quick Jump
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <button
-                onClick={() => onNavigate('watchlist')}
-                className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 hover:border-teal-300 dark:hover:border-teal-700 flex items-center justify-between text-left transition-all cursor-pointer group"
-              >
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-teal-600">
-                    My Saved Watchlist
-                  </span>
-                  <span className="text-[11px] text-slate-400">8 Indian equities tracked</span>
-                </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
-              </button>
-
-              <button
-                onClick={() => onNavigate('screener')}
-                className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 hover:border-teal-300 dark:hover:border-teal-700 flex items-center justify-between text-left transition-all cursor-pointer group"
-              >
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-teal-600">
-                    NSE Stock Screener
-                  </span>
-                  <span className="text-[11px] text-slate-400">500+ stocks filtered</span>
-                </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
-              </button>
-
-              <button
-                onClick={() => onNavigate('learn')}
-                className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 hover:border-teal-300 dark:hover:border-teal-700 flex items-center justify-between text-left transition-all cursor-pointer group"
-              >
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-teal-600">
-                    Learning Academy
-                  </span>
-                  <span className="text-[11px] text-slate-400">Beginner to Pro Guides</span>
-                </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 2: KYC & DEMAT ACCOUNT */}
-      {activeTab === 'kyc' && (
+      ) : (
+        /* View Details Grid */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          {/* Left Column: Demat & Regulatory Details */}
+          <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-teal-600" />
-                <span>Identity & Taxation Details</span>
-              </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                Verified
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Demat & Regulatory Information
+                </h2>
+              </div>
+              <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                SEBI Compliant
               </span>
             </div>
 
-            <div className="flex flex-col gap-3 text-xs">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-                <span className="text-slate-500">PAN Number</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-slate-900 dark:text-white">
-                    {showPan ? 'ABCDE1234F' : user.panMasked || 'ABCDE****F'}
-                  </span>
+            <div className="space-y-3.5 text-xs">
+              <div className="flex items-center justify-between py-1">
+                <span className="text-slate-500 dark:text-slate-400">CDSL Demat BO ID</span>
+                <span className="font-mono font-semibold text-slate-900 dark:text-white">
+                  {userProfile.dematAccount}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between py-1">
+                <span className="text-slate-500 dark:text-slate-400">Clearing Broker</span>
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {userProfile.broker}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between py-1">
+                <span className="text-slate-500 dark:text-slate-400">PAN Card</span>
+                <div className="flex items-center gap-1.5 font-mono">
+                  <span className="font-semibold text-slate-900 dark:text-white">{maskedPan}</span>
                   <button
+                    type="button"
                     onClick={() => setShowPan(!showPan)}
-                    className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5"
+                    title={showPan ? 'Hide PAN' : 'Show PAN'}
                   >
                     {showPan ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-                <span className="text-slate-500">Aadhaar Verification</span>
-                <span className="font-semibold text-emerald-600 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  UIDAI DigiLocker Linked
+              <div className="flex items-center justify-between py-1">
+                <span className="text-slate-500 dark:text-slate-400">Primary Bank Mandate</span>
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {userProfile.bankAccount}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-                <span className="text-slate-500">SEBI Investor Categorization</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  Individual Resident (Indian)
+              <div className="flex items-center justify-between py-1">
+                <span className="text-slate-500 dark:text-slate-400">Registered City</span>
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {userProfile.city}
                 </span>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Building className="w-4 h-4 text-teal-600" />
-                <span>Linked Demat & Bank Account</span>
-              </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
-                Active DP
-              </span>
-            </div>
-
-            <div className="flex flex-col gap-3 text-xs">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-                <span className="text-slate-500">Depository Participant</span>
-                <span className="font-mono font-bold text-slate-900 dark:text-white">
-                  CDSL (Central Depository Services)
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-                <span className="text-slate-500">Demat Account Number</span>
-                <span className="font-mono font-bold text-slate-900 dark:text-white">
-                  {user.dematAccount || '1208160089234512'}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-                <span className="text-slate-500">Primary Bank Mandate</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  HDFC Bank (A/C ****4821)
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 3: TRADING & AI PREFERENCES */}
-      {activeTab === 'preferences' && (
-        <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-5">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-            Trading Engine & Notification Configuration
-          </h3>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            {/* Preferred Exchange */}
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="font-bold text-slate-900 dark:text-white">Default Market Feed</span>
-                <span className="text-slate-400 mt-0.5">NSE Consolidated (National Stock Exchange)</span>
-              </div>
-              <span className="px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-700 font-bold font-mono">
-                {user.preferredExchange}
-              </span>
-            </div>
-
-            {/* Email Alerts Toggle */}
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="font-bold text-slate-900 dark:text-white">Real-Time Email Price Alerts</span>
-                <span className="text-slate-400 mt-0.5">Send alerts when triggers are hit</span>
-              </div>
-              <button
-                onClick={handleToggleEmailAlerts}
-                className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer ${
-                  user.emailAlerts ? 'bg-teal-600' : 'bg-slate-300 dark:bg-slate-700'
-                }`}
-              >
-                <span
-                  className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform ${
-                    user.emailAlerts ? 'left-7' : 'left-1'
-                  }`}
-                />
-              </button>
-            </div>
-
-            {/* AI Reasoning Mode */}
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="font-bold text-slate-900 dark:text-white">AI Reasoning Model</span>
-                <span className="text-slate-400 mt-0.5">Dual-Ensemble SHAP + LIME Rules</span>
-              </div>
-              <span className="px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-700 font-bold">
-                XGBoost v2.4
-              </span>
-            </div>
-
-            {/* Trading Experience Level */}
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="font-bold text-slate-900 dark:text-white">Trading Experience Level</span>
-                <span className="text-slate-400 mt-0.5">Adapts dashboard UI complexity</span>
-              </div>
-              <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold">
-                {user.tradingExperience}
+            <div className="mt-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 flex items-start gap-2">
+              <ShieldCheck className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+              <span>
+                Your virtual portfolio operates in an isolated regulatory sandbox. Simulated orders do not execute real money trades on NSE/BSE.
               </span>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* TAB 4: SECURITY & ACCESS LOG */}
-      {activeTab === 'security' && (
-        <div className="flex flex-col gap-6">
-          <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-4">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Lock className="w-4 h-4 text-teal-600" />
-              <span>Authentication & Security Hardening</span>
-            </h3>
+          {/* Right Column: Preferences & Security Controls */}
+          <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <Settings className="w-4 h-4 text-teal-600" />
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                  App Preferences & Security
+                </h2>
+              </div>
+              <span className="text-[11px] text-slate-400">Instant Sync</span>
+            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              {/* 2FA Toggle */}
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <div className="space-y-4 text-xs">
+              {/* Theme Toggle */}
+              <div className="flex items-center justify-between">
                 <div className="flex flex-col">
-                  <span className="font-bold text-slate-900 dark:text-white">
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    App Theme Mode
+                  </span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Currently in {theme === 'light' ? 'Clean White Light' : 'Deep Space Dark'} mode
+                  </span>
+                </div>
+                <button
+                  onClick={toggleTheme}
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  {theme === 'dark' ? (
+                    <>
+                      <Sun className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Light</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-3.5 h-3.5 text-teal-600" />
+                      <span>Dark</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Price Alerts Toggle */}
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex flex-col">
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    Stock Price Alerts
+                  </span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Get notified when tracked stocks cross breakout levels
+                  </span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={userProfile.priceAlertsEnabled}
+                    onChange={(e) => {
+                      onUpdateProfile({ priceAlertsEnabled: e.target.checked });
+                      triggerToast(e.target.checked ? 'Price alerts enabled' : 'Price alerts paused');
+                    }}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600"></div>
+                </label>
+              </div>
+
+              {/* 2FA Security Toggle */}
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex flex-col">
+                  <span className="font-semibold text-slate-900 dark:text-white">
                     Two-Factor Authentication (2FA)
                   </span>
-                  <span className="text-slate-400 mt-0.5">
-                    Requires authenticator code on new device login
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Require OTP / Auth App confirmation for portfolio transactions
                   </span>
                 </div>
-                <button
-                  onClick={handleToggleTwoFactor}
-                  className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer ${
-                    user.twoFactorEnabled ? 'bg-teal-600' : 'bg-slate-300 dark:bg-slate-700'
-                  }`}
-                >
-                  <span
-                    className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform ${
-                      user.twoFactorEnabled ? 'left-7' : 'left-1'
-                    }`}
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={userProfile.twoFactorEnabled}
+                    onChange={(e) => {
+                      onUpdateProfile({ twoFactorEnabled: e.target.checked });
+                      triggerToast(e.target.checked ? 'Two-Factor Auth activated' : '2FA disabled');
+                    }}
+                    className="sr-only peer"
                   />
-                </button>
+                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600"></div>
+                </label>
               </div>
 
-              {/* Password update link */}
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              {/* Biometric / Quick Pin */}
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
                 <div className="flex flex-col">
-                  <span className="font-bold text-slate-900 dark:text-white">Account Password</span>
-                  <span className="text-slate-400 mt-0.5">Last updated 42 days ago</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    App Biometrics & PIN
+                  </span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Unlock with fingerprint, Face ID or 4-digit PIN
+                  </span>
                 </div>
-                <button
-                  onClick={() => showNotification('Password reset link sent to your registered email.')}
-                  className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold cursor-pointer"
-                >
-                  Change
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Active Sessions */}
-          <div className="bg-white dark:bg-[#121c2d] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col gap-3">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-              Active Sessions & Device Audit Log
-            </h3>
-            <div className="flex flex-col gap-2 text-xs">
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Smartphone className="w-4 h-4 text-teal-600" />
-                  <div className="flex flex-col">
-                    <span className="font-bold text-slate-900 dark:text-white">
-                      Current Browser (Chrome 128 / Linux x86_64)
-                    </span>
-                    <span className="text-[11px] text-slate-400">
-                      Mumbai, Maharashtra, India • IP 103.21.***.*** • Active Now
-                    </span>
-                  </div>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  Current Session
-                </span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={userProfile.biometricLogin}
+                    onChange={(e) => {
+                      onUpdateProfile({ biometricLogin: e.target.checked });
+                      triggerToast(e.target.checked ? 'Biometric security activated' : 'Biometrics turned off');
+                    }}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600"></div>
+                </label>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex items-center justify-between opacity-75">
-                <div className="flex items-center gap-3">
-                  <Smartphone className="w-4 h-4 text-slate-400" />
-                  <div className="flex flex-col">
-                    <span className="font-bold text-slate-900 dark:text-white">
-                      Mobile App (iOS 18 / iPhone 15 Pro)
-                    </span>
-                    <span className="text-[11px] text-slate-400">
-                      Bengaluru, Karnataka, India • Yesterday at 4:15 PM
-                    </span>
-                  </div>
+              {/* Data Export Button */}
+              {onExportCSV && (
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+                  <button
+                    onClick={onExportCSV}
+                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Download className="w-4 h-4 text-teal-600" />
+                    <span>Export Trading Statement & Watchlist (CSV)</span>
+                  </button>
                 </div>
-                <span className="text-[11px] text-slate-400">Terminated</span>
-              </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
+      {/* 4. Beginner Learning & Support Links */}
+      <div className="bg-slate-50 dark:bg-[#0c1524] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300 flex items-center justify-center shrink-0">
+            <HelpCircle className="w-5 h-5" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-slate-900 dark:text-white">
+              Need help understanding Indian Stock Market terms?
+            </span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Check our Beginner's Academy for simple explanations of P/E ratios, RSI, AI predictions, and risk management.
+            </span>
+          </div>
+        </div>
+        <button
+          onClick={() => onNavigate('learn')}
+          className="px-4 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold transition-all shadow-xs shrink-0 flex items-center gap-1.5 cursor-pointer"
+        >
+          <span>Open Learn Screen</span>
+          <ChevronRight className="w-3.5 h-3.5 text-teal-600" />
+        </button>
+      </div>
     </div>
   );
 };

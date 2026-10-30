@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScreenTab, StockData } from '../types';
 import { HistoricalPriceTrends } from '../components/HistoricalPriceTrends';
+import { ResponsiveContainer, AreaChart, Area, Tooltip, YAxis, XAxis } from 'recharts';
 
 interface OverviewScreenProps {
   onNavigate: (tab: ScreenTab) => void;
@@ -114,31 +115,71 @@ export const OverviewScreen: React.FC<OverviewScreenProps> = ({
               </div>
             </div>
 
-            {/* Sparkline Visual */}
-            <div className="w-full h-24 bg-[#010f1f] rounded-xl p-2.5 flex flex-col justify-between relative overflow-hidden border border-[#1c2b3c]">
+            {/* Live Interactive Stock Price Mini Chart */}
+            <div className="w-full bg-[#010f1f] rounded-xl p-3 flex flex-col gap-1 border border-[#1c2b3c]">
               <div className="flex justify-between items-center px-1">
-                <span className="text-[11px] text-[#8c909f]">Intraday 5m Momentum</span>
-                <span className="font-mono text-[11px] text-[#4edea3] font-semibold">Vol Surge +38%</span>
+                <span className="text-[11px] text-[#8c909f]">Live Intraday Price Trend (NSE)</span>
+                <span className="font-mono text-[11px] text-[#4edea3] font-semibold">Active Session</span>
               </div>
-              <svg className="w-full h-12 overflow-visible" preserveAspectRatio="none" viewBox="0 0 300 40">
-                <defs>
-                  <linearGradient id="sparklineGrad" x1="0%" x2="0%" y1="0%" y2="100%">
-                    <stop offset="0%" stopColor="#4edea3" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#4edea3" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M 0 35 L 20 32 L 45 36 L 70 28 L 95 30 L 120 22 L 150 25 L 180 18 L 210 20 L 240 10 L 270 14 L 300 4"
-                  fill="none"
-                  stroke="#4edea3"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M 0 35 L 20 32 L 45 36 L 70 28 L 95 30 L 120 22 L 150 25 L 180 18 L 210 20 L 240 10 L 270 14 L 300 4 L 300 40 L 0 40 Z"
-                  fill="url(#sparklineGrad)"
-                />
-              </svg>
+              <div className="w-full h-28 relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={[
+                      { time: '09:15', price: 2810.0 },
+                      { time: '10:00', price: 2822.4 },
+                      { time: '11:00', price: 2818.1 },
+                      { time: '12:00', price: 2835.5 },
+                      { time: '13:00', price: 2831.0 },
+                      { time: '14:00', price: 2844.8 },
+                      { time: '14:45', price: 2840.2 },
+                      { time: '15:30', price: 2850.4 }
+                    ]}
+                    margin={{ top: 5, right: 5, left: -25, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="liveStockAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#4edea3" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#4edea3" stopOpacity={0.0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis
+                      dataKey="time"
+                      tick={{ fontSize: 9, fill: '#8c909f' }}
+                      tickLine={false}
+                      axisLine={{ stroke: '#1c2b3c' }}
+                    />
+                    <YAxis
+                      domain={['dataMin - 5', 'dataMax + 5']}
+                      tick={{ fontSize: 9, fill: '#8c909f' }}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(val) => `₹${val}`}
+                    />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-[#0f1d33] border border-[#273647] rounded-lg px-2.5 py-1.5 shadow-xl text-[11px] text-white font-mono">
+                              <span className="text-slate-400">{data.time} IST</span>
+                              <div className="font-bold text-[#4edea3]">₹{data.price.toFixed(2)}</div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="price"
+                      stroke="#4edea3"
+                      strokeWidth={2.2}
+                      fillOpacity={1}
+                      fill="url(#liveStockAreaGrad)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </div>
 
             {/* SHAP Drivers + Risk Strip */}

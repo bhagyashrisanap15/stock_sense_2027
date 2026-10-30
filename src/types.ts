@@ -161,24 +161,28 @@ export type ScreenTab =
 export type AuthScreen = 'none' | 'login' | 'register' | 'forgot';
 
 export interface UserProfile {
-  id: string;
   name: string;
   email: string;
-  phone?: string;
-  avatarInitials: string;
-  accountType: 'Investor (Pro)' | 'Institutional' | 'Retail Trader' | 'Guest Explorer';
+  phone: string;
   isGuest: boolean;
-  memberSince: string;
-  kycStatus: 'VERIFIED' | 'PENDING' | 'NOT_STARTED';
-  panMasked?: string;
-  dematAccount?: string;
-  riskTolerance: 'Conservative' | 'Moderate' | 'Aggressive';
-  investmentHorizon: 'Short-Term (< 1 yr)' | 'Medium-Term (1-3 yrs)' | 'Long-Term (3-5+ yrs)';
-  tradingExperience: 'Beginner (<1 yr)' | 'Intermediate (1-3 yrs)' | 'Advanced (3+ yrs)';
+  avatarUrl?: string;
+  panNumber: string;
+  kycStatus: 'Verified' | 'Pending' | 'Not Started';
+  dematAccount: string;
+  broker: string;
+  bankAccount: string;
+  city: string;
+  occupation: string;
+  tradingExperience: 'Beginner' | 'Intermediate' | 'Advanced';
+  riskProfile: 'Conservative' | 'Balanced' | 'Aggressive';
+  virtualCapital: number;
+  totalTrades: number;
+  winRate: number;
   preferredExchange: 'NSE' | 'BSE' | 'BOTH';
-  virtualCash: number;
+  chartDefaultStyle: 'line' | 'candlestick';
+  notificationsEnabled: boolean;
+  priceAlertsEnabled: boolean;
+  biometricLogin: boolean;
   twoFactorEnabled: boolean;
-  emailAlerts: boolean;
-  whatsappAlerts: boolean;
-  themePreference: 'light' | 'dark' | 'system';
+  joinDate: string;
 }

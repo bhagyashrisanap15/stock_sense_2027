@@ -11,7 +11,8 @@ import {
   FileCode,
   Compass,
   Zap,
-  ArrowRight
+  ArrowRight,
+  User
 } from 'lucide-react';
 import { ScreenTab } from '../types';
 
@@ -318,6 +319,19 @@ export const KeyboardShortcutsModal: React.FC<KeyboardShortcutsModalProps> = ({
         },
         actionLabel: 'Go to Summary',
         icon: Compass
+      },
+      {
+        id: 'nav-profile',
+        category: 'navigation',
+        title: 'User Profile & Settings',
+        description: 'View your Demat info, practice funds, KYC status, and risk profile',
+        keys: ['U'],
+        action: () => {
+          onClose();
+          onNavigate('profile');
+        },
+        actionLabel: 'Go to Profile',
+        icon: User
       }
     ],
     [modKey, onClose, onOpenSearch, onExportCSV, toggleTheme, theme, toggleSidebar, onOpenPriceAlert, onOpenJsonDossier, onNavigate]
