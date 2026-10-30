@@ -21,7 +21,7 @@ import {
   ChevronDown,
   ChevronUp,
   X,
-  LogOut,
+  Compass,
   User
 } from 'lucide-react';
 import { ScreenTab, UserProfile } from '../types';
@@ -56,18 +56,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenHelp,
   userProfile
 }) => {
-  // Primary navigation items requested
+  // Ordered primary navigation items
   const primaryNavItems: NavItem[] = [
     { id: 'dashboard', label: 'Home', icon: Home },
     { id: 'markets', label: 'Markets', icon: TrendingUp },
     { id: 'watchlist', label: 'Watchlist', icon: Bookmark },
     { id: 'ai-predict', label: 'AI Insights', icon: Sparkles, badge: 'AI' },
     { id: 'portfolio', label: 'Portfolio', icon: Wallet },
-    { id: 'learn', label: 'Learn', icon: BookOpen },
-    { id: 'profile', label: 'My Profile', icon: User }
+    { id: 'learn', label: 'Learn', icon: BookOpen }
   ];
 
-  // Secondary tools in expandable dropdown
+  // Secondary tools inside "More Tools" submenu
   const secondaryNavItems: NavItem[] = [
     { id: 'paper-trading', label: 'Practice Trading', icon: CandlestickChart, badge: 'VIRTUAL' },
     { id: 'risk-radar', label: 'Risk & Safety Meter', icon: ShieldAlert },
@@ -75,10 +74,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'technical-analysis', label: 'Technical Charts', icon: Activity },
     { id: 'heatmap', label: 'Sector Heatmap', icon: Grid3X3 },
     { id: 'news-sentiment', label: 'Market News', icon: Newspaper },
-    { id: 'backtesting', label: 'Strategy Tester', icon: Cpu }
+    { id: 'backtesting', label: 'Strategy Tester', icon: Cpu },
+    { id: 'overview', label: 'Market Summary', icon: Compass }
   ];
 
-  // Check if current tab is in secondary tools
   const isSecondaryActive = secondaryNavItems.some((item) => item.id === currentTab);
   const [isMoreToolsExpanded, setIsMoreToolsExpanded] = useState<boolean>(isSecondaryActive);
 
@@ -94,26 +93,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const isActive = currentTab === item.id;
 
     return (
-      <div key={item.id} className="relative group/navitem">
+      <div key={item.id} className="relative group/navitem w-full">
         <button
           type="button"
           onClick={() => handleSelectTab(item.id)}
-          className={`w-full flex items-center gap-3 py-2.5 rounded-xl text-left text-xs font-semibold transition-all duration-150 relative ${
+          className={`w-full flex items-center gap-3 py-2.5 rounded-xl text-left text-xs font-semibold transition-all duration-150 relative cursor-pointer ${
             isSubItem ? 'pl-8 pr-3' : 'px-3'
           } ${
             isActive
-              ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 shadow-xs'
+              ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 shadow-xs font-bold'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/60'
           } ${isCollapsed ? 'justify-center px-2' : ''}`}
         >
-          {/* Active left indicator line */}
+          {/* Active left indicator strip */}
           {isActive && (
             <span className="absolute left-0 top-2 bottom-2 w-1 bg-teal-600 dark:bg-teal-400 rounded-r-full" />
           )}
 
           <div className="shrink-0 flex items-center justify-center">
             <Icon
-              className={`w-4 h-4 transition-transform duration-150 ${
+              className={`w-4.5 h-4.5 transition-transform duration-150 ${
                 isActive
                   ? 'text-teal-600 dark:text-teal-400 scale-105'
                   : 'text-slate-400 group-hover/navitem:text-slate-700 dark:group-hover/navitem:text-slate-200'
@@ -157,14 +156,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white dark:bg-[#0c1524] border-r border-slate-200/90 dark:border-slate-800 select-none text-slate-800 dark:text-slate-200 transition-colors">
-      {/* Brand & Collapse Header */}
+      
+      {/* 1. Brand Logo Header & Collapse Button */}
       <div className="h-16 px-4 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800 shrink-0">
         <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
           {/* Logo Mark */}
           <button
             type="button"
             onClick={() => handleSelectTab('dashboard')}
-            className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-sm transition-transform hover:scale-105 focus:outline-none"
+            className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-sm transition-transform hover:scale-105 focus:outline-none cursor-pointer"
             title="StockSense Home"
           >
             <Sparkles className="w-5 h-5" />
@@ -187,7 +187,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             type="button"
             onClick={() => setIsMobileOpen(false)}
-            className="md:hidden w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-colors"
+            className="md:hidden w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-colors cursor-pointer"
             aria-label="Close navigation"
           >
             <X className="w-4 h-4" />
@@ -198,8 +198,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           type="button"
           onClick={() => setIsCollapsed((prev) => !prev)}
-          className="hidden md:flex w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 items-center justify-center transition-colors"
-          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          className="hidden md:flex w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 items-center justify-center transition-colors cursor-pointer"
+          title={isCollapsed ? 'Expand sidebar (250px)' : 'Collapse sidebar (72px)'}
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? (
@@ -210,19 +210,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
       </div>
 
-      {/* Main Navigation Items */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2.5 flex flex-col gap-1 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
-        {/* Primary Items */}
+      {/* 2. Main Navigation Scrollable List */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 flex flex-col gap-1 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
+        {/* Items 1 to 6 */}
         {primaryNavItems.map((item) => renderNavButton(item))}
 
-        {/* Expandable "More Tools" Section */}
+        {/* Item 7: Expandable "More Tools" Section */}
         <div className="pt-2 mt-1 border-t border-slate-100 dark:border-slate-800/80">
           {!isCollapsed ? (
             <div>
               <button
                 type="button"
                 onClick={() => setIsMoreToolsExpanded(!isMoreToolsExpanded)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
                   isSecondaryActive
                     ? 'text-teal-700 dark:text-teal-300 bg-teal-50/50 dark:bg-teal-950/20'
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-800/40'
@@ -246,7 +246,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               )}
             </div>
           ) : (
-            // In Collapsed Mode: show secondary items directly as icons
+            // In Collapsed Mode: show secondary tool icon buttons
             <div className="flex flex-col gap-1">
               {secondaryNavItems.map((item) => renderNavButton(item))}
             </div>
@@ -254,16 +254,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Bottom Section: Settings, Help & User Profile */}
-      <div className="p-2.5 border-t border-slate-200/80 dark:border-slate-800 shrink-0 flex flex-col gap-1 bg-slate-50/50 dark:bg-[#09101c]/50">
-        {/* Settings button */}
-        <div className="relative group/navitem">
+      {/* 3. Anchored Bottom Section: Settings (8), Help & Shortcuts (9), and User Profile */}
+      <div className="p-3 border-t border-slate-200/80 dark:border-slate-800 shrink-0 flex flex-col gap-1 bg-slate-50/60 dark:bg-[#09101c]/50">
+        
+        {/* Item 8: Settings (Navigates to Profile/Settings) */}
+        <div className="relative group/navitem w-full">
           <button
             type="button"
-            onClick={onOpenSettings}
-            className={`w-full flex items-center gap-3 py-2 px-3 rounded-xl text-left text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ${
-              isCollapsed ? 'justify-center px-2' : ''
-            }`}
+            onClick={() => {
+              if (onOpenSettings) {
+                onOpenSettings();
+              } else {
+                handleSelectTab('profile');
+              }
+            }}
+            className={`w-full flex items-center gap-3 py-2 px-3 rounded-xl text-left text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer ${
+              currentTab === 'profile' ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-bold' : ''
+            } ${isCollapsed ? 'justify-center px-2' : ''}`}
           >
             <Settings className="w-4 h-4 text-slate-400 shrink-0" />
             {!isCollapsed && <span>Settings</span>}
@@ -275,12 +282,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
         </div>
 
-        {/* Help button */}
-        <div className="relative group/navitem">
+        {/* Item 9: Help & Shortcuts */}
+        <div className="relative group/navitem w-full">
           <button
             type="button"
             onClick={onOpenHelp}
-            className={`w-full flex items-center gap-3 py-2 px-3 rounded-xl text-left text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ${
+            className={`w-full flex items-center gap-3 py-2 px-3 rounded-xl text-left text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer ${
               isCollapsed ? 'justify-center px-2' : ''
             }`}
           >
@@ -295,7 +302,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* User Profile Card at Bottom */}
-        <div className="pt-1.5 mt-1 border-t border-slate-200/60 dark:border-slate-800/80">
+        <div className="pt-2 mt-1 border-t border-slate-200/60 dark:border-slate-800/80">
           {!isCollapsed ? (
             <div
               onClick={() => handleSelectTab('profile')}
@@ -303,14 +310,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300 flex items-center justify-center font-bold text-xs border border-teal-200 dark:border-teal-800 shrink-0">
-                  {userProfile ? userProfile.name.charAt(0).toUpperCase() : 'P'}
+                  {userProfile?.avatarInitials || (userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : 'P')}
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                    {userProfile ? userProfile.name : 'Pooja Bhagwat'}
+                    {userProfile?.name || 'Pooja Bhagwat'}
                   </span>
                   <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
-                    {userProfile?.isGuest ? 'Guest Explorer' : 'Investor · Pro Member'}
+                    {userProfile?.accountType || (userProfile?.isGuest ? 'Guest Explorer' : 'Investor (Pro)')}
                   </span>
                 </div>
               </div>
@@ -321,7 +328,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   handleSelectTab('profile');
                 }}
                 className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
-                title="Account Settings & Profile"
+                title="View Profile & Settings"
               >
                 <User className="w-3.5 h-3.5" />
               </button>
@@ -332,14 +339,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 type="button"
                 onClick={() => handleSelectTab('profile')}
                 className="w-9 h-9 rounded-full bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300 flex items-center justify-center font-bold text-xs border border-teal-200 dark:border-teal-800 shadow-xs cursor-pointer"
-                title={`${userProfile ? userProfile.name : 'Pooja Bhagwat'} (Profile)`}
+                title={`${userProfile?.name || 'Pooja Bhagwat'} (Profile)`}
               >
-                {userProfile ? userProfile.name.charAt(0).toUpperCase() : 'P'}
+                {userProfile?.avatarInitials || (userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : 'P')}
               </button>
               <div className="hidden md:group-hover/profile:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 flex-col px-3 py-2 rounded-xl bg-slate-900 text-white text-xs shadow-xl pointer-events-none whitespace-nowrap">
-                <span className="font-bold">{userProfile ? userProfile.name : 'Pooja Bhagwat'}</span>
+                <span className="font-bold">{userProfile?.name || 'Pooja Bhagwat'}</span>
                 <span className="text-[10px] text-slate-400">
-                  {userProfile?.isGuest ? 'Guest Explorer' : 'Investor Profile'}
+                  {userProfile?.accountType || (userProfile?.isGuest ? 'Guest Explorer' : 'Investor (Pro)')}
                 </span>
               </div>
             </div>
@@ -351,10 +358,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Desktop Fixed Left Sidebar */}
+      {/* Desktop Fixed Left Sidebar: width 250px expanded, 72px collapsed */}
       <aside
         className={`hidden md:block fixed left-0 top-0 bottom-0 z-40 transition-all duration-300 ease-in-out ${
-          isCollapsed ? 'w-18' : 'w-64'
+          isCollapsed ? 'w-[72px]' : 'w-[250px]'
         }`}
       >
         {sidebarContent}
@@ -369,8 +376,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={() => setIsMobileOpen(false)}
           />
 
-          {/* Drawer content */}
-          <div className="relative w-72 max-w-[80vw] h-full shadow-2xl z-10 animate-in slide-in-from-left duration-200">
+          {/* Drawer content (250px max-w) */}
+          <div className="relative w-[260px] max-w-[85vw] h-full shadow-2xl z-10 animate-in slide-in-from-left duration-200">
             {sidebarContent}
           </div>
         </div>

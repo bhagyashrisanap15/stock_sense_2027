@@ -644,7 +644,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#08101e] text-slate-900 dark:text-slate-100 font-body selection:bg-teal-500/20 selection:text-teal-900 relative transition-colors duration-200 flex flex-col">
+    <div className="min-h-screen bg-[#F5F8FC] dark:bg-[#08101e] text-slate-900 dark:text-slate-100 font-body selection:bg-teal-500/20 selection:text-teal-900 relative transition-colors duration-200 flex flex-col">
       {/* 1. Fixed Left Vertical Sidebar */}
       <Sidebar
         currentTab={currentTab}
@@ -658,10 +658,10 @@ export default function App() {
         userProfile={userProfile}
       />
 
-      {/* 2. Main Content Container (Offset by sidebar width on desktop) */}
+      {/* 2. Main Content Container (Offset by sidebar width on desktop: 250px expanded, 72px collapsed) */}
       <div
         className={`min-h-screen flex flex-col transition-all duration-300 ease-in-out ${
-          isSidebarCollapsed ? 'md:pl-18' : 'md:pl-64'
+          isSidebarCollapsed ? 'md:pl-[72px]' : 'md:pl-[250px]'
         }`}
       >
         {/* Compact Top Header */}
@@ -680,8 +680,8 @@ export default function App() {
           userProfile={userProfile}
         />
 
-        {/* Main Content Viewport */}
-        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col pb-16 md:pb-8">
+        {/* Main Content Viewport: 24-32px padding */}
+        <main className="flex-1 w-full max-w-[1600px] mx-auto px-6 sm:px-8 py-6 flex flex-col pb-16 md:pb-8">
           {renderActiveScreen()}
         </main>
       </div>

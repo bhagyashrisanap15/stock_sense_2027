@@ -97,23 +97,28 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     triggerToast('Profile and preferences updated successfully!');
   };
 
+  const virtualFunds = userProfile.virtualCapital ?? userProfile.virtualCash ?? 1000000;
+  const panStr = userProfile.panNumber || userProfile.panMasked || 'ABCDE1234F';
+
   const handleAddVirtualCash = () => {
-    const updatedFunds = userProfile.virtualCapital + 100000;
-    onUpdateProfile({ virtualCapital: updatedFunds });
+    const updatedFunds = virtualFunds + 100000;
+    onUpdateProfile({ virtualCapital: updatedFunds, virtualCash: updatedFunds });
     triggerToast('Added ₹1,00,000 practice funds to your Demat balance.');
   };
 
   const handleResetFunds = () => {
     if (window.confirm('Reset virtual practice balance to ₹10,00,000?')) {
       onResetPortfolio();
-      onUpdateProfile({ virtualCapital: 1000000 });
+      onUpdateProfile({ virtualCapital: 1000000, virtualCash: 1000000 });
       triggerToast('Portfolio reset to initial ₹10,00,000 balance.');
     }
   };
 
   const maskedPan = showPan
-    ? userProfile.panNumber
-    : `${userProfile.panNumber.slice(0, 3)}••••${userProfile.panNumber.slice(-2)}`;
+    ? panStr
+    : panStr.length > 5
+    ? `${panStr.slice(0, 3)}••••${panStr.slice(-2)}`
+    : panStr;
 
   return (
     <div className="flex flex-col w-full max-w-5xl mx-auto space-y-6 pb-12 animate-in fade-in duration-200">
@@ -254,7 +259,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </div>
           <div className="my-2">
             <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white tabular-nums">
-              ₹{userProfile.virtualCapital.toLocaleString('en-IN')}
+              ₹{virtualFunds.toLocaleString('en-IN')}
             </div>
             <span className="text-[11px] text-teal-600 dark:text-teal-400 font-medium">
               Demo capital for zero-risk practice
