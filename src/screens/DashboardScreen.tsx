@@ -333,6 +333,18 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
       })
       .join(' ');
   };
+
+  const handleChartPointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
+    if (candleSeries.length === 0) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const relX = e.clientX - rect.left;
+    const scale = svgWidth / rect.width;
+    const xInSvg = relX * scale;
+    const usableWidth = svgWidth - padding.left - padding.right;
+    const normalized = (xInSvg - padding.left) / usableWidth;
+    const index = Math.max(0, Math.min(candleSeries.length - 1, Math.floor(normalized * candleSeries.length)));
+    setHoveredCandle(candleSeries[index]);
+  };
   // Derived Key Details
   const keyDetails = useMemo(() => {
     const price = currentStock.price;
@@ -752,8 +764,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
             <div className="w-full relative select-none">
               <svg
                 viewBox={`0 0 ${svgWidth} ${chartHeight + (showVolume ? volumeHeight : 0)}`}
-                className="w-full h-auto overflow-visible cursor-crosshair"
-                onMouseLeave={() => setHoveredCandle(null)}
+                className="w-full h-auto overflow-visible cursor-crosshair touch-none"
+                onPointerMove={handleChartPointerMove}
+                onPointerLeave={() => setHoveredCandle(null)}
               >
                 <defs>
                   <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">

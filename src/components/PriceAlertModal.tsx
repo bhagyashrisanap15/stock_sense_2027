@@ -1,4 +1,17 @@
 import React, { useState } from 'react';
+import {
+  Bell,
+  BellRing,
+  BellOff,
+  Trash2,
+  X,
+  TrendingUp,
+  TrendingDown,
+  FlaskConical,
+  Check,
+  ArrowUpRight,
+  ArrowDownRight
+} from 'lucide-react';
 import { StockData, PriceAlert } from '../types';
 
 interface PriceAlertModalProps {
@@ -33,7 +46,7 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
   const currentPrice = currentStock.price;
   const numTargetPrice = parseFloat(targetPrice) || currentPrice;
   const deltaRupees = numTargetPrice - currentPrice;
-  const deltaPercent = ((deltaRupees) / currentPrice) * 100;
+  const deltaPercent = (deltaRupees / currentPrice) * 100;
 
   const handlePreset = (pct: number) => {
     const calculated = currentPrice * (1 + pct / 100);
@@ -68,119 +81,118 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
   const otherAlerts = alerts.filter((a) => a.ticker !== currentStock.ticker);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-[#122131] w-full max-w-lg rounded-2xl shadow-2xl border border-[#1c2b3c] overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-[#0c1524] w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden flex flex-col max-h-[92vh] text-slate-800 dark:text-slate-100">
+        
         {/* Header */}
-        <div className="p-4 bg-[#1c2b3c]/60 border-b border-[#1c2b3c] flex items-center justify-between">
+        <div className="p-4 sm:p-5 bg-slate-50/50 dark:bg-[#121c2d]/50 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#4d8eff]/15 text-[#adc6ff] flex items-center justify-center border border-[#4d8eff]/30">
-              <span className="material-symbols-outlined text-[18px]">add_alert</span>
+            <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/70 dark:border-amber-800">
+              <Bell className="w-4.5 h-4.5" />
             </div>
             <div>
-              <h2 className="text-[16px] font-bold text-[#d4e4fa] leading-none">
-                Price Trigger & Volatility Alert
+              <h2 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
+                Price Trigger & Alerts
               </h2>
-              <span className="text-[11px] text-[#c2c6d6] mt-0.5 block font-mono">
+              <span className="text-xs text-slate-400 block font-mono">
                 {currentStock.ticker} • Real-time Level Watcher
               </span>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg text-[#c2c6d6] hover:text-[#d4e4fa] hover:bg-[#273647] flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <X className="w-4.5 h-4.5" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="p-4 overflow-y-auto space-y-4">
+        <div className="p-4 sm:p-5 overflow-y-auto space-y-4">
           {/* Current Stock Context Display */}
-          <div className="bg-[#0d1c2d] p-3 rounded-xl border border-[#1c2b3c] flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-lg bg-[#1c2b3c] flex items-center justify-center font-bold text-[#adc6ff] text-[15px] border border-[#273647]">
-                {currentStock.ticker.charAt(0)}
+          <div className="bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-2xl border border-slate-200/70 dark:border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 flex items-center justify-center font-bold font-mono text-sm border border-teal-200/70 dark:border-teal-800">
+                {currentStock.ticker.slice(0, 3)}
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-[15px] text-[#d4e4fa]">
+                  <span className="font-bold text-sm text-slate-900 dark:text-white">
                     {currentStock.ticker}
                   </span>
-                  <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-[#1c2b3c] text-[#c2c6d6]">
+                  <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
                     {currentStock.exchange}
                   </span>
                 </div>
-                <span className="text-[11px] text-[#8c909f]">{currentStock.name}</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[160px]">{currentStock.name}</span>
               </div>
             </div>
 
             <div className="flex flex-col items-end">
-              <span className="font-mono text-[16px] font-bold text-[#d4e4fa]">
+              <span className="font-mono text-base font-bold text-slate-900 dark:text-white">
                 ₹{currentPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </span>
               <span
-                className={`font-mono text-[11px] font-semibold flex items-center gap-0.5 ${
-                  currentStock.changePercent >= 0 ? 'text-[#4edea3]' : 'text-[#ffb4ab]'
+                className={`font-mono text-xs font-semibold flex items-center gap-0.5 ${
+                  currentStock.changePercent >= 0 ? 'text-emerald-600' : 'text-rose-600'
                 }`}
               >
-                <span className="material-symbols-outlined text-[13px]">
-                  {currentStock.changePercent >= 0 ? 'north_east' : 'south_east'}
-                </span>
-                {currentStock.changePercent >= 0 ? '+' : ''}{currentStock.changePercent}%
+                {currentStock.changePercent >= 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+                {currentStock.changePercent >= 0 ? '+' : ''}{currentStock.changePercent.toFixed(2)}%
               </span>
             </div>
           </div>
 
           {/* Alert Configuration Form */}
-          <form onSubmit={handleCreateAlert} className="bg-[#122131] rounded-xl p-3.5 border border-[#1c2b3c] space-y-3">
-            <span className="text-[11px] uppercase tracking-wider text-[#c2c6d6] font-semibold block">
+          <form onSubmit={handleCreateAlert} className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl p-4 border border-slate-200/70 dark:border-slate-800 space-y-3.5">
+            <span className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold block">
               Set Custom Trigger Condition
             </span>
 
             {/* Condition Switcher */}
-            <div className="grid grid-cols-2 gap-2 bg-[#051424] p-1 rounded-xl border border-[#1c2b3c]">
+            <div className="grid grid-cols-2 gap-2 bg-slate-200/60 dark:bg-slate-900/60 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setCondition('ABOVE')}
-                className={`py-2 px-3 rounded-lg text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                className={`py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   condition === 'ABOVE'
-                    ? 'bg-[#00a572]/20 text-[#4edea3] border border-[#00a572]/40 shadow-sm'
-                    : 'text-[#c2c6d6] hover:text-[#d4e4fa]'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 shadow-xs border border-emerald-200 dark:border-emerald-800'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
               >
-                <span className="material-symbols-outlined text-[16px]">trending_up</span>
+                <TrendingUp className="w-3.5 h-3.5" />
                 <span>Rises Above (≥)</span>
               </button>
               <button
                 type="button"
                 onClick={() => setCondition('BELOW')}
-                className={`py-2 px-3 rounded-lg text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                className={`py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   condition === 'BELOW'
-                    ? 'bg-[#93000a]/30 text-[#ffb4ab] border border-[#93000a]/40 shadow-sm'
-                    : 'text-[#c2c6d6] hover:text-[#d4e4fa]'
+                    ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 shadow-xs border border-rose-200 dark:border-rose-800'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
               >
-                <span className="material-symbols-outlined text-[16px]">trending_down</span>
+                <TrendingDown className="w-3.5 h-3.5" />
                 <span>Drops Below (≤)</span>
               </button>
             </div>
 
             {/* Target Price Input with Delta Preview */}
             <div className="flex flex-col gap-1.5">
-              <div className="flex items-center justify-between text-[12px]">
-                <label className="text-[#c2c6d6] font-medium" htmlFor="targetPriceInput">
+              <div className="flex items-center justify-between text-xs">
+                <label className="text-slate-700 dark:text-slate-300 font-semibold" htmlFor="targetPriceInput">
                   Target Trigger Price (₹)
                 </label>
                 <span
-                  className={`font-mono text-[11px] font-semibold ${
-                    deltaRupees >= 0 ? 'text-[#4edea3]' : 'text-[#ffb4ab]'
+                  className={`font-mono text-xs font-bold ${
+                    deltaRupees >= 0 ? 'text-emerald-600' : 'text-rose-600'
                   }`}
                 >
                   {deltaRupees >= 0 ? '+' : ''}₹{deltaRupees.toFixed(2)} ({deltaPercent >= 0 ? '+' : ''}{deltaPercent.toFixed(2)}%)
                 </span>
               </div>
               <div className="relative flex items-center">
-                <span className="absolute left-3 text-[#8c909f] font-mono font-bold text-[14px]">
+                <span className="absolute left-3.5 text-slate-400 font-mono font-bold text-sm">
                   ₹
                 </span>
                 <input
@@ -190,7 +202,7 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
                   value={targetPrice}
                   onChange={(e) => setTargetPrice(e.target.value)}
                   placeholder="Enter target price..."
-                  className="w-full h-11 pl-8 pr-3 rounded-lg bg-[#051424] text-[#d4e4fa] font-mono text-[14px] font-bold border border-[#1c2b3c] outline-none focus:border-[#4d8eff]"
+                  className="w-full h-11 pl-9 pr-3 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono text-sm font-bold border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
                   required
                 />
               </div>
@@ -198,7 +210,7 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
 
             {/* Quick Presets */}
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-              <span className="text-[10px] text-[#8c909f] uppercase font-semibold shrink-0 mr-1">
+              <span className="text-[10px] text-slate-400 uppercase font-bold shrink-0 mr-1">
                 Presets:
               </span>
               {[
@@ -213,10 +225,10 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
                   key={p.label}
                   type="button"
                   onClick={() => handlePreset(p.val)}
-                  className={`px-2.5 py-1 rounded text-[11px] font-mono font-semibold transition-all border shrink-0 ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all border shrink-0 cursor-pointer ${
                     p.val > 0
-                      ? 'bg-[#00a572]/15 text-[#4edea3] border-[#00a572]/30 hover:bg-[#00a572]/25'
-                      : 'bg-[#93000a]/20 text-[#ffb4ab] border-[#93000a]/30 hover:bg-[#93000a]/30'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
+                      : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800 hover:bg-rose-100'
                   }`}
                 >
                   {p.label}
@@ -226,7 +238,7 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
 
             {/* Note Input */}
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] text-[#c2c6d6]" htmlFor="alertNoteInput">
+              <label className="text-xs text-slate-500 dark:text-slate-400 font-medium" htmlFor="alertNoteInput">
                 Execution Memo (Optional)
               </label>
               <input
@@ -234,50 +246,50 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
                 type="text"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="e.g. Key resistance level, stop loss exit..."
-                className="w-full h-9 px-3 rounded-lg bg-[#051424] text-[#d4e4fa] text-[12px] border border-[#1c2b3c] outline-none focus:border-[#4d8eff]"
+                placeholder="e.g. Key resistance breakout, stop loss exit..."
+                className="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
               />
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full h-11 rounded-lg bg-[#4d8eff] hover:bg-[#adc6ff] text-[#00285d] font-semibold text-[13px] flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-[0.99]"
+              className="w-full h-11 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer active:scale-[0.99]"
             >
-              <span className="material-symbols-outlined text-[17px]">notifications_active</span>
+              <BellRing className="w-4 h-4" />
               <span>Set Alert at ₹{numTargetPrice.toFixed(2)}</span>
             </button>
           </form>
 
           {/* Test Sandbox: Simulate Mock Market Fluctuation */}
-          <div className="bg-[#051424] p-3 rounded-xl border border-[#273647] flex flex-col gap-2">
+          <div className="bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-2xl border border-slate-200/70 dark:border-slate-800 flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-[#adc6ff]">
-                <span className="material-symbols-outlined text-[16px]">science</span>
-                <span className="text-[11px] uppercase font-bold tracking-wider">
-                  Test Alert Engine (Simulate Price Fluctuation)
+              <div className="flex items-center gap-1.5 text-teal-700 dark:text-teal-300">
+                <FlaskConical className="w-4 h-4" />
+                <span className="text-xs uppercase font-bold tracking-wider">
+                  Test Alert Engine
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-[#4edea3]">Real-time Sandbox</span>
+              <span className="text-[10px] font-mono text-emerald-600 font-semibold">Real-time Sandbox</span>
             </div>
-            <p className="text-[11px] text-[#8c909f] leading-snug">
-              Nudge the mock price across thresholds to instantly test real-time toast dispatching:
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-snug">
+              Nudge the price across thresholds to instantly test real-time notification dispatching:
             </p>
             <div className="grid grid-cols-2 gap-2 pt-0.5">
               <button
                 type="button"
                 onClick={() => onSimulateTick('UP', 2.5)}
-                className="h-8 rounded bg-[#00a572]/20 hover:bg-[#00a572]/30 text-[#4edea3] text-[11px] font-semibold font-mono flex items-center justify-center gap-1 border border-[#00a572]/40 active:scale-95 transition-all"
+                className="h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-xs font-semibold font-mono flex items-center justify-center gap-1 border border-emerald-200 dark:border-emerald-800 active:scale-95 transition-all cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[14px]">north</span>
+                <TrendingUp className="w-3.5 h-3.5" />
                 <span>Simulate +2.5% Spike</span>
               </button>
               <button
                 type="button"
                 onClick={() => onSimulateTick('DOWN', 2.5)}
-                className="h-8 rounded bg-[#93000a]/25 hover:bg-[#93000a]/35 text-[#ffb4ab] text-[11px] font-semibold font-mono flex items-center justify-center gap-1 border border-[#93000a]/40 active:scale-95 transition-all"
+                className="h-8 rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 text-xs font-semibold font-mono flex items-center justify-center gap-1 border border-rose-200 dark:border-rose-800 active:scale-95 transition-all cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[14px]">south</span>
+                <TrendingDown className="w-3.5 h-3.5" />
                 <span>Simulate -2.5% Dip</span>
               </button>
             </div>
@@ -286,14 +298,14 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
           {/* Active Alerts List */}
           <div className="space-y-2">
             <div className="flex items-center justify-between px-1">
-              <span className="text-[12px] font-semibold text-[#d4e4fa]">
-                Configured Watcher Triggers ({stockAlerts.length})
+              <span className="text-xs font-bold text-slate-900 dark:text-white">
+                Active Watcher Triggers ({stockAlerts.length})
               </span>
-              <span className="text-[11px] text-[#8c909f] font-mono">Stored in LocalStorage</span>
+              <span className="text-[11px] text-slate-400 font-mono">Stored in LocalStorage</span>
             </div>
 
             {stockAlerts.length === 0 ? (
-              <div className="p-4 rounded-xl bg-[#0d1c2d] border border-[#1c2b3c] text-center text-[#8c909f] text-[12px]">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 text-center text-slate-400 text-xs">
                 No price alerts set for {currentStock.ticker} yet. Configure one above!
               </div>
             ) : (
@@ -307,65 +319,61 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
                       key={a.id}
                       className={`p-3 rounded-xl border flex items-center justify-between transition-all ${
                         a.isActive
-                          ? 'bg-[#0d1c2d] border-[#1c2b3c]'
-                          : 'bg-[#051424] border-[#1c2b3c]/50 opacity-60'
+                          ? 'bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'
+                          : 'bg-slate-50 dark:bg-slate-900/40 border-slate-100 dark:border-slate-800 opacity-60'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div
                           className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                             isAbove
-                              ? 'bg-[#00a572]/20 text-[#4edea3]'
-                              : 'bg-[#93000a]/30 text-[#ffb4ab]'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600'
+                              : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600'
                           }`}
                         >
-                          <span className="material-symbols-outlined text-[16px]">
-                            {isAbove ? 'arrow_upward' : 'arrow_downward'}
-                          </span>
+                          {isAbove ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                         </div>
                         <div className="flex flex-col min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <span className="font-mono text-[13px] font-bold text-[#d4e4fa]">
+                            <span className="font-mono text-xs font-bold text-slate-900 dark:text-white">
                               {isAbove ? '≥' : '≤'} ₹{a.targetPrice.toFixed(2)}
                             </span>
                             <span
                               className={`text-[10px] font-mono px-1.5 py-0.2 rounded font-semibold ${
                                 isAbove
-                                  ? 'bg-[#00a572]/15 text-[#4edea3]'
-                                  : 'bg-[#93000a]/20 text-[#ffb4ab]'
+                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                  : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
                               }`}
                             >
                               {distance >= 0 ? '+' : ''}{distance.toFixed(1)}% away
                             </span>
                           </div>
-                          <span className="text-[11px] text-[#8c909f] truncate">
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
                             {a.note || `Base price: ₹${a.createdPrice.toFixed(2)}`}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-1 shrink-0">
                         <button
                           type="button"
                           onClick={() => onToggleAlert(a.id)}
-                          className={`w-7 h-7 rounded flex items-center justify-center transition-colors ${
+                          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                             a.isActive
-                              ? 'text-[#4edea3] hover:bg-[#00a572]/20'
-                              : 'text-[#8c909f] hover:bg-[#1c2b3c]'
+                              ? 'text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-950/40'
+                              : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                           }`}
                           title={a.isActive ? 'Active watcher' : 'Muted'}
                         >
-                          <span className="material-symbols-outlined text-[18px]">
-                            {a.isActive ? 'notifications_active' : 'notifications_off'}
-                          </span>
+                          {a.isActive ? <BellRing className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
                         </button>
                         <button
                           type="button"
                           onClick={() => onDeleteAlert(a.id)}
-                          className="w-7 h-7 rounded flex items-center justify-center text-[#8c909f] hover:text-[#ffb4ab] hover:bg-[#93000a]/20 transition-colors"
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
                           title="Delete alert"
                         >
-                          <span className="material-symbols-outlined text-[16px]">delete</span>
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -377,16 +385,16 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
             {/* Other Active Equities with Alerts */}
             {otherAlerts.length > 0 && (
               <div className="pt-2">
-                <span className="text-[11px] text-[#8c909f] font-mono block pb-1">
+                <span className="text-[11px] text-slate-400 font-mono block pb-1">
                   Other Active Monitored Assets ({otherAlerts.length})
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {otherAlerts.map((oa) => (
                     <span
                       key={oa.id}
-                      className="px-2 py-0.5 rounded-full bg-[#1c2b3c] text-[#c2c6d6] text-[10px] font-mono flex items-center gap-1 border border-[#273647]"
+                      className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-mono flex items-center gap-1 border border-slate-200 dark:border-slate-700"
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#adc6ff]"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
                       {oa.ticker} ({oa.condition === 'ABOVE' ? '≥' : '≤'} ₹{oa.targetPrice})
                     </span>
                   ))}
@@ -397,13 +405,13 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-3 bg-[#1c2b3c]/40 border-t border-[#1c2b3c] flex items-center justify-between">
-          <span className="text-[11px] text-[#8c909f] font-mono">
-            Encrypted Client Trigger Engine
+        <div className="p-3.5 sm:p-4 bg-slate-50/50 dark:bg-[#121c2d]/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <span className="text-xs text-slate-400 font-mono">
+            Client Trigger Engine Active
           </span>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-[#273647] hover:bg-[#314256] text-[#d4e4fa] text-[12px] font-semibold transition-colors"
+            className="px-4 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors cursor-pointer"
           >
             Done
           </button>

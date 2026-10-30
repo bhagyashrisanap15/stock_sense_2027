@@ -1,6 +1,20 @@
 import React, { useState, useMemo } from 'react';
+import {
+  Search,
+  X,
+  History,
+  TrendingUp,
+  TrendingDown,
+  Bookmark,
+  BookmarkCheck,
+  ArrowRight,
+  ShieldCheck,
+  Sparkles,
+  Layers,
+  Info
+} from 'lucide-react';
 import { StockData } from '../types';
-import { HOTLINKED_ASSETS, getAllIndianStocks, getStockData, STOCKS_DATA } from '../data/stocks';
+import { getAllIndianStocks, getStockData } from '../data/stocks';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -32,12 +46,12 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   if (!isOpen) return null;
 
   const filterOptions = [
-    { id: 'all', label: 'All NSE / BSE Equities', icon: 'check' },
-    { id: 'IT / Tech', label: 'IT & Software', icon: 'memory' },
+    { id: 'all', label: 'All NSE / BSE Equities' },
+    { id: 'IT / Tech', label: 'IT & Software' },
     { id: 'Banking', label: 'Banks & NBFCs' },
     { id: 'Auto & Metals', label: 'Auto & Metals' },
-    { id: 'Bullish (UP)', label: 'AI Bullish', dotColor: '#4edea3' },
-    { id: 'Neutral', label: 'AI Neutral', dotColor: '#adc6ff' },
+    { id: 'Bullish (UP)', label: 'AI Bullish' },
+    { id: 'Neutral', label: 'AI Neutral' },
     { id: 'Energy', label: 'Energy & Petrochem' }
   ];
 
@@ -61,7 +75,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
       return s.sector.includes('Auto') || s.sector.includes('Metal') || s.sector.includes('Steel');
     }
     if (selectedFilter === 'Energy') {
-      return s.sector.includes('Energy') || s.sector.includes('Oil') || s.sector.includes('Petro');
+      return s.sector.includes('Energy') || s.sector.includes('Power') || s.sector.includes('Oil');
     }
     if (selectedFilter === 'Bullish (UP)') {
       return s.direction === 'UP';
@@ -82,374 +96,220 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#051424] flex flex-col animate-in fade-in duration-200">
-      {/* Header */}
-      <header className="sticky top-0 w-full z-50 pt-safe bg-[#051424]/90 backdrop-blur-xl border-b border-[#1c2b3c] shadow-sm">
-        <div className="h-16 px-4 flex items-center justify-between gap-2 max-w-2xl mx-auto">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <button
-              onClick={onClose}
-              className="w-10 h-10 -ml-1 flex items-center justify-center text-[#c2c6d6] hover:text-[#d4e4fa] rounded-lg hover:bg-[#1c2b3c] transition-colors"
-              aria-label="Close search modal"
-            >
-              <span className="material-symbols-outlined text-[24px]">close</span>
-            </button>
-            <div className="w-7 h-7 rounded bg-[#1c2b3c] p-1 flex items-center justify-center shrink-0 border border-[#273647]">
-              <span className="material-symbols-outlined text-[18px] text-[#4d8eff]">analytics</span>
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-start justify-center p-2 sm:p-4 md:p-6 animate-in fade-in duration-150">
+      <div className="bg-white dark:bg-[#0c1524] border border-slate-200/90 dark:border-slate-800 rounded-3xl w-full max-w-3xl shadow-2xl flex flex-col overflow-hidden my-auto max-h-[92vh]">
+        
+        {/* Modal Top Header */}
+        <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50/50 dark:bg-[#121c2d]/50 shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-300 flex items-center justify-center border border-teal-200/60 dark:border-teal-800">
+              <Search className="w-4.5 h-4.5" />
             </div>
-            <div className="flex flex-col min-w-0">
-              <h1 className="text-[#d4e4fa] font-semibold text-[17px] tracking-tight leading-none truncate">
-                Search Modal
-              </h1>
-              <span className="text-[#c2c6d6] text-[11px] leading-tight truncate mt-0.5">
-                StockSense Intelligence
+            <div>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
+                Search Indian Equities
+              </h2>
+              <span className="text-xs text-slate-400">
+                Live NSE/BSE price lookup & AI forecast
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            <img
-              src={HOTLINKED_ASSETS.profile}
-              alt="Profile"
-              className="w-8 h-8 rounded-full object-cover border border-[#4d8eff]/30"
-            />
-          </div>
-        </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="flex-1 w-full max-w-2xl mx-auto px-4 py-4 space-y-4">
-        {/* Search Bar Container */}
-        <div className="relative flex items-center w-full bg-[#122131] rounded-xl shadow-md border border-[#1c2b3c]">
-          <div className="pl-3.5 pr-2 flex items-center justify-center text-[#adc6ff] pointer-events-none">
-            <span className="material-symbols-outlined text-[22px]">search</span>
-          </div>
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search stock by name, symbol, or ISIN (e.g. RELIANCE, TCS)..."
-            className="w-full bg-transparent py-3 pr-2 font-mono text-[13px] text-[#d4e4fa] focus:outline-none placeholder:text-[#8c909f]"
-            autoFocus
-          />
-          <div className="flex items-center space-x-1.5 pr-3">
-            {query && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#1c2b3c] text-[#adc6ff] text-[11px] font-semibold tracking-wide">
-                QUERY: {query.toUpperCase()}
-              </span>
-            )}
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            aria-label="Close search"
+          >
+            <X className="w-4.5 h-4.5" />
+          </button>
+        </div>
+
+        {/* Search Bar Input */}
+        <div className="p-4 sm:p-5 pb-3 border-b border-slate-100 dark:border-slate-800/80 flex flex-col gap-3 shrink-0">
+          <div className="relative flex items-center w-full">
+            <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by company name, ticker or sector (e.g. Reliance, TCS, HDFC)..."
+              className="w-full h-12 pl-11 pr-20 bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
+              autoFocus
+            />
             {query && (
               <button
                 onClick={() => setQuery('')}
-                className="w-7 h-7 flex items-center justify-center rounded-full text-[#c2c6d6] hover:text-[#d4e4fa] hover:bg-[#273647] transition-colors"
-                title="Clear input"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold px-2 py-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[18px]">cancel</span>
+                Clear
               </button>
             )}
           </div>
-        </div>
 
-        {/* Live Execution Micro-pill (FastAPI Telemetry) */}
-        <div className="flex items-center justify-between px-1 text-[11px] text-[#c2c6d6]">
-          <div className="flex items-center space-x-1.5 font-mono">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#4edea3] animate-pulse"></span>
-            <span className="text-[#4edea3] font-semibold">18ms</span>
-            <span>•</span>
-            <span className="text-[#8c909f]">via FastAPI /api/stocks/search</span>
-          </div>
-          <span className="text-[#8c909f] font-mono">
-            {filteredStocks.length} Instruments Found
-          </span>
-        </div>
-
-        {/* Horizontal Scrollable Filter Ribbons */}
-        <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
-          {filterOptions.map((f) => {
-            const isActive = selectedFilter === f.id || (f.id === 'all' && selectedFilter === 'all');
-            return (
-              <button
-                key={f.id}
-                onClick={() => setSelectedFilter(f.id === selectedFilter ? 'all' : f.id)}
-                className={`flex-shrink-0 flex items-center space-x-1 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all ${
-                  isActive
-                    ? 'bg-[#4d8eff] text-[#00285d] font-semibold shadow-sm'
-                    : 'bg-[#1c2b3c] text-[#d4e4fa] hover:bg-[#273647]'
-                }`}
-              >
-                {f.icon === 'memory' && (
-                  <span className="material-symbols-outlined text-[14px] text-[#adc6ff]">memory</span>
-                )}
-                {f.dotColor && (
-                  <span
-                    className="w-2 h-2 rounded-full inline-block mr-0.5"
-                    style={{ backgroundColor: f.dotColor }}
-                  />
-                )}
-                <span>{f.label}</span>
-                {isActive && (
-                  <span className="material-symbols-outlined text-[14px]">check</span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Recent Searches & Trending History Strip */}
-        {recentSearches.length > 0 && (
-          <section className="flex flex-col space-y-1 bg-[#0d1c2d] p-3 rounded-xl border border-[#1c2b3c]/80">
-            <div className="flex items-center justify-between pb-1">
-              <div className="flex items-center space-x-1.5 text-[#c2c6d6] text-[11px] uppercase tracking-wider font-semibold">
-                <span className="material-symbols-outlined text-[16px] text-[#adc6ff]">history</span>
-                <span>Recent Searches & Trending</span>
-              </div>
-              <button
-                onClick={() => setRecentSearches([])}
-                className="text-[#adc6ff] hover:text-[#d4e4fa] text-[11px] font-medium transition-colors"
-              >
-                Clear History
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2 pt-1">
-              {recentSearches.map((item) => (
-                <div
-                  key={item.ticker}
-                  className="flex items-center space-x-1.5 bg-[#122131] px-2.5 py-1.5 rounded-lg text-[#d4e4fa] text-[12px] border border-[#1c2b3c]"
-                >
-                  <button
-                    onClick={() => {
-                      const stock = getStockData(item.ticker);
-                      if (stock) handleSelect(stock);
-                    }}
-                    className="font-mono hover:text-[#adc6ff] transition-colors font-medium"
-                  >
-                    {item.ticker}
-                  </button>
-                  <span
-                    className={`font-mono text-[11px] font-semibold ${
-                      item.isPositive ? 'text-[#4edea3]' : 'text-[#ffb4ab]'
-                    }`}
-                  >
-                    {item.change}
-                  </span>
-                  <button
-                    onClick={() => removeRecent(item.ticker)}
-                    className="text-[#8c909f] hover:text-[#ffb4ab] transition-colors ml-0.5"
-                    aria-label={`Remove ${item.ticker}`}
-                  >
-                    <span className="material-symbols-outlined text-[14px]">close</span>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Live Search Results Header */}
-        <div className="flex items-center justify-between pt-1">
-          <div className="flex items-center space-x-2">
-            <span className="material-symbols-outlined text-[#adc6ff] text-[20px]">troubleshoot</span>
-            <h2 className="text-[#d4e4fa] font-semibold text-[15px]">Verified Match Results</h2>
-          </div>
-          <span className="text-[#c2c6d6] text-[11px] font-mono">Models: Daily Close (v4.2)</span>
-        </div>
-
-        {/* Result Cards Stack */}
-        <div className="flex flex-col space-y-3">
-          {filteredStocks.map((stock) => {
-            const isWatchlisted = watchlist.includes(stock.ticker);
-            const isUp = stock.direction === 'UP';
-            const isDown = stock.direction === 'DOWN';
-            const isNeutral = stock.direction === 'NEUTRAL';
-
-            return (
-              <div
-                key={stock.ticker}
-                className="bg-[#122131] p-4 rounded-xl shadow-sm border border-[#1c2b3c] flex flex-col space-y-3 relative overflow-hidden transition-all hover:border-[#273647]"
-              >
-                {/* Accent Top Line */}
-                <div
-                  className={`absolute top-0 left-0 right-0 h-1 ${
-                    isUp
-                      ? 'bg-[#4edea3]'
-                      : isDown
-                      ? 'bg-[#ffb4ab]'
-                      : 'bg-[#adc6ff]'
+          {/* Category Filter Chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+            {filterOptions.map((f) => {
+              const isActive = selectedFilter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setSelectedFilter(isActive ? 'all' : f.id)}
+                  className={`shrink-0 px-3 py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-teal-600 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
-                />
+                >
+                  {f.label}
+                </button>
+              );
+            })}
+          </div>
 
-                {/* Header Row: Symbol & Price */}
-                <div className="flex items-start justify-between min-w-0 pt-1">
-                  <div className="flex flex-col min-w-0 pr-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-bold text-[17px] text-[#d4e4fa] tracking-tight">
-                        {stock.ticker}
-                      </span>
-                      <span className="text-[#c2c6d6] text-[13px] truncate">
-                        • {stock.name}
-                      </span>
-                    </div>
-                    <span className="text-[#8c909f] text-[11px] font-mono mt-0.5">
-                      {stock.exchange}: {stock.ticker}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-end flex-shrink-0">
-                    <span className="font-bold text-[16px] text-[#d4e4fa] font-mono">
-                      ₹{stock.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                    </span>
-                    <span
-                      className={`font-mono text-[12px] flex items-center space-x-0.5 ${
-                        stock.changePercent >= 0 ? 'text-[#4edea3]' : 'text-[#ffb4ab]'
-                      }`}
+          {/* Recent Searches Strip */}
+          {recentSearches.length > 0 && !query && (
+            <div className="flex items-center gap-2 pt-1 overflow-x-auto no-scrollbar">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
+                <History className="w-3 h-3" />
+                Recent:
+              </span>
+              <div className="flex items-center gap-1.5">
+                {recentSearches.map((item) => (
+                  <div
+                    key={item.ticker}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-mono border border-slate-200/60 dark:border-slate-700"
+                  >
+                    <button
+                      onClick={() => {
+                        const stock = getStockData(item.ticker);
+                        if (stock) handleSelect(stock);
+                      }}
+                      className="font-bold text-slate-800 dark:text-slate-200 hover:text-teal-600 cursor-pointer"
                     >
-                      <span className="material-symbols-outlined text-[13px]">
-                        {stock.changePercent >= 0 ? 'trending_up' : 'trending_down'}
-                      </span>
-                      <span>
-                        {stock.changePercent >= 0 ? '+' : ''}
-                        {stock.changePercent}% intraday
-                      </span>
+                      {item.ticker}
+                    </button>
+                    <span className={`text-[11px] font-semibold ${item.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {item.change}
                     </span>
+                    <button
+                      onClick={() => removeRecent(item.ticker)}
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-0.5 cursor-pointer"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
                   </div>
-                </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
-                {/* Metadata & Sector Badges */}
-                <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-[#c2c6d6]">
-                  <span className="px-2 py-0.5 rounded bg-[#1c2b3c] text-[#d4e4fa]">
-                    {stock.sector}
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-[#1c2b3c] text-[#c2c6d6]">
-                    {stock.marketCap}
-                  </span>
-                </div>
+        {/* Stock Results Scrollable List */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 flex flex-col gap-2.5 min-h-[240px]">
+          {filteredStocks.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {filteredStocks.map((stock) => {
+                const isWatchlisted = watchlist.includes(stock.ticker);
+                const isPos = stock.changePercent >= 0;
 
-                {/* Machine Learning Predictive Signal Block */}
-                <div className="bg-[#010f1f]/80 p-3 rounded-lg flex flex-col space-y-2 border border-[#1c2b3c]">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-1.5">
-                      <span
-                        className={`w-2 h-2 rounded-full ${
-                          isUp ? 'bg-[#4edea3]' : isDown ? 'bg-[#ffb4ab]' : 'bg-[#adc6ff]'
-                        }`}
-                      />
-                      <span
-                        className={`text-[12px] font-semibold tracking-wide ${
-                          isUp ? 'text-[#4edea3]' : isDown ? 'text-[#ffb4ab]' : 'text-[#adc6ff]'
-                        }`}
-                      >
-                        {stock.directionLabel}
-                      </span>
-                    </div>
-                    <span className="text-[#c2c6d6] text-[11px] font-mono">
-                      {stock.confidence}% Conf. • {stock.activeModel}
-                    </span>
-                  </div>
-
-                  {/* SHAP Factor Highlight */}
-                  {stock.shapFactors.length > 0 && (
-                    <div className="pt-1 flex flex-col space-y-1">
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-[#8c909f]">Key Factor Attribution (SHAP)</span>
-                        <span className="text-[#4edea3] font-mono font-medium">
-                          {isUp ? '+0.47 Net Boost' : '-0.03 delta'}
-                        </span>
-                      </div>
-                      <div className="bg-[#1c2b3c] rounded p-2 text-[12px] space-y-1">
-                        {stock.shapFactors.slice(0, 2).map((factor, idx) => (
-                          <div key={idx} className="flex items-center justify-between">
-                            <span className="text-[#c2c6d6] flex items-center space-x-1 truncate max-w-[200px]">
-                              <span
-                                className={`material-symbols-outlined text-[14px] ${
-                                  factor.impact >= 0 ? 'text-[#4edea3]' : 'text-[#ffb4ab]'
-                                }`}
-                              >
-                                {factor.impact >= 0 ? 'north_east' : 'south_east'}
-                              </span>
-                              <span className="truncate">{factor.feature}</span>
+                return (
+                  <div
+                    key={stock.ticker}
+                    onClick={() => handleSelect(stock)}
+                    className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 hover:border-teal-400 dark:hover:border-teal-600 transition-all cursor-pointer flex flex-col justify-between gap-3 group"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-2.5 min-w-0 pr-2">
+                        <div className="w-9 h-9 rounded-xl bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-400 flex items-center justify-center font-bold font-mono text-xs border border-slate-200 dark:border-slate-700 shadow-2xs shrink-0">
+                          {stock.ticker.slice(0, 3)}
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-teal-600 transition-colors">
+                              {stock.ticker}
                             </span>
-                            <span
-                              className={`font-mono text-[11px] font-semibold ${
-                                factor.impact >= 0 ? 'text-[#4edea3]' : 'text-[#ffb4ab]'
-                              }`}
-                            >
-                              {factor.impact >= 0 ? '+' : ''}
-                              {factor.impact.toFixed(2)}
+                            <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                              {stock.exchange}
                             </span>
                           </div>
-                        ))}
+                          <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                            {stock.name}
+                          </span>
+                          <span className="text-[10px] text-teal-600 dark:text-teal-400 font-medium">
+                            {stock.sector}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-end shrink-0">
+                        <span className="font-mono font-bold text-sm text-slate-900 dark:text-white">
+                          ₹{stock.price.toFixed(2)}
+                        </span>
+                        <span
+                          className={`font-mono text-xs font-semibold flex items-center gap-0.5 ${
+                            isPos ? 'text-emerald-600' : 'text-rose-600'
+                          }`}
+                        >
+                          {isPos ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                          {isPos ? '+' : ''}{stock.changePercent.toFixed(2)}%
+                        </span>
                       </div>
                     </div>
-                  )}
 
-                  {/* Institutional Risk Gauge */}
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-center space-x-1.5">
-                      <span className="material-symbols-outlined text-[14px] text-[#c2c6d6]">shield</span>
-                      <span className="text-[#c2c6d6] text-[11px]">Risk Assessment:</span>
-                      <span
-                        className={`font-mono text-[11px] font-semibold ${
-                          stock.riskScore < 35
-                            ? 'text-[#4edea3]'
-                            : stock.riskScore < 55
-                            ? 'text-[#adc6ff]'
-                            : 'text-[#ffb4ab]'
-                        }`}
-                      >
-                        {stock.riskCategory} RISK ({stock.riskScore}/100)
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-800 text-xs">
+                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-teal-600" />
+                        AI: <strong className="text-slate-700 dark:text-slate-300">{stock.direction}</strong> ({stock.confidence}%)
                       </span>
-                    </div>
-                    <div className="w-16 h-1.5 bg-[#1c2b3c] rounded-full overflow-hidden flex">
-                      <div
-                        className={`h-full rounded-full ${
-                          stock.riskScore < 35
-                            ? 'bg-[#4edea3]'
-                            : stock.riskScore < 55
-                            ? 'bg-[#4d8eff]'
-                            : 'bg-[#ffb4ab]'
-                        }`}
-                        style={{ width: `${stock.riskScore}%` }}
-                      />
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleWatchlist(stock.ticker);
+                          }}
+                          className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer transition-colors ${
+                            isWatchlisted
+                              ? 'text-teal-600 bg-teal-50 dark:bg-teal-950/40'
+                              : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                          }`}
+                          title={isWatchlisted ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                        >
+                          {isWatchlisted ? (
+                            <BookmarkCheck className="w-4 h-4 text-teal-600" />
+                          ) : (
+                            <Bookmark className="w-4 h-4" />
+                          )}
+                        </button>
+                        <span className="text-teal-600 group-hover:translate-x-0.5 transition-transform flex items-center">
+                          <ArrowRight className="w-4 h-4" />
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Action Footer */}
-                <div className="flex items-center space-x-2 pt-1">
-                  <button
-                    onClick={() => handleSelect(stock)}
-                    className="flex-1 py-2 px-3 rounded-lg bg-[#4d8eff] hover:bg-[#adc6ff] text-[#00285d] font-semibold text-[13px] flex items-center justify-center space-x-1 shadow active:scale-[0.99] transition-all"
-                  >
-                    <span>Analyze Stock</span>
-                    <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                  </button>
-                  <button
-                    onClick={() => onToggleWatchlist(stock.ticker)}
-                    className={`py-2 px-3 rounded-lg text-[13px] font-medium flex items-center space-x-1 transition-all ${
-                      isWatchlisted
-                        ? 'bg-[#00a572] text-[#00311f]'
-                        : 'bg-[#1c2b3c] text-[#c2c6d6] hover:text-[#d4e4fa]'
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-[16px]">
-                      {isWatchlisted ? 'check' : 'bookmark_add'}
-                    </span>
-                    <span>{isWatchlisted ? 'Watchlisted' : '+ Watchlist'}</span>
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          ) : (
+            <div className="py-12 flex flex-col items-center justify-center text-center gap-2">
+              <Search className="w-10 h-10 text-slate-300 dark:text-slate-600" />
+              <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                No matching Indian equities found
+              </span>
+              <p className="text-xs text-slate-400 max-w-sm">
+                Try searching for company names like "Tata", "Reliance", "Infosys", or sector names like "Banking".
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Compliance & Academic Model Disclaimer */}
-        <section className="bg-[#010f1f] p-3 rounded-lg flex items-start space-x-2 mt-3 text-[#8c909f] border border-[#1c2b3c]">
-          <span className="material-symbols-outlined text-[18px] text-[#adc6ff] flex-shrink-0 mt-0.5">
-            info
-          </span>
-          <p className="text-[11px] leading-relaxed">
-            <strong className="text-[#c2c6d6]">Academic Modeling Disclaimer:</strong> StockSense search returns verified NSE/BSE listed equities for quantitative simulation and backtesting purposes. Predictions represent non-advisory statistical inferences generated through ensemble machine learning models.
-          </p>
-        </section>
-      </main>
+        {/* Footer */}
+        <div className="p-3 sm:p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-400 bg-slate-50/50 dark:bg-[#121c2d]/50 shrink-0">
+          <span>{filteredStocks.length} Indian Equities Loaded</span>
+          <span className="font-mono">Press ESC or click Outside to Close</span>
+        </div>
+
+      </div>
     </div>
   );
 };

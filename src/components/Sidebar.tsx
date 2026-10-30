@@ -56,6 +56,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenHelp,
   userProfile
 }) => {
+  // On mobile drawer, always render fully expanded; on desktop, respect isCollapsed
+  const isEffectiveCollapsed = isCollapsed && !isMobileOpen;
+
   // Ordered primary navigation items
   const primaryNavItems: NavItem[] = [
     { id: 'dashboard', label: 'Home', icon: Home },
@@ -103,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             isActive
               ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 shadow-xs font-bold'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/60'
-          } ${isCollapsed ? 'justify-center px-2' : ''}`}
+          } ${isEffectiveCollapsed ? 'justify-center px-2' : ''}`}
         >
           {/* Active left indicator strip */}
           {isActive && (
@@ -120,7 +123,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           </div>
 
-          {!isCollapsed && (
+          {!isEffectiveCollapsed && (
             <div className="flex items-center justify-between flex-1 min-w-0">
               <span className="truncate tracking-tight">{item.label}</span>
               {item.badge && (
@@ -139,7 +142,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
 
         {/* Floating Tooltip in Collapsed Mode */}
-        {isCollapsed && (
+        {isEffectiveCollapsed && (
           <div className="hidden md:group-hover/navitem:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium shadow-xl border border-slate-800 pointer-events-none whitespace-nowrap">
             <span>{item.label}</span>
             {item.badge && (
@@ -170,7 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <Sparkles className="w-5 h-5" />
           </button>
 
-          {!isCollapsed && (
+          {!isEffectiveCollapsed && (
             <div className="flex flex-col min-w-0">
               <span className="font-bold text-base tracking-tight text-slate-900 dark:text-white leading-none">
                 StockSense
@@ -217,7 +220,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Item 7: Expandable "More Tools" Section */}
         <div className="pt-2 mt-1 border-t border-slate-100 dark:border-slate-800/80">
-          {!isCollapsed ? (
+          {!isEffectiveCollapsed ? (
             <div>
               <button
                 type="button"
@@ -270,12 +273,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
             className={`w-full flex items-center gap-3 py-2 px-3 rounded-xl text-left text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer ${
               currentTab === 'profile' ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-bold' : ''
-            } ${isCollapsed ? 'justify-center px-2' : ''}`}
+            } ${isEffectiveCollapsed ? 'justify-center px-2' : ''}`}
           >
             <Settings className="w-4 h-4 text-slate-400 shrink-0" />
-            {!isCollapsed && <span>Settings</span>}
+            {!isEffectiveCollapsed && <span>Settings</span>}
           </button>
-          {isCollapsed && (
+          {isEffectiveCollapsed && (
             <div className="hidden md:group-hover/navitem:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 items-center px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium shadow-xl pointer-events-none whitespace-nowrap">
               <span>Settings</span>
             </div>
@@ -288,13 +291,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             type="button"
             onClick={onOpenHelp}
             className={`w-full flex items-center gap-3 py-2 px-3 rounded-xl text-left text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer ${
-              isCollapsed ? 'justify-center px-2' : ''
+              isEffectiveCollapsed ? 'justify-center px-2' : ''
             }`}
           >
             <HelpCircle className="w-4 h-4 text-slate-400 shrink-0" />
-            {!isCollapsed && <span>Help & Shortcuts</span>}
+            {!isEffectiveCollapsed && <span>Help & Shortcuts</span>}
           </button>
-          {isCollapsed && (
+          {isEffectiveCollapsed && (
             <div className="hidden md:group-hover/navitem:flex absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-50 items-center px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium shadow-xl pointer-events-none whitespace-nowrap">
               <span>Help & Shortcuts (?)</span>
             </div>
@@ -303,7 +306,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* User Profile Card at Bottom */}
         <div className="pt-2 mt-1 border-t border-slate-200/60 dark:border-slate-800/80">
-          {!isCollapsed ? (
+          {!isEffectiveCollapsed ? (
             <div
               onClick={() => handleSelectTab('profile')}
               className="p-2 rounded-xl flex items-center justify-between gap-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group"

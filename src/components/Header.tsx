@@ -80,16 +80,16 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-30 w-full bg-white/95 dark:bg-[#0c1524]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 transition-colors shadow-xs">
-      <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div className="w-full px-3.5 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
         
         {/* Left: Mobile Drawer Hamburger & Page Breadcrumb / Title */}
-        <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {/* Hamburger for mobile slide-out drawer */}
           {onToggleMobileMenu && (
             <button
               type="button"
               onClick={onToggleMobileMenu}
-              className="md:hidden p-2 -ml-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="md:hidden p-2 -ml-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
               aria-label="Open sidebar drawer"
               title="Open Navigation Menu"
             >
@@ -98,14 +98,14 @@ export const Header: React.FC<HeaderProps> = ({
           )}
 
           {/* Breadcrumb / Page Title */}
-          <div className="flex items-center gap-2 text-sm min-w-0">
-            <span className="font-bold text-base md:text-lg text-slate-900 dark:text-white tracking-tight truncate">
+          <div className="flex items-center gap-1.5 sm:gap-2 text-sm min-w-0">
+            <span className="font-bold text-sm sm:text-base md:text-lg text-slate-900 dark:text-white tracking-tight truncate">
               {tabInfo.title}
             </span>
 
             {/* Optional breadcrumb ticker badge */}
             {(currentTab === 'dashboard' || currentTab === 'ai-predict' || currentTab === 'markets' || currentTab === 'technical-analysis') && currentStockTicker && (
-              <div className="hidden sm:flex items-center gap-1.5 min-w-0">
+              <div className="hidden sm:flex items-center gap-1.5 min-w-0 shrink-0">
                 <span className="text-slate-300 dark:text-slate-700">/</span>
                 <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-md bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200/70 dark:border-teal-800/60 truncate">
                   NSE: {currentStockTicker}
@@ -116,12 +116,12 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Right: Search, Export, Bell, Theme, Profile Dropdown */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {/* Search Trigger Button */}
           <button
             type="button"
             onClick={onOpenSearch}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 text-slate-500 dark:text-slate-300 text-xs font-medium transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 text-slate-500 dark:text-slate-300 text-xs font-medium transition-colors cursor-pointer"
             title="Search stocks (⌘K)"
           >
             <Search className="w-3.5 h-3.5" />

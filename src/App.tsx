@@ -182,9 +182,15 @@ export default function App() {
     if (theme === 'light') {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.body.classList.add('light');
+      document.body.classList.remove('dark');
     } else {
       document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.body.classList.add('dark');
+      document.body.classList.remove('light');
     }
   }, [theme]);
 
@@ -680,8 +686,8 @@ export default function App() {
           userProfile={userProfile}
         />
 
-        {/* Main Content Viewport: 24-32px padding */}
-        <main className="flex-1 w-full max-w-[1600px] mx-auto px-6 sm:px-8 py-6 flex flex-col pb-16 md:pb-8">
+        {/* Main Content Viewport: responsive across mobile, laptop and large lab screens */}
+        <main className="flex-1 w-full max-w-[1680px] 2xl:max-w-[1840px] mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col pb-24 md:pb-8">
           {renderActiveScreen()}
         </main>
       </div>

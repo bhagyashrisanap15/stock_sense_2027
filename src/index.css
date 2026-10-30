@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
   --color-surface: #051424;
   --color-surface-dim: #051424;
@@ -76,8 +78,8 @@
   }
   
   html.dark, body.dark {
-    background-color: #08101e;
-    color: #f1f5f9;
+    background-color: #08101e !important;
+    color: #f1f5f9 !important;
   }
   
   .font-data-mono {
